@@ -59,10 +59,8 @@ namespace TestAPIs
         public void Test2()
         {
             Item a = new Item { Name = "Food" };
-
             var reply = fixture.GetClient().GetAllItems(a);
             Assert.Contains<Item>(a, reply.List);
-            //Assert.Equal("Food", reply.List[1].Name);
         }
     }
 }
