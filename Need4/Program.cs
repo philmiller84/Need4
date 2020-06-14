@@ -36,14 +36,7 @@ namespace Need4
 
         public void Dispose() => _connection.Dispose();
     }
-    class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase
-    {
-        // Server side handler of the SayHello RPC
-        public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
-        {
-            return Task.FromResult(new ActionResponse { Result = 1 });
-        }
-    }
+
 
     public class ServiceHandler //: SharedService.IAsync
     {
@@ -54,7 +47,7 @@ namespace Need4
             server = new Server
             {
                 Services = { ItemRepository.BindService(new ItemRepositoryImpl()) },
-                Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
+                Ports = { new ServerPort("127.0.0.1", Port, ServerCredentials.Insecure) }
             };
             server.Start();
         }

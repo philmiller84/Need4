@@ -48,9 +48,17 @@ namespace TestAPIs
         public void Test1()
         {
             Item a = new Item { Name = "Food" };
-
             var reply = fixture.GetClient().AddNewItem(a);
-            Assert.Equal(0, reply.Result);
+            Assert.Equal(1, reply.Result);
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            Item a = new Item { Name = "Food" };
+
+            var reply = fixture.GetClient().GetAllItems(a);
+            Assert.Equal("Food", reply.List.Name);
         }
     }
 }

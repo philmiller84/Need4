@@ -16,4 +16,7 @@
 	<ItemGroup>
 		<Protobuf Include="**/*.proto" />
 	</ItemGroup>
+    <ItemGroup>
+	    <Content Include="obj/Debug/netcoreapp3.1/*.cs" />
+	</ItemGroup>
 </Project>
