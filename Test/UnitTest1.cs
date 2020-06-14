@@ -3,10 +3,8 @@ using Need4Protocol;
 using System;
 using Xunit;
 using Need4;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
-using System.Net.Http;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace TestAPIs
 {
@@ -15,7 +13,6 @@ namespace TestAPIs
         ItemRepository.ItemRepositoryClient client;
         Channel channel;
         ServiceHandler handler;
-        
 
         int port = 50051;
         string localhost_ip = "127.0.0.1";
@@ -40,6 +37,9 @@ namespace TestAPIs
 
     public class TestItems : IClassFixture<ServiceFixture>
     {
+        // TODO: Set this up to run in parallel to detect problems
+        // https://xunit.net/docs/running-tests-in-parallel.html
+
         ServiceFixture fixture;
 
         public TestItems(ServiceFixture fixture)
@@ -50,7 +50,7 @@ namespace TestAPIs
         [Fact]
         public void Test1()
         {
-            Item a = new Item { Name = "Food" };
+            Item a = new Item { Name = "Lemons" };
             var reply = fixture.GetClient().AddNewItem(a);
             Assert.Equal((int)HttpStatusCode.OK, reply.Result);
         }
