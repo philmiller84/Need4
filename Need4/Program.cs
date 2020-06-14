@@ -1,11 +1,41 @@
 ﻿using Grpc.Core;
 using Helloworld;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Models;
 using System;
+using System.Data.Common;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Need4
 {
     
+    public class SqliteInMemoryItemsControllerTest : IDisposable
+    {
+        private readonly DbConnection _connection;
+
+        //public SqliteInMemoryItemsControllerTest()
+        //    : base(
+        //        new DbContextOptionsBuilder<BloggingContext>()
+        //            .UseSqlite(CreateInMemoryDatabase())
+        //            .Options)
+        //{
+        //    _connection = RelationalOptionsExtension.Extract(ContextOptions).Connection;
+        //}
+
+        private static DbConnection CreateInMemoryDatabase()
+        {
+            var connection = new SqliteConnection("Filename=:memory:");
+
+            connection.Open();
+        
+            return connection;
+        }
+
+        public void Dispose() => _connection.Dispose();
+    }
     class GreeterImpl : Greeter.GreeterBase
     {
         // Server side handler of the SayHello RPC
