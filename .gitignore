@@ -6,6 +6,8 @@
 **/bin
 **/obj
 **/obj
+**/Migrations
+*.db
 PublishProfiles
 appsettings.json
 **/wwwroot/css
