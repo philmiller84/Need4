@@ -1,0 +1,11 @@
+
+*.dll
+*.pdb
+**/.vs
+**/bin
+**/bin
+**/obj
+**/obj
+PublishProfiles
+appsettings.json
+**/wwwroot/css
