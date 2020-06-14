@@ -18,7 +18,7 @@ namespace Need4
 
         //public SqliteInMemoryItemsControllerTest()
         //    : base(
-        //        new DbContextOptionsBuilder<BloggingContext>()
+        //        new DbContextOptionsBuilder<ItemContext>()
         //            .UseSqlite(CreateInMemoryDatabase())
         //            .Options)
         //{
