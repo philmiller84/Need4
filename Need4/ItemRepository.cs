@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Http;
 using Models;
+using System.Net;
 
 namespace Need4
 {
@@ -13,29 +15,28 @@ namespace Need4
         // Server side handler of the SayHello RPC
         public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
         {
-            //using (var db = new ItemContext())
-            //{
-                //db.Add(request);
-                //db.SaveChanges();
-            //}
-            
-            return Task.FromResult(new ActionResponse { Result = 1 });
+            using (var db = new ItemContext())
+            {
+                try
+                {
+                    db.Add(request);
+                    db.SaveChanges();
+                }
+                catch 
+                {
+                    return Task.FromResult(new ActionResponse { Result = (int) HttpStatusCode.Forbidden });
+                }
+            }
+
+            return Task.FromResult(new ActionResponse { Result = (int) HttpStatusCode.OK });
         }
 
         public override Task<ItemList> GetAllItems(Item request, ServerCallContext context)
         {
-            return Task.FromResult(new ItemList {List = new Item{Name = "Food" } });
+            //ItemList list = new ItemList {List = new Item{Name = "Food" } };
+            ItemList list = new ItemList();
+            list.List.Add(new Item { Name = "Food" });
+            return Task.FromResult(list);
         }
-
-        //public override Task<ActionResponse> GetAllItems(Item request, ServerCallContext context)
-        //{
-        //    using (var db = new ItemContext())
-        //    {
-        //        db.Add(request);
-        //        db.SaveChanges();
-        //    }
-            
-        //    return Task.FromResult(new ActionResponse { Result = 1 });
-        //}
     }
 }

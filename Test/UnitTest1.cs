@@ -5,6 +5,8 @@ using Xunit;
 using Need4;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net;
 
 namespace TestAPIs
 {
@@ -13,6 +15,7 @@ namespace TestAPIs
         ItemRepository.ItemRepositoryClient client;
         Channel channel;
         ServiceHandler handler;
+        
 
         int port = 50051;
         string localhost_ip = "127.0.0.1";
@@ -49,7 +52,7 @@ namespace TestAPIs
         {
             Item a = new Item { Name = "Food" };
             var reply = fixture.GetClient().AddNewItem(a);
-            Assert.Equal(1, reply.Result);
+            Assert.Equal((int)HttpStatusCode.OK, reply.Result);
         }
 
         [Fact]
@@ -58,7 +61,8 @@ namespace TestAPIs
             Item a = new Item { Name = "Food" };
 
             var reply = fixture.GetClient().GetAllItems(a);
-            Assert.Equal("Food", reply.List.Name);
+            Assert.Contains<Item>(a, reply.List);
+            //Assert.Equal("Food", reply.List[1].Name);
         }
     }
 }

@@ -5,11 +5,11 @@ import "protos/ActionResponse.proto";
 
 service ItemRepository {
 	rpc AddNewItem (Item) returns (ActionResponse);
-	rpc GetAllItems(Item) returns (ItemList);
+	rpc GetAllItems (Item) returns (ItemList);
 }
 
 message ItemList {
-	Item list = 1;
+	repeated Item list = 1;
 }
 
 message Item {
