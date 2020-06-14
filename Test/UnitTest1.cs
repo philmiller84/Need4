@@ -1,5 +1,5 @@
 using Grpc.Core;
-using Helloworld;
+using Need4Protocol;
 using System;
 using Xunit;
 using Need4;
@@ -10,20 +10,23 @@ namespace TestAPIs
 {
     public class ServiceFixture : IDisposable
     {
-        Greeter.GreeterClient client;
+        ItemRepository.ItemRepositoryClient client;
         Channel channel;
         ServiceHandler handler;
+
+        int port = 50051;
+        string localhost_ip = "127.0.0.1";
+
         public ServiceFixture()
         {
             handler = new ServiceHandler();
             handler.Startup();
-
-            channel = new Channel("127.0.0.1:50051", ChannelCredentials.Insecure);
-
-            client = new Greeter.GreeterClient(channel);
+            string connection = string.Format("{0}:{1}", localhost_ip, port);
+            channel = new Channel(connection, ChannelCredentials.Insecure);
+            client = new ItemRepository.ItemRepositoryClient(channel);
         }
     
-        public Greeter.GreeterClient GetClient() => client;
+        public ItemRepository.ItemRepositoryClient GetClient() => client;
     
         public void Dispose()
         {
@@ -32,10 +35,11 @@ namespace TestAPIs
         }
     }
 
-    public class UnitTest1 : IClassFixture<ServiceFixture>
+    public class TestItems : IClassFixture<ServiceFixture>
     {
         ServiceFixture fixture;
-        public UnitTest1(ServiceFixture fixture)
+
+        public TestItems(ServiceFixture fixture)
         {
             this.fixture = fixture;
         }
@@ -43,9 +47,10 @@ namespace TestAPIs
         [Fact]
         public void Test1()
         {
-            String user = "you";
-            var reply = fixture.GetClient().SayHello(new HelloRequest { Name = user });
-            Assert.Equal("Hello you", reply.Message);
+            Item a = new Item { Name = "Food" };
+
+            var reply = fixture.GetClient().AddNewItem(a);
+            Assert.Equal(0, reply.Result);
         }
     }
 }

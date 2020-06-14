@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+package Need4Protocol;
+import "protos/ActionResponse.proto";
+
+service ItemRepository {
+	rpc AddNewItem (Item) returns (ActionResponse);
+}
+
+message Item {
+	string name = 1;
+}

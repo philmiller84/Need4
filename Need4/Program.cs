@@ -1,5 +1,5 @@
 ﻿using Grpc.Core;
-using Helloworld;
+using Need4Protocol;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -36,12 +36,12 @@ namespace Need4
 
         public void Dispose() => _connection.Dispose();
     }
-    class GreeterImpl : Greeter.GreeterBase
+    class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase
     {
         // Server side handler of the SayHello RPC
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
+        public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
         {
-            return Task.FromResult(new HelloReply { Message = "Hello " + request.Name });
+            return Task.FromResult(new ActionResponse { Result = 1 });
         }
     }
 
@@ -53,7 +53,7 @@ namespace Need4
         {
             server = new Server
             {
-                Services = { Greeter.BindService(new GreeterImpl()) },
+                Services = { ItemRepository.BindService(new ItemRepositoryImpl()) },
                 Ports = { new ServerPort("localhost", Port, ServerCredentials.Insecure) }
             };
             server.Start();
