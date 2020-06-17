@@ -2,10 +2,12 @@
 
 package Need4Protocol;
 import "protos/ActionResponse.proto";
+import "google/protobuf/empty.proto";
 
 service ItemRepository {
 	rpc AddNewItem (Item) returns (ActionResponse);
-	rpc GetAllItems (Item) returns (ItemList);
+	rpc GetAllItems (google.protobuf.Empty) returns (ItemList);
+	rpc GetMatchingItems (Item) returns (ItemList);
 }
 
 message ItemList {
@@ -15,3 +17,4 @@ message ItemList {
 message Item {
 	string name = 1;
 }
+

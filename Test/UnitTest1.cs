@@ -5,9 +5,12 @@ using Xunit;
 using Need4;
 using System.Net;
 using System.Threading.Tasks;
+using Google.Protobuf.WellKnownTypes;
+
 
 namespace TestAPIs
 {
+
     public class ServiceFixture : IDisposable
     {
         ItemRepository.ItemRepositoryClient client;
@@ -41,26 +44,42 @@ namespace TestAPIs
         // https://xunit.net/docs/running-tests-in-parallel.html
 
         ServiceFixture fixture;
+        ItemRepository.ItemRepositoryClient client;
 
         public TestItems(ServiceFixture fixture)
         {
             this.fixture = fixture;
+            client = fixture.GetClient();
+        }
+
+        Item orange = new Item { Name = "Oranges" };
+        Item fruit = new Item { Name = "Fruit" };
+
+        [Fact]
+        public void AddItem()
+        {
+            var allItems = client.GetAllItems(new Empty());
+
+            client.AddNewItem(fruit);
+            var reply = client.AddNewItem(orange);
+            if(!allItems.List.Contains(orange))
+                Assert.Equal((int)HttpStatusCode.OK, reply.Result);
+            else
+                Assert.Equal((int)HttpStatusCode.Forbidden, reply.Result);
         }
 
         [Fact]
-        public void Test1()
+        public void GetAllItemsCheckOne()
         {
-            Item a = new Item { Name = "Lemons" };
-            var reply = fixture.GetClient().AddNewItem(a);
-            Assert.Equal((int)HttpStatusCode.OK, reply.Result);
+            var reply = client.GetAllItems(new Empty());
+            Assert.Contains<Item>(orange, reply.List);
         }
 
         [Fact]
-        public void Test2()
+        public void GetMatchingItems()
         {
-            Item a = new Item { Name = "Food" };
-            var reply = fixture.GetClient().GetAllItems(a);
-            Assert.Contains<Item>(a, reply.List);
+            var reply = client.GetMatchingItems(orange);
+            Assert.Contains<Item>(orange, reply.List);
         }
     }
 }
