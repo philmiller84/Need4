@@ -2,3 +2,6 @@
 
 For testing, the DB is read from the Test/bin/... location
 
+
+
+If you need join tables, us ethe Joins.cs in the API project

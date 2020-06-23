@@ -1,9 +1,7 @@
-﻿using Grpc.Core;
-using Microsoft.EntityFrameworkCore;
-using Google.Protobuf.WellKnownTypes;
+﻿using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using Models;
 using Need4Protocol;
-using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -15,7 +13,7 @@ namespace Need4
         // Server side handler of the SayHello RPC
         public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
         {
-            using (var db = new ItemContext())
+            using (var db = new Need4Context())
             {
                 var created = db.Database.EnsureCreated();
                 //Console.WriteLine("Database was created (true), or existing (false): {0}", created);
@@ -34,7 +32,7 @@ namespace Need4
 
         public override Task<ItemList> GetMatchingItems(Item itemToMatch, ServerCallContext context)
         {
-            using (var db = new ItemContext())
+            using (var db = new Need4Context())
             {
                 try
                 {
@@ -52,10 +50,11 @@ namespace Need4
         }
         public override Task<ItemList> GetAllItems(Empty empty, ServerCallContext context)
         {
-            using (var db = new ItemContext())
+            using (var db = new Need4Context())
             {
                 try
                 {
+                    var created = db.Database.EnsureCreated();
                     var q = from r in db.Items select r;
                     var i = new ItemList();
                     q.ToList().ForEach(x => i.List.Add(x));

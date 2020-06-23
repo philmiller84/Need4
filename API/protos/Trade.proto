@@ -1,0 +1,26 @@
+﻿syntax = "proto3";
+
+package Need4Protocol;
+import "protos/ActionResponse.proto";
+import "google/protobuf/empty.proto";
+import "protos/Item.proto";
+
+service TradeService {
+	rpc CreateTrade (Trade) returns (ActionResponse);
+	rpc GetOpenTrades (google.protobuf.Empty) returns (TradeList);
+}
+
+message TradeList {
+	repeated Trade trade_list = 1;
+}
+
+message Trade {
+	int32 id = 1;
+	repeated TradeItemDetails trade_items_list = 2;
+}
+
+message TradeItemDetails {
+	int32 id = 1;
+	Item item = 2;
+	int32 need_offset = 3;
+}
