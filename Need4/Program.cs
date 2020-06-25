@@ -1,20 +1,12 @@
 ﻿using Grpc.Core;
 using Need4Protocol;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Models;
-using System;
-using System.Data.Common;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace Need4
 {
-    public class ServiceHandler 
+    public class ServiceHandler
     {
-        Server server;
-        const int Port = 50051;
+        private Server server;
+        private const int Port = 50051;
         public void Startup()
         {
             server = new Server
@@ -25,6 +17,9 @@ namespace Need4
             server.Start();
         }
 
-        public void Shutdown() => server.ShutdownAsync().Wait();
+        public void Shutdown()
+        {
+            server.ShutdownAsync().Wait();
+        }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Need4Protocol;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Models
 {
@@ -22,9 +20,9 @@ namespace Models
 
                 try
                 {
-                    optionsBuilder.UseSqlite(ConnectionString); 
+                    optionsBuilder.UseSqlite(ConnectionString);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
@@ -56,14 +54,14 @@ namespace Models
                 .HasOne(ili => ili.ItemList)
                 .WithMany(i => i.joins)
                 .HasForeignKey(ili => ili.Id);
-               
+
 
             //modelBuilder.Entity<ItemList>()
             //    .HasMany<Item>(t => t.items);
 
             //modelBuilder.Entity<Item>()
             //    .HasMany<ItemList>(t => t.lists);
-            
+
             modelBuilder.Entity<TradeItemDetails>(b =>
             {
                 b.HasKey(r => r.Id);

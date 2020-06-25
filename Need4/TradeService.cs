@@ -6,24 +6,24 @@ using System.Threading.Tasks;
 
 namespace Need4
 {
-    class TradeServiceImpl : TradeService.TradeServiceBase
+    internal class TradeServiceImpl : TradeService.TradeServiceBase
     {
         // Server side handler of the SayHello RPC
         public override Task<ActionResponse> CreateTrade(Trade request, ServerCallContext context)
         {
-            using (var db = new Need4Context())
+            using (Need4Context db = new Need4Context())
             {
-                var created = db.Database.EnsureCreated();
+                bool created = db.Database.EnsureCreated();
                 //Console.WriteLine("Database was created (true), or existing (false): {0}", created);
                 try
                 {
                     db.Add(request);
                     db.SaveChanges();
-                    return Task.FromResult(new ActionResponse { Result = (int) HttpStatusCode.OK });
+                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
                 }
-                catch 
+                catch
                 {
-                    return Task.FromResult(new ActionResponse { Result = (int) HttpStatusCode.Forbidden });
+                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
                 }
             }
         }

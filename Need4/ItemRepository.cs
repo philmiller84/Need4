@@ -8,36 +8,36 @@ using System.Threading.Tasks;
 
 namespace Need4
 {
-    class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase
+    internal class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase
     {
         // Server side handler of the SayHello RPC
         public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
         {
-            using (var db = new Need4Context())
+            using (Need4Context db = new Need4Context())
             {
-                var created = db.Database.EnsureCreated();
+                bool created = db.Database.EnsureCreated();
                 //Console.WriteLine("Database was created (true), or existing (false): {0}", created);
                 try
                 {
                     db.Add(request);
                     db.SaveChanges();
-                    return Task.FromResult(new ActionResponse { Result = (int) HttpStatusCode.OK });
+                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
                 }
-                catch 
+                catch
                 {
-                    return Task.FromResult(new ActionResponse { Result = (int) HttpStatusCode.Forbidden });
+                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
                 }
             }
         }
 
         public override Task<ItemList> GetMatchingItems(Item itemToMatch, ServerCallContext context)
         {
-            using (var db = new Need4Context())
+            using (Need4Context db = new Need4Context())
             {
                 try
                 {
-                    var q = from r in db.Items where r.Name == itemToMatch.Name select r;
-                    var i = new ItemList();
+                    IQueryable<Item> q = from r in db.Items where r.Name == itemToMatch.Name select r;
+                    ItemList i = new ItemList();
                     q.ToList().ForEach(x => i.List.Add(x));
                     return Task.FromResult(i);
                 }
@@ -50,13 +50,13 @@ namespace Need4
         }
         public override Task<ItemList> GetAllItems(Empty empty, ServerCallContext context)
         {
-            using (var db = new Need4Context())
+            using (Need4Context db = new Need4Context())
             {
                 try
                 {
-                    var created = db.Database.EnsureCreated();
-                    var q = from r in db.Items select r;
-                    var i = new ItemList();
+                    bool created = db.Database.EnsureCreated();
+                    IQueryable<Item> q = from r in db.Items select r;
+                    ItemList i = new ItemList();
                     q.ToList().ForEach(x => i.List.Add(x));
                     return Task.FromResult(i);
                 }
