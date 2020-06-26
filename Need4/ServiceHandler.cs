@@ -1,9 +1,10 @@
 ﻿using Grpc.Core;
 using Need4Protocol;
+using System;
 
 namespace Need4
 {
-    public class ServiceHandler
+    public class ServiceHandler : IDisposable
     {
         private Server server;
         private const int Port = 50051;
@@ -21,5 +22,10 @@ namespace Need4
         {
             server.ShutdownAsync().Wait();
         }
+        public void Dispose()
+        {
+            Shutdown();
+        }
     }
+
 }

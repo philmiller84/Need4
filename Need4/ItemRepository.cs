@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Need4
 {
-    internal class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase
+    public class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase
     {
         // Server side handler of the SayHello RPC
         public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)

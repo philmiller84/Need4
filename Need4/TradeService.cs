@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Need4
 {
-    internal class TradeServiceImpl : TradeService.TradeServiceBase
+    public class TradeServiceImpl : TradeService.TradeServiceBase
     {
         // Server side handler of the SayHello RPC
         public override Task<ActionResponse> CreateTrade(Trade request, ServerCallContext context)
