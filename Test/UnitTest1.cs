@@ -11,17 +11,21 @@ namespace TestAPIs
 
     public class ServiceFixture : IDisposable
     {
+        private readonly ServiceHandler handler;
+
         private readonly ItemRepository.ItemRepositoryClient itemClient;
         private readonly TradeService.TradeServiceClient tradeClient;
         private readonly Channel channel;
-        private readonly ServiceHandler handler;
         private readonly int port = 50051;
         private readonly string localhost_ip = "127.0.0.1";
 
         public ServiceFixture()
         {
+            // This is the service startup
             handler = new ServiceHandler();
             handler.Startup();
+            
+            // This is the client startup
             string connection = string.Format("{0}:{1}", localhost_ip, port);
             channel = new Channel(connection, ChannelCredentials.Insecure);
             itemClient = new ItemRepository.ItemRepositoryClient(channel);

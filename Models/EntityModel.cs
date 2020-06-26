@@ -16,7 +16,7 @@ namespace Models
             {
                 //string ConnectionString = "Data Source=" + Path.Combine(Directory.GetCurrentDirectory(), "need4.db");
                 string ConnectionString = "Data Source=need4.db";
-                Console.WriteLine(ConnectionString);
+                //Console.WriteLine(ConnectionString);
 
                 try
                 {
