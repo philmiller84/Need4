@@ -1,8 +1,8 @@
 ﻿@page "/fetchdata"
 
 @using XYZ.Data
-@using Need4Protocol;
 @inject Need4Service ForecastService
+
 
 <h1>Weather forecast</h1>
 
@@ -39,12 +39,9 @@ else
 
 @code {
     private WeatherForecast[] forecasts;
-    private ItemRepository.ItemRepositoryClient itemClient;
 
     protected override async Task OnInitializedAsync()
     {
-        itemClient = ForecastService.GetItemClient();
-        itemClient.AddNewItem(new Item { Name = "Bananas" });
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
     }
 }

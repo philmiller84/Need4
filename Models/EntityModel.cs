@@ -40,7 +40,7 @@ namespace Models
                 b.Property(r => r.Id).ValueGeneratedOnAdd();
             });
             //Ignore this field so it does not end up in DB table. We will use join instead.
-            modelBuilder.Entity<ItemList>().Ignore(r => r.List);
+            modelBuilder.Entity<ItemList>().Ignore(r => r.Items);
 
             modelBuilder.Entity<ItemListItem>()
                 .HasKey(t => new { t.Id, t.Name });

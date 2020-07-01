@@ -38,7 +38,7 @@ namespace Need4
                 {
                     IQueryable<Item> q = from r in db.Items where r.Name == itemToMatch.Name select r;
                     ItemList i = new ItemList();
-                    q.ToList().ForEach(x => i.List.Add(x));
+                    q.ToList().ForEach(x => i.Items.Add(x));
                     return Task.FromResult(i);
                 }
                 catch
@@ -57,7 +57,7 @@ namespace Need4
                     bool created = db.Database.EnsureCreated();
                     IQueryable<Item> q = from r in db.Items select r;
                     ItemList i = new ItemList();
-                    q.ToList().ForEach(x => i.List.Add(x));
+                    q.ToList().ForEach(x => i.Items.Add(x));
                     return Task.FromResult(i);
                 }
                 catch

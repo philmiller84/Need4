@@ -111,7 +111,7 @@ namespace TestAPIs
 
             client.AddNewItem(InitData.fruit);
             ActionResponse reply = client.AddNewItem(InitData.orange);
-            if (!allItems.List.Contains(InitData.orange))
+            if (!allItems.Items.Contains(InitData.orange))
             {
                 Assert.Equal((int)HttpStatusCode.OK, reply.Result);
             }
@@ -125,14 +125,14 @@ namespace TestAPIs
         public void GetAllItemsCheckOne()
         {
             ItemList reply = client.GetAllItems(new Empty());
-            Assert.Contains<Item>(InitData.orange, reply.List);
+            Assert.Contains<Item>(InitData.orange, reply.Items);
         }
 
         [Fact]
         public void GetMatchingItems()
         {
             ItemList reply = client.GetMatchingItems(InitData.orange);
-            Assert.Contains<Item>(InitData.orange, reply.List);
+            Assert.Contains<Item>(InitData.orange, reply.Items);
         }
     }
 }

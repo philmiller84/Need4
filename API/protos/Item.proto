@@ -12,7 +12,7 @@ service ItemRepository {
 
 message ItemList {
 	int32 id = 1;
-	repeated Item list = 2;
+	repeated Item items = 2;
 }
 
 message Item {
