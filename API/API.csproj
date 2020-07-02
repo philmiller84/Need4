@@ -20,4 +20,14 @@
     <ItemGroup>
 	    <Content Include="obj/Debug/netcoreapp3.1/*.cs" />
 	</ItemGroup>
+
+	<Target Name="CoreCompile">
+		<CreateProperty Value="true">
+			<Output TaskParameter="ValueSetByTask" PropertyName="CompileRan" />
+		</CreateProperty>
+	</Target>
+	<Target Name="CopyFilesToOutputDirectory" Condition="$(CompileRan) == true"/>
+
+
+
 </Project>

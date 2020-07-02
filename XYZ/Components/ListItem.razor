@@ -1,6 +1,5 @@
 ﻿@using Need4Protocol;
 @using XYZ.Data
-@using System.ComponentModel.DataAnnotations
 @inject Need4Service Need4Service
 
 <h3>ItemList</h3>
@@ -19,7 +18,6 @@
 
 
 @code {
-    Item newItem = new Item();
     ItemList list = new ItemList();
     private ItemRepository.ItemRepositoryClient itemClient;
 
@@ -31,12 +29,7 @@
 
     private async Task Refresh()
     {
-        newItem.Name = string.Empty;
         list = await Task.Run(() => itemClient.GetAllItems(new Google.Protobuf.WellKnownTypes.Empty()));
     }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        await Refresh();
-    }
 }
