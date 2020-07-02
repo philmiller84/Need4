@@ -54,7 +54,7 @@ namespace Scaffold
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name")] Item item)
+        public async Task<IActionResult> Create([Bind("Name,EstimatedCost,Quantity,Measurement,Description")] Item item)
         {
             if (ModelState.IsValid)
             {
@@ -86,7 +86,7 @@ namespace Scaffold
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Name")] Item item)
+        public async Task<IActionResult> Edit(string id, [Bind("Name,EstimatedCost,Quantity,Measurement,Description")] Item item)
         {
             if (id != item.Name)
             {

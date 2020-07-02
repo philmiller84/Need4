@@ -1,0 +1,77 @@
+﻿@using Need4Protocol;
+@using XYZ.Data
+@inject Need4Service Need4Service
+
+<h1>Create</h1>
+
+<h4>Item</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@newItem" OnValidSubmit="HandleValidSubmit">
+            <FluentValidationValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="Name" class="control-label">Name</label>
+                <input @bind="newItem.Name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="EstimatedCost" class="control-label">Estimate Cost</label>
+                <input @bind="newItem.EstimatedCost" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="Quantity" class="control-label">Quantity</label>
+                <input @bind="newItem.Quantity" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="Measurement" class="control-label">Measurement</label>
+                <input @bind="newItem.Measurement" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="Description" class="control-label">Description</label>
+                <input @bind="newItem.Description" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </EditForm>
+    </div>
+    <div class="col-md-4">
+        <ListItem/>
+    </div>
+</div>
+
+
+
+
+
+@code {
+    Item newItem = new Item();
+    ItemList list = new ItemList();
+    private ItemRepository.ItemRepositoryClient itemClient;
+
+    //private async Task
+    protected override void OnInitialized()
+    {
+        itemClient = Need4Service.GetItemClient();
+    }
+
+    private async Task Refresh()
+    {
+        newItem.Name = string.Empty;
+        list = await Task.Run(() => itemClient.GetAllItems(new Google.Protobuf.WellKnownTypes.Empty()));
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Refresh();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await Task.Run(() => itemClient.AddNewItem(newItem));
+        //newItem.Validate();
+        await Refresh();
+        StateHasChanged();
+    }
+}

@@ -17,5 +17,10 @@ message ItemList {
 
 message Item {
 	string name = 1;
+	double estimatedCost = 2;
+	double quantity = 3;
+	string measurement = 4;
+	string description = 5;
+
 }
 

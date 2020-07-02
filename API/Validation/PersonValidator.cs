@@ -6,8 +6,8 @@ namespace Need4Protocol.Validation
     {
         public ItemValidator()
         {
-            RuleFor(p => p.Name).NotEmpty().WithMessage("You must enter a name");
-            RuleFor(p => p.Name).MaximumLength(5).WithMessage("Name cannot be longer than 5 characters");
+            RuleFor(i => i.Name).NotEmpty().WithMessage("You must enter a name");
+            RuleFor(i => i.Name).MaximumLength(5).WithMessage("Name cannot be longer than 5 characters");
         }
     }
 }

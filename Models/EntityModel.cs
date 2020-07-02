@@ -15,7 +15,7 @@ namespace Models
             if (!optionsBuilder.IsConfigured)
             {
                 //string ConnectionString = "Data Source=" + Path.Combine(Directory.GetCurrentDirectory(), "need4.db");
-                string ConnectionString = "Data Source=need4.db";
+                string ConnectionString = "Data Source=C:\\Users\\Phil\\Repo\\Need4\\Models\\need4.db";
                 //Console.WriteLine(ConnectionString);
 
                 try
