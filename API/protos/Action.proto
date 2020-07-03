@@ -5,3 +5,9 @@ package Need4Protocol;
 message ActionResponse {
 	int32 result = 1;
 }
+
+message ActionType {
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+}

@@ -1,0 +1,40 @@
+﻿syntax = "proto3";
+
+package Need4Protocol;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "protos/Action.proto";
+import "protos/User.proto";
+
+service PermissionService {
+	rpc IsUserPermissioned (UserPermission) returns (ActionResponse);
+}
+
+message UserPermission {
+	User user = 1;
+	Permission permission = 2;
+}
+
+message Permission {
+	int32 id = 1;
+	PermissionType permission_type = 2;
+	ActionType action_type = 3;
+}
+
+message PermissionSet {
+	int32 id = 1;
+	repeated Permission permissions = 2;
+}
+
+message PermissionType {
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+}
+
+message PermissionCondition {
+	int32 id = 1;
+	string name = 2;
+	string description = 3;
+}

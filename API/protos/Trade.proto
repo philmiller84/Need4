@@ -4,7 +4,7 @@ package Need4Protocol;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
-import "protos/ActionResponse.proto";
+import "protos/Action.proto";
 import "protos/Item.proto";
 
 service TradeService {

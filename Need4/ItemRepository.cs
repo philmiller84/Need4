@@ -13,7 +13,7 @@ namespace Need4
 
         public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
         {
-            return this.GenericCreate(request, typeof(Item));
+            return this.GenericCreate<Item>(request);
         }
 
         public override Task<ItemList> GetMatchingItems(Item itemToMatch, ServerCallContext context)

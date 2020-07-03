@@ -1,7 +1,7 @@
 ﻿syntax = "proto3";
 
 package Need4Protocol;
-import "protos/ActionResponse.proto";
+import "protos/Action.proto";
 import "google/protobuf/empty.proto";
 
 service ItemRepository {

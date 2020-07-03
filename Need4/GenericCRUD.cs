@@ -14,11 +14,10 @@ namespace Need4
 
     public static class GenericCRUDExtensions
     {
-        public static Task<ActionResponse> GenericCreate(this IGenericCRUD i, object inputObject, Type inputType)
+        public static Task<ActionResponse> GenericCreate<T>(this IGenericCRUD i, T inputObject)
         {
             try
             {
-                dynamic thisObject = Convert.ChangeType(inputObject, inputType);
                 using (Need4Context db = new Need4Context())
                 {
                     bool created = db.Database.EnsureCreated();
