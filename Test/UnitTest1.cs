@@ -111,14 +111,8 @@ namespace TestAPIs
 
             client.AddNewItem(InitData.fruit);
             ActionResponse reply = client.AddNewItem(InitData.orange);
-            if (!allItems.Items.Contains(InitData.orange))
-            {
-                Assert.Equal((int)HttpStatusCode.OK, reply.Result);
-            }
-            else
-            {
-                Assert.Equal((int)HttpStatusCode.Forbidden, reply.Result);
-            }
+
+            Assert.Equal(!allItems.Items.Contains(InitData.orange) ? (int)HttpStatusCode.OK : (int)HttpStatusCode.Forbidden, reply.Result);
         }
 
         [Fact]
