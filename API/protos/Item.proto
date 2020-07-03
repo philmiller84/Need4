@@ -21,6 +21,5 @@ message Item {
 	double quantity = 3;
 	string measurement = 4;
 	string description = 5;
-
 }
 
