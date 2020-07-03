@@ -1,33 +1,19 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Models;
 using Need4Protocol;
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
 namespace Need4
 {
-    public class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase
+    public class ItemRepositoryImpl : ItemRepository.ItemRepositoryBase, IGenericCRUD
     {
-        // Server side handler of the SayHello RPC
+
         public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
         {
-            using (Need4Context db = new Need4Context())
-            {
-                bool created = db.Database.EnsureCreated();
-                //Console.WriteLine("Database was created (true), or existing (false): {0}", created);
-                try
-                {
-                    db.Add(request);
-                    db.SaveChanges();
-                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
-                }
-                catch
-                {
-                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
-                }
-            }
+            return this.GenericCreate(request, typeof(Item));
         }
 
         public override Task<ItemList> GetMatchingItems(Item itemToMatch, ServerCallContext context)
@@ -48,7 +34,7 @@ namespace Need4
 
             }
         }
-        public override Task<ItemList> GetAllItems(Empty empty, ServerCallContext context)
+        public override Task<ItemList> GetAllItems(Google.Protobuf.WellKnownTypes.Empty empty, ServerCallContext context)
         {
             using (Need4Context db = new Need4Context())
             {
@@ -67,5 +53,6 @@ namespace Need4
 
             }
         }
+
     }
 }

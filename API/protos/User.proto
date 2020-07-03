@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+
+package Need4Protocol;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "protos/ActionResponse.proto";
+import "protos/Item.proto";
+import "protos/Trade.proto";
+
+
+service UserService {
+	rpc GetUserTrades (google.protobuf.Int32Value) returns (TradeList);
+	rpc GetUser (google.protobuf.Int32Value) returns (User);
+	rpc CreateUser (google.protobuf.Int32Value) returns (User);
+}
+
+message User {
+	int32 id = 1;
+	string name = 2;
+}
