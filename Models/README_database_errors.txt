@@ -4,4 +4,4 @@
 
 
 
-If you need join tables, us ethe Joins.cs in the API project
+If you need join tables, use the Joins.cs in the API project
