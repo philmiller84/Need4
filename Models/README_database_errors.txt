@@ -3,5 +3,7 @@
 //For testing, the DB is read from the Test/bin/... location <- not always true. could be other bins. or could be specified.
 
 
+If you need to make a foreign key, will need to seed the child entity first, then use "ForeignTableId" = # as the entry in the parent table
+
 
 If you need join tables, use the Joins.cs in the API project

@@ -94,12 +94,12 @@ namespace TestAPIs
         // TODO: Set this up to run in parallel to detect problems
         // https://xunit.net/docs/running-tests-in-parallel.html
 
-        private readonly ServiceFixture fixture;
+        //private readonly ServiceFixture fixture;
         private readonly ItemRepository.ItemRepositoryClient client;
 
         public TestItems(ServiceFixture fixture)
         {
-            this.fixture = fixture;
+            //this.fixture = fixture;
             client = fixture.GetItemClient();
         }
 

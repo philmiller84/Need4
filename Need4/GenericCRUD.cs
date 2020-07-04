@@ -14,19 +14,18 @@ namespace Need4
 
     public static class GenericCRUDExtensions
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extension method")]
         public static Task<ActionResponse> GenericCreate<T>(this IGenericCRUD i, T inputObject)
         {
             try
             {
-                using (Need4Context db = new Need4Context())
-                {
-                    bool created = db.Database.EnsureCreated();
+                using var db = new Need4Context();
+                bool created = db.Database.EnsureCreated();
 
-                    db.Add(inputObject);
-                    db.SaveChanges();
+                db.Add(inputObject);
+                db.SaveChanges();
 
-                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
-                }
+                return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
             }
             catch
             {
@@ -34,16 +33,15 @@ namespace Need4
             }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extension method")]
         public static IQueryable<T> GenericWrappedInvoke<T>(this IGenericCRUD i, T inputObject, Func<Need4Context, IQueryable<T>> filterFunction, Action<T> formatFunction)
         {
             try
             {
-                using (Need4Context db = new Need4Context())
-                {
-                    IQueryable<T> q =  filterFunction.Invoke(db);
-                    q.ToList().ForEach(formatFunction);
-                    return q;
-                }
+                using Need4Context db = new Need4Context();
+                IQueryable<T> q = filterFunction.Invoke(db);
+                q.ToList().ForEach(formatFunction);
+                return q;
             }
             catch
             {

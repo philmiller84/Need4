@@ -3,8 +3,8 @@
 namespace Need4Protocol
 {
     //JOIN TABLE FOR ITEMLIST TO WORK
-    public partial class ItemList { public List<ItemList_Item> joins { get; set; } }
-    public partial class Item { public List<ItemList_Item> joins { get; set; } }
+    public partial class ItemList { public List<ItemList_Item> Joins { get; set; } }
+    public partial class Item { public List<ItemList_Item> Joins { get; set; } }
     public class ItemList_Item
     {
         public int Id { get; set; }
@@ -20,8 +20,8 @@ namespace Need4Protocol
     //////////////////////////////////////////////////////////////////////////////////////////////////
     ////JOIN TABLE FOR TRADEACTIONLIST TO WORK
     //////////////////////////////////////////////////////////////////////////////////////////////////
-    //public partial class TradeAction { public List<TradeActionList_TradeAction> joins { get; set; } }
-    //public partial class TradeActionList { public List<TradeActionList_TradeAction> joins { get; set; } }
+    //public partial class TradeAction { public List<TradeActionList_TradeAction> Joins { get; set; } }
+    //public partial class TradeActionList { public List<TradeActionList_TradeAction> Joins { get; set; } }
     //public class TradeActionList_TradeAction
     //{
     //    public int TAL_Id { get; set; }

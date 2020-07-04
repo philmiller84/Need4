@@ -27,6 +27,8 @@ namespace Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // PERSISTED ENTITIES
+            OnCreatePermissionTypes(modelBuilder.Entity<PermissionType>());
+            OnCreateActionTypes(modelBuilder.Entity<ActionType>());
             OnCreateUsers(modelBuilder.Entity<User>());
             OnCreatePermissions(modelBuilder.Entity<Permission>());
             OnCreateItems(modelBuilder.Entity<Item>());
@@ -40,25 +42,37 @@ namespace Models
             OnCreateT_Timestamp(modelBuilder.Entity<T_Timestamp>()); // required due to build issues with scaffolding
             modelBuilder.Ignore<T_Timestamp>(); // required to be after the entity is specified
         }
+
+        public DbSet<PermissionType> PermissionTypes { get; set; }
+        private void OnCreatePermissionTypes(EntityTypeBuilder<PermissionType> entityTypeBuilder)
+        {
+            entityTypeBuilder.HasKey(r => r.Id);
+            entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
+            entityTypeBuilder.HasData(new { Id = -1, Name = "Read", Description = "" });
+        }
+
+        public DbSet<ActionType> ActionTypes { get; set; }
+        private void OnCreateActionTypes(EntityTypeBuilder<ActionType> entityTypeBuilder)
+        {
+            entityTypeBuilder.HasKey(r => r.Id);
+            entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
+            entityTypeBuilder.HasData(new { Id = -1, Name = "GetTradeData", Description = "sample: /get/trade" });
+        }
+
         public DbSet<User> Users { get; set; }
         private void OnCreateUsers(EntityTypeBuilder<User> entityTypeBuilder)
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-
-            entityTypeBuilder.HasData(
-                new { Id = -1, Name = "Phil" } 
-                );
+            entityTypeBuilder.HasData( new { Id = -1, Name = "Phil" } );
         }
+        public DbSet<Permission> Permissions { get; set; }
         private void OnCreatePermissions(EntityTypeBuilder<Permission> entityTypeBuilder)
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            //entityTypeBuilder.HasData(
-            //    new { Name = "Phil" }
-            //    );
+            entityTypeBuilder.HasData( new { Id = -1, PermissionTypeId = -1, ActionTypeId = -1 } /* LEGIT: this seed data refers to child entities */ );
         }
-        public DbSet<Permission> Permissions { get; set; }
 
         public DbSet<Item> Items { get; set; }
         protected void OnCreateItems(EntityTypeBuilder<Item> e)
@@ -76,10 +90,10 @@ namespace Models
         {
             e.HasKey(t => new { t.Id, t.Name });
             e.HasOne(ili => ili.Item)
-                .WithMany(i => i.joins)
+                .WithMany(i => i.Joins)
                 .HasForeignKey(ili => ili.Name);
             e.HasOne(ili => ili.ItemList)
-                .WithMany(il => il.joins)
+                .WithMany(il => il.Joins)
                 .HasForeignKey(ili => ili.Id);
         }
         public DbSet<Trade> Trades { get; set; }
