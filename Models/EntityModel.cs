@@ -48,7 +48,12 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            entityTypeBuilder.HasData(new { Id = -1, Name = "Read", Description = "" });
+            entityTypeBuilder.HasData(
+                new { Id = -1, Name = "Owner", Description = "The entity is owned" },
+                new { Id = -2, Name = "Reviewer", Description = "The entity is being reviewed" },
+                new { Id = -3, Name = "Participant", Description = "The entity is being participated in" },
+                new { Id = -4, Name = "Any", Description = "Any status has permission to entity" }
+                );
         }
 
         public DbSet<ActionType> ActionTypes { get; set; }
@@ -56,7 +61,7 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            entityTypeBuilder.HasData(new { Id = -1, Name = "GetTradeData", Description = "sample: /get/trade" });
+            entityTypeBuilder.HasData(new { Id = -1, Name = "GetTradeData", Description = "/get/trade/{0}" });
         }
 
         public DbSet<User> Users { get; set; }
@@ -71,7 +76,7 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            entityTypeBuilder.HasData( new { Id = -1, PermissionTypeId = -1, ActionTypeId = -1 } /* LEGIT: this seed data refers to child entities */ );
+            entityTypeBuilder.HasData( new { Id = -1, PermissionTypeId = -4, ActionTypeId = -1 } /* LEGIT: this seed data refers to child entities */ );
         }
 
         public DbSet<Item> Items { get; set; }
