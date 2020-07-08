@@ -16,10 +16,11 @@ message ItemList {
 }
 
 message Item {
-	string name = 1;
-	double estimatedCost = 2;
-	double quantity = 3;
-	string measurement = 4;
-	string description = 5;
+	int32 id = 1;
+	string name = 2;
+	double estimatedCost = 3;
+	double quantity = 4;
+	string measurement = 5;
+	string description = 6;
 }
 

@@ -7,11 +7,21 @@ namespace Need4Protocol
     public partial class Item { public List<ItemList_Item> Joins { get; set; } }
     public class ItemList_Item
     {
-        public int Id { get; set; }
+        public int ItemListId { get; set; }
         public ItemList ItemList { get; set; }
 
-        public string Name { get; set; }
+        public int ItemId { get; set; }
         public Item Item { get; set; }
+    }
+
+    public partial class TradeItemList { public List<TradeItemList_TradeItemDetails> Joins { get; set; } }
+    public partial class TradeItemDetails { public List<TradeItemList_TradeItemDetails> Joins { get; set; } }
+    public class TradeItemList_TradeItemDetails
+    {
+        public int TradeItemListId { get; set; }
+        public TradeItemList TradeItemList { get; set; }
+        public int TradeItemDetailsId { get; set; }
+        public TradeItemDetails TradeItemDetails { get; set; }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,7 @@
 **/obj
 **/Migrations
 *.db
+*.db.*
 PublishProfiles
 appsettings.json
 **/wwwroot/css

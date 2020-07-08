@@ -1,0 +1,31 @@
+﻿@page "/TradeViewDetails"
+<h3>TradeViewDetails</h3>
+
+<div class="row ">
+    <div class="col-md-8 themed-grid-col">
+        <div class="pb-3">
+            .col-md-8
+        </div>
+        <div class="row">
+            <div style="@style_display" class="col-md-6 themed-grid-col">.col-md-6</div>
+            <div style="display:none" class="col-md-6 themed-grid-col">.col-md-6</div>
+        </div>
+    </div>
+</div>
+<div class="row ">
+    <div class="col-md-8 themed-grid-col">
+        <div class="pb-3">
+            .col-md-8
+        </div>
+        <div class="row">
+            <div class="col-md-6 themed-grid-col">.col-md-6</div>
+            <div class="col-md-6 themed-grid-col">.col-md-6</div>
+        </div>
+    </div>
+</div>
+
+@code {
+    bool show = true;
+    string style_display { get { return show?"display:show":"display:none"; } }
+}
+
