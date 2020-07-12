@@ -28,7 +28,7 @@ namespace Models
         {
             // PERSISTED ENTITIES
             OnCreatePermissionTypes(modelBuilder.Entity<PermissionType>());
-            OnCreateActionTypes(modelBuilder.Entity<ActionType>());
+            OnCreateActionDetails(modelBuilder.Entity<ActionDetails>());
             OnCreateUsers(modelBuilder.Entity<User>());
             OnCreatePermissions(modelBuilder.Entity<Permission>());
             OnCreateItems(modelBuilder.Entity<Item>());
@@ -38,9 +38,7 @@ namespace Models
             OnCreateTradeItemLists(modelBuilder.Entity<TradeItemList>());
             OnCreateTradeItemDetails(modelBuilder.Entity<TradeItemDetails>());
             OnCreateTradeItemList_TradeItemDetails(modelBuilder.Entity<TradeItemList_TradeItemDetails>());
-            OnCreateTradeActions(modelBuilder.Entity<TradeAction>());
         }
-
 
 
         public DbSet<PermissionType> PermissionTypes { get; set; }
@@ -49,19 +47,25 @@ namespace Models
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData(
-                new { Id = -1, Name = "Owner", Description = "The entity is owned" },
-                new { Id = -2, Name = "Reviewer", Description = "The entity is being reviewed" },
-                new { Id = -3, Name = "Participant", Description = "The entity is being participated in" },
-                new { Id = -4, Name = "Any", Description = "Any status has permission to entity" }
+                new { Id = -1, Name = "Admin", Description = "The user is admin" },
+                new { Id = -2, Name = "Owner", Description = "The entity is owned" },
+                new { Id = -3, Name = "Reviewer", Description = "The entity is being reviewed" },
+                new { Id = -4, Name = "Participant", Description = "The entity is being participated in" },
+                new { Id = -5, Name = "Any", Description = "Any status has permission to entity" }
                 );
         }
 
-        public DbSet<ActionType> ActionTypes { get; set; }
-        private void OnCreateActionTypes(EntityTypeBuilder<ActionType> entityTypeBuilder)
+        public DbSet<ActionDetails> ActionDetails { get; set; }
+        private void OnCreateActionDetails(EntityTypeBuilder<ActionDetails> entityTypeBuilder)
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            entityTypeBuilder.HasData(new { Id = -1, Name = "GetTradeData", Description = "/get/trade/{0}" });
+            entityTypeBuilder.HasData(
+                new { Id = -1, Name = "GetTradeData", Category = "Trade", Description = "/get/trade/{0}" },
+                new { Id = -2, Name = "ExcludeUser", Category = "Trade", Description = "/update/trade/{0}/user/{1}/exclude" },
+                new { Id = -3, Name = "SplitTrade", Category = "Trade", Description = "/update/trade/{0}/split" },
+                new { Id = -4, Name = "FinalizeTrade", Category = "Trade", Description = "/update/trade/{0}/finalize" }
+                );
         }
 
         public DbSet<User> Users { get; set; }
@@ -76,7 +80,12 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            entityTypeBuilder.HasData( new { Id = -1, PermissionTypeId = -4, ActionTypeId = -1 } /* LEGIT: this seed data refers to child entities */ );
+            entityTypeBuilder.HasData(
+                new { Id = -1, PermissionTypeId = -1, ActionTypeId = -1 },
+                new { Id = -2, PermissionTypeId = -1, ActionTypeId = -2 },
+                new { Id = -3, PermissionTypeId = -1, ActionTypeId = -3 },
+                new { Id = -4, PermissionTypeId = -1, ActionTypeId = -4 }
+                );
         }
 
         public DbSet<Item> Items { get; set; }
@@ -139,7 +148,6 @@ namespace Models
                 );
         }
 
-
         public DbSet<TradeItemDetails> TradeDetails { get; set; }
         protected void OnCreateTradeItemDetails(EntityTypeBuilder<TradeItemDetails> e)
         {
@@ -163,13 +171,6 @@ namespace Models
                 new {TradeItemListId = -1, TradeItemDetailsId = -1}
                 );
         }
-        public DbSet<TradeAction> TradeActions { get; set; }
-        protected void OnCreateTradeActions(EntityTypeBuilder<TradeAction> e)
-        {
-            e.HasKey(r => r.Id);
-            e.Property(r => r.Id).ValueGeneratedOnAdd();
-        }
-
       }
 }
 

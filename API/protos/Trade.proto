@@ -11,7 +11,18 @@ service TradeService {
 	rpc CreateTrade (Trade) returns (ActionResponse);
 	rpc GetOpenTrades (google.protobuf.Empty) returns (TradeList);
 	rpc GetDetailedTradeView (google.protobuf.Int32Value) returns (Trade);
+	rpc GetTradeActions (TradeActionRequest) returns (TradeActionResponse);
 }
+
+message TradeActionRequest {
+	int32 trade_id = 1;
+	int32 user_id = 2;
+}
+
+message TradeActionResponse {
+	repeated ActionDetails actions = 1;
+}
+
 
 message TradeList {
 	repeated Trade trade_list = 1;
@@ -35,13 +46,3 @@ message TradeItemDetails {
 	int32 fulfilled_quantity = 4;
 }
 
-message TradeActionList {
-	int32 id = 1;
-	repeated TradeAction action = 2;
-}
-
-message TradeAction {
-	int32 id = 1;
-	string description = 2;
-	string method_rest_signature = 3;
-}

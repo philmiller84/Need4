@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Need4
 {
-    public class TradeServiceImpl : TradeService.TradeServiceBase
+    public class TradeServiceImpl : TradeService.TradeServiceBase, IGenericCRUD
     {
         // Server side handler of the SayHello RPC
         public override Task<ActionResponse> CreateTrade(Trade request, ServerCallContext context)
@@ -26,6 +26,12 @@ namespace Need4
                     return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
                 }
             }
+        }
+        public override Task<TradeActionResponse> GetTradeActions(TradeActionRequest request, ServerCallContext context)
+        {
+            TradeActionResponse t = new TradeActionResponse();
+            //this.GenericWrappedInvoke<ActionDetails>(request, db => from r in db.ActionDetails select r, (x) => t.Actions.Add(x));
+            return Task.FromResult(t);
         }
     }
 }

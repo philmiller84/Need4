@@ -1,0 +1,16 @@
+﻿@using Need4Protocol;
+@using XYZ.Data;
+@inject Need4Service Need4Service
+<h3>TradeActionSelect</h3>
+
+@code {
+    private ItemRepository.ItemRepositoryClient itemClient;
+
+    //private async Task
+    protected override void OnInitialized()
+    {
+        itemClient = Need4Service.GetItemClient();
+    }
+
+
+}

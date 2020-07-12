@@ -18,7 +18,7 @@ message UserPermission {
 message Permission {
 	int32 id = 1;
 	PermissionType permission_type = 2;
-	ActionType action_type = 3;
+	ActionDetails action_type = 3;
 }
 
 message PermissionSet {
