@@ -12,7 +12,10 @@ namespace Need4
         {
             server = new Server
             {
-                Services = { ItemRepository.BindService(new ItemRepositoryImpl()) },
+                Services = { 
+                    ItemRepository.BindService(new ItemRepositoryImpl()) ,
+                    TradeService.BindService(new TradeServiceImpl())
+                },
                 Ports = { new ServerPort("127.0.0.1", Port, ServerCredentials.Insecure) }
             };
             server.Start();

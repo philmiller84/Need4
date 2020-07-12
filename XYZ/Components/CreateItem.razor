@@ -1,7 +1,4 @@
-﻿@using Need4Protocol;
-@using XYZ.Data
-@inject Need4Service Need4Service
-
+﻿
 <h1>Create</h1>
 
 <h4>Item</h4>
@@ -50,7 +47,6 @@
     ItemList list = new ItemList();
     private ItemRepository.ItemRepositoryClient itemClient;
 
-    //private async Task
     protected override void OnInitialized()
     {
         itemClient = Need4Service.GetItemClient();

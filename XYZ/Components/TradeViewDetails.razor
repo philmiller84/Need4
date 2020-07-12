@@ -1,4 +1,5 @@
 ﻿@page "/TradeViewDetails"
+
 <h3>TradeViewDetails</h3>
 
 <div class="row ">
@@ -24,8 +25,27 @@
     </div>
 </div>
 
+<div class="container">
+    <div class="col-md-6">
+    @foreach(ActionDetails a in actions)
+    {
+        <button type="button" class="btn btn-primary">@a.Name</button>
+    }
+    </div>
+</div>
+
 @code {
     bool show = true;
     string style_display { get { return show?"display:show":"display:none"; } }
+
+    List<ActionDetails> actions;
+    TradeService.TradeServiceClient tradeClient;
+
+    protected override void OnInitialized()
+    {
+        tradeClient = Need4Service.GetTradeClient();
+        var response = tradeClient.GetTradeActions(new TradeActionRequest { UserId = -1 });
+        actions = response.Actions.ToList();
+    }
 }
 

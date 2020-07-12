@@ -2,6 +2,7 @@
 using Models;
 using Need4Protocol;
 using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Need4
@@ -30,7 +31,8 @@ namespace Need4
         public override Task<TradeActionResponse> GetTradeActions(TradeActionRequest request, ServerCallContext context)
         {
             TradeActionResponse t = new TradeActionResponse();
-            //this.GenericWrappedInvoke<ActionDetails>(request, db => from r in db.ActionDetails select r, (x) => t.Actions.Add(x));
+            //NOTE: THIS IS NOT IMPLEMENTED, JUST A STUB HERE
+            this.GenericWrappedInvoke<TradeActionRequest, ActionDetails>(request, db => from r in db.ActionDetails select r, (x) => t.Actions.Add(x));
             return Task.FromResult(t);
         }
     }
