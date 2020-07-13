@@ -1,13 +1,16 @@
 ﻿<p>Trade started: 10/10/2020 11:30am</p>
 
-<a href="/TradeViewDetails">Details</a>
+@*@<a href="/TradeViewDetails">Details</a>*@
+
 <div class="row mb-3">
-    <div class="col-lg-4 themed-grid-col">.col-lg-4</div>
-    <div class="col-lg-4 themed-grid-col">.col-lg-4</div>
-    <div class="col-lg-4 themed-grid-col">.col-lg-4</div>
+@*@foreach (TradeItemDetails i in trade.TradeItemsList.TradeItemDetails.ToList())
+{
+    <div class="col-lg-4 themed-grid-col">@i.Item.Name</div>
+}*@
 </div>
 
 
 @code {
-
+    [Parameter]
+    public Trade trade { get; set; }
 }

@@ -25,18 +25,18 @@ message TradeActionResponse {
 
 
 message TradeList {
-	repeated Trade trade_list = 1;
+	repeated Trade Trades = 1;
 }
 
 message Trade {
 	int32 id = 1;
     string time_started = 2;
-	TradeItemList trade_items_list = 3;
+	TradeItemList TradeItemList = 3;
 }
 
 message TradeItemList {
 	int32 id = 1;
-	repeated TradeItemDetails trade_item_details = 2;
+	repeated TradeItemDetails TradeItemDetails = 2;
 }
 
 message TradeItemDetails {

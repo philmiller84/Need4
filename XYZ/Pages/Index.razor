@@ -8,5 +8,29 @@
     <p class="lead">Browse trades-in-progress and participate!</p>
 </div>
 
-<TradeViewSmall></TradeViewSmall>
+@foreach (Trade t in openTrades)
+{
+    <TradeViewSmall trade="t"></TradeViewSmall>
+
+}
 @*<CreateItem></CreateItem>*@
+
+@code {
+    TradeService.TradeServiceClient client;
+
+    List<Trade> openTrades;
+
+    protected override void OnInitialized()
+    {
+        client = Need4Service.GetTradeClient();
+    }
+
+    protected override void OnParametersSet()
+    {
+        openTrades = client.GetOpenTrades(new Google.Protobuf.WellKnownTypes.Empty()).Trades.ToList() ;
+    }
+
+
+
+
+}
