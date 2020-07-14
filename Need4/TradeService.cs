@@ -46,6 +46,14 @@ namespace Need4
                       .ThenInclude(z => z.Item)
                       select t,
                 (x) => tl.Trades.Add(x));
+
+            foreach(var t in tl.Trades)
+            {
+                foreach(var j in t.TradeItemList.TradeItemList_TradeItemDetails)
+                {
+                    t.TradeItemList.TradeItemDetails.Add(j.TradeItemDetails);
+                }
+            }
             return Task.FromResult(tl);
         }
     }

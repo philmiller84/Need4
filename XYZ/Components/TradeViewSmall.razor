@@ -3,14 +3,19 @@
 @*@<a href="/TradeViewDetails">Details</a>*@
 
 <div class="row mb-3">
-@*@foreach (TradeItemDetails i in trade.TradeItemsList.TradeItemDetails.ToList())
+@foreach (TradeItemDetails i in trade.TradeItemList.TradeItemDetails.ToList())
 {
     <div class="col-lg-4 themed-grid-col">@i.Item.Name</div>
-}*@
+}
 </div>
 
 
 @code {
     [Parameter]
     public Trade trade { get; set; }
+
+    override protected void OnParametersSet()
+    {
+
+    }
 }
