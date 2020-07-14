@@ -76,15 +76,23 @@ namespace Models
             entityTypeBuilder.HasData( new { Id = -1, Name = "Phil" } );
         }
         public DbSet<Permission> Permissions { get; set; }
-        private void OnCreatePermissions(EntityTypeBuilder<Permission> entityTypeBuilder)
+        private void OnCreatePermissions(EntityTypeBuilder<Permission> entity)
         {
-            entityTypeBuilder.HasKey(r => r.Id);
-            entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            entityTypeBuilder.HasData(
-                new { Id = -1, PermissionTypeId = -1, ActionTypeId = -1 },
-                new { Id = -2, PermissionTypeId = -1, ActionTypeId = -2 },
-                new { Id = -3, PermissionTypeId = -1, ActionTypeId = -3 },
-                new { Id = -4, PermissionTypeId = -1, ActionTypeId = -4 }
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Id).ValueGeneratedOnAdd();
+            entity.HasOne(d => d.ActionDetails)
+                .WithMany(p => p.Permissions)
+                .HasForeignKey(d => d.ActionDetailsId);
+
+            entity.HasOne(d => d.PermissionType)
+                .WithMany(p => p.Permissions)
+                .HasForeignKey(d => d.PermissionTypeId);
+
+            entity.HasData(
+                new { Id = -1, PermissionTypeId = -1, ActionDetailsId = -1 },
+                new { Id = -2, PermissionTypeId = -1, ActionDetailsId = -2 },
+                new { Id = -3, PermissionTypeId = -1, ActionDetailsId = -3 },
+                new { Id = -4, PermissionTypeId = -1, ActionDetailsId = -4 }
                 );
         }
 
@@ -116,10 +124,10 @@ namespace Models
         {
             e.HasKey(t => new { t.ItemListId, t.ItemId });
             e.HasOne(ili => ili.Item)
-                .WithMany(i => i.Joins)
+                .WithMany(i => i.ItemList_Item)
                 .HasForeignKey(ili => ili.ItemId);
             e.HasOne(ili => ili.ItemList)
-                .WithMany(il => il.Joins)
+                .WithMany(il => il.ItemList_Item)
                 .HasForeignKey(ili => ili.ItemListId);
             e.HasData(
                 new {ItemListId = -1, ItemId = -4 },
@@ -132,8 +140,12 @@ namespace Models
         {
             e.HasKey(r => r.Id);
             e.Property(r => r.Id).ValueGeneratedOnAdd();
+
+            e.HasOne(d => d.TradeItemList)
+                .WithMany(p => p.Trades)
+                .HasForeignKey(d => d.TradeItemListId);
             e.HasData(
-                new { Id = -1, TimeStarted = "20200707", TradeItemsListId = -1 }
+                new { Id = -1, TimeStarted = "20200707", TradeItemListId = -1 }
                 ); ;
         }
 
@@ -153,6 +165,9 @@ namespace Models
         {
             e.HasKey(r => r.Id);
             e.Property(r => r.Id).ValueGeneratedOnAdd();
+            e.HasOne(d => d.Item)
+                .WithMany(p => p.TradeItemDetails)
+                .HasForeignKey(d => d.ItemId);
             e.HasData(
                 new { Id = -1, ItemId = -1, FulfilledQuantity= 0, NeedOffset = 1 }
                 );
@@ -161,12 +176,16 @@ namespace Models
         private void OnCreateTradeItemList_TradeItemDetails(EntityTypeBuilder<TradeItemList_TradeItemDetails> e)
         {
             e.HasKey(r => new { r.TradeItemListId, r.TradeItemDetailsId});
-            e.HasOne(r => r.TradeItemList)
-                .WithMany(r => r.Joins)
-                .HasForeignKey(r => r.TradeItemListId);
-            e.HasOne(r => r.TradeItemDetails)
-                .WithMany(r => r.Joins)
-                .HasForeignKey(r => r.TradeItemDetailsId);
+
+
+            e.HasOne(d => d.TradeItemDetails)
+                .WithMany(p => p.TradeItemList_TradeItemDetails)
+                .HasForeignKey(d => d.TradeItemDetailsId);
+
+            e.HasOne(d => d.TradeItemList)
+                .WithMany(p => p.TradeItemList_TradeItemDetails)
+                .HasForeignKey(d => d.TradeItemListId);
+
             e.HasData(
                 new {TradeItemListId = -1, TradeItemDetailsId = -1}
                 );

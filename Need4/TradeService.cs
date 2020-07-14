@@ -40,15 +40,12 @@ namespace Need4
         {
             TradeList tl = new TradeList();
             this.GenericWrappedInvoke<Empty, Trade>(e,
-                db => from t in db.Trades.Include(l => l.TradeItemList).ThenInclude(j => j.Joins).ThenInclude(d => d.TradeItemDetails).ThenInclude(i => i.Item)
-                      //join til in db.TradeItemLists
-                      //on t.TradeItemListId equals til.Id
-                      select t
-                      , (x) => tl.Trades.Add(x));
-            //foreach(var t in tl.TradeList_.ToList())
-            //{
-            //    this.GenericWrappedInvoke<Trade>(t, db => from r in db.TradeItemLists select r, (x) => t.TradeList_.Add(x));
-            //}
+                db => from t in db.Trades.Include(l => l.TradeItemList)
+                      .ThenInclude(x => x.TradeItemList_TradeItemDetails)
+                      .ThenInclude(y => y.TradeItemDetails)
+                      .ThenInclude(z => z.Item)
+                      select t,
+                (x) => tl.Trades.Add(x));
             return Task.FromResult(tl);
         }
     }

@@ -1,27 +1,101 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Need4Protocol
 {
-    //JOIN TABLE FOR ITEMLIST TO WORK
-    public partial class ItemList { public List<ItemList_Item> Joins { get; set; } }
-    public partial class Item { public List<ItemList_Item> Joins { get; set; } }
-    public class ItemList_Item
+    public partial class ActionDetails
     {
-        public int ItemListId { get; set; }
-        public ItemList ItemList { get; set; }
-
-        public int ItemId { get; set; }
-        public Item Item { get; set; }
+        partial void OnConstruction()
+        {
+            Permissions = new HashSet<Permission>();
+        }
+        public ICollection<Permission> Permissions { get; set; } 
     }
 
-    public partial class TradeItemList { public List<TradeItemList_TradeItemDetails> Joins { get; set; } }
-    public partial class TradeItemDetails { public List<TradeItemList_TradeItemDetails> Joins { get; set; } }
-    public class TradeItemList_TradeItemDetails
+    public partial class ItemList
+    {
+        partial void OnConstruction()
+        {
+            ItemList_Item = new HashSet<ItemList_Item>();
+        }
+
+        public ICollection<ItemList_Item> ItemList_Item { get; set; }
+    }
+
+    public partial class ItemList_Item
+    {
+        public int ItemListId { get; set; }
+        public int ItemId { get; set; }
+
+        public virtual Item Item { get; set; }
+        public virtual ItemList ItemList { get; set; }
+    }
+
+
+    public partial class Item
+    {
+        partial void OnConstruction()
+        {
+            ItemList_Item = new HashSet<ItemList_Item>();
+            TradeItemDetails = new HashSet<TradeItemDetails>();
+        }
+
+        public  ICollection<ItemList_Item> ItemList_Item { get; set; }
+        public  ICollection<TradeItemDetails> TradeItemDetails { get; set; }
+    }
+
+    public partial class Permission
+    {
+        //[ForeignKey("ActionDetails")]
+        public  int ActionDetailsId { get; set; }
+        //[ForeignKey("PermissionType")]
+        public  int PermissionTypeId { get; set; }
+    }
+
+    public partial class PermissionType
+    {
+        partial void OnConstruction()
+        {
+            Permissions = new HashSet<Permission>();
+        }
+
+        public ICollection<Permission> Permissions { get; set; }
+    }
+
+    public partial class TradeItemDetails
+    {
+        partial void OnConstruction()
+        {
+            TradeItemList_TradeItemDetails = new HashSet<TradeItemList_TradeItemDetails>();
+        }
+
+        public int ItemId { get; set; }
+        public ICollection<TradeItemList_TradeItemDetails> TradeItemList_TradeItemDetails { get; set; }
+    }
+
+    public partial class TradeItemList
+    {
+        partial void OnConstruction()
+        {
+            TradeItemList_TradeItemDetails = new HashSet<TradeItemList_TradeItemDetails>();
+            Trades = new HashSet<Trade>();
+        }
+
+        public ICollection<TradeItemList_TradeItemDetails> TradeItemList_TradeItemDetails { get; set; }
+        public ICollection<Trade> Trades { get; set; }
+    }
+    public partial class TradeItemList_TradeItemDetails
     {
         public int TradeItemListId { get; set; }
-        public TradeItemList TradeItemList { get; set; }
         public int TradeItemDetailsId { get; set; }
-        public TradeItemDetails TradeItemDetails { get; set; }
+
+        public virtual TradeItemDetails TradeItemDetails { get; set; }
+        public virtual TradeItemList TradeItemList { get; set; }
+    }
+
+    public partial class Trade
+    { 
+        public  int TradeItemListId { get; set; }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
