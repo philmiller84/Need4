@@ -11,7 +11,6 @@ namespace Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //string ConnectionString = "Data Source=" + Path.Combine(Directory.GetCurrentDirectory(), "need4.db");
                 string ConnectionString = "Data Source=C:\\Users\\Phil\\Repo\\Need4\\Models\\need4.db";
 
                 try
@@ -37,7 +36,6 @@ namespace Models
             OnCreateTrade(modelBuilder.Entity<Trade>());
             OnCreateTradeItemLists(modelBuilder.Entity<TradeItemList>());
             OnCreateTradeItemDetails(modelBuilder.Entity<TradeItemDetails>());
-            OnCreateTradeItemList_TradeItemDetails(modelBuilder.Entity<TradeItemList_TradeItemDetails>());
         }
 
 
@@ -168,26 +166,11 @@ namespace Models
             e.HasOne(d => d.Item)
                 .WithMany(p => p.TradeItemDetails)
                 .HasForeignKey(d => d.ItemId);
-            e.HasData(
-                new { Id = -1, ItemId = -1, FulfilledQuantity= 0, NeedOffset = 1 }
-                );
-        }
-
-        private void OnCreateTradeItemList_TradeItemDetails(EntityTypeBuilder<TradeItemList_TradeItemDetails> e)
-        {
-            e.HasKey(r => new { r.TradeItemListId, r.TradeItemDetailsId});
-
-
-            e.HasOne(d => d.TradeItemDetails)
-                .WithMany(p => p.TradeItemList_TradeItemDetails)
-                .HasForeignKey(d => d.TradeItemDetailsId);
-
             e.HasOne(d => d.TradeItemList)
-                .WithMany(p => p.TradeItemList_TradeItemDetails)
+                .WithMany(p => p.TradeItemDetails)
                 .HasForeignKey(d => d.TradeItemListId);
-
             e.HasData(
-                new {TradeItemListId = -1, TradeItemDetailsId = -1}
+                new { Id = -1, ItemId = -1, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -1 }
                 );
         }
       }

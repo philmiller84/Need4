@@ -46,9 +46,7 @@ namespace Need4Protocol
 
     public partial class Permission
     {
-        //[ForeignKey("ActionDetails")]
         public  int ActionDetailsId { get; set; }
-        //[ForeignKey("PermissionType")]
         public  int PermissionTypeId { get; set; }
     }
 
@@ -66,31 +64,21 @@ namespace Need4Protocol
     {
         partial void OnConstruction()
         {
-            TradeItemList_TradeItemDetails = new HashSet<TradeItemList_TradeItemDetails>();
         }
 
         public int ItemId { get; set; }
-        public ICollection<TradeItemList_TradeItemDetails> TradeItemList_TradeItemDetails { get; set; }
+        public TradeItemList TradeItemList { get; set; }
+        public int TradeItemListId { get; set; }
     }
 
     public partial class TradeItemList
     {
         partial void OnConstruction()
         {
-            TradeItemList_TradeItemDetails = new HashSet<TradeItemList_TradeItemDetails>();
             Trades = new HashSet<Trade>();
         }
 
-        public ICollection<TradeItemList_TradeItemDetails> TradeItemList_TradeItemDetails { get; set; }
         public ICollection<Trade> Trades { get; set; }
-    }
-    public partial class TradeItemList_TradeItemDetails
-    {
-        public int TradeItemListId { get; set; }
-        public int TradeItemDetailsId { get; set; }
-
-        public virtual TradeItemDetails TradeItemDetails { get; set; }
-        public virtual TradeItemList TradeItemList { get; set; }
     }
 
     public partial class Trade
