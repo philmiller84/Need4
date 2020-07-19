@@ -1,0 +1,36 @@
+﻿syntax = "proto3";
+
+package Need4Protocol;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "protos/Action.proto";
+import "protos/Item.proto";
+
+service SaleService {
+	rpc CreateSale (Sale) returns (ActionResponse);
+	rpc GetSales (google.protobuf.Empty) returns (SaleList);
+}
+
+message SaleList {
+	repeated Sale Sales = 1;
+}
+
+message Sale {
+	int32 id = 1;
+    string time_started = 2;
+	SaleItemList SaleItemList = 3;
+}
+
+message SaleItemList {
+	int32 id = 1;
+	repeated SaleItemDetails SaleItemDetails = 2;
+}
+
+message SaleItemDetails {
+	int32 id = 1;
+	Item item = 2;
+	int32 available_quantity = 3;
+	double price = 4;
+}
+

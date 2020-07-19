@@ -7,7 +7,7 @@
     <div class="col-md-6">
         @foreach (ActionDetails a in actions)
         {
-            <button type="button" class="btn btn-primary" @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId+1)))">@a.Name</button>
+            <button type="button" class="btn btn-primary" @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId)))">@a.Name</button>
         }
     </div>
 </div>

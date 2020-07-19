@@ -37,11 +37,11 @@ namespace Need4Protocol
         partial void OnConstruction()
         {
             ItemList_Item = new HashSet<ItemList_Item>();
-            TradeItemDetails = new HashSet<TradeItemDetails>();
+            //TradeItemDetails = new HashSet<TradeItemDetails>();
         }
 
         public  ICollection<ItemList_Item> ItemList_Item { get; set; }
-        public  ICollection<TradeItemDetails> TradeItemDetails { get; set; }
+        //public  ICollection<TradeItemDetails> TradeItemDetails { get; set; }
     }
 
     public partial class Permission
@@ -62,10 +62,6 @@ namespace Need4Protocol
 
     public partial class TradeItemDetails
     {
-        partial void OnConstruction()
-        {
-        }
-
         public int ItemId { get; set; }
         public TradeItemList TradeItemList { get; set; }
         public int TradeItemListId { get; set; }
@@ -84,6 +80,24 @@ namespace Need4Protocol
     public partial class Trade
     { 
         public  int TradeItemListId { get; set; }
+    }
+
+    public partial class SaleItemDetails
+    {
+        public int ItemId { get; set; }
+        public SaleItemList SaleItemList { get; set; }
+        public int SaleItemListId { get; set; }
+
+    }
+
+    public partial class Sale
+    {
+        //public int SaleItemListId { get; set; }
+    }
+    public partial class SaleItemList
+    {
+        public Sale Sale { get; set; }
+        public int SaleId { get; set; }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

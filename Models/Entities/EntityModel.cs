@@ -36,8 +36,52 @@ namespace Models
             OnCreateTrade(modelBuilder.Entity<Trade>());
             OnCreateTradeItemLists(modelBuilder.Entity<TradeItemList>());
             OnCreateTradeItemDetails(modelBuilder.Entity<TradeItemDetails>());
+            OnCreateSaleItemDetails(modelBuilder.Entity<SaleItemDetails>());
+            OnCreateSaleItemList(modelBuilder.Entity<SaleItemList>());
+            OnCreateSale(modelBuilder.Entity<Sale>());
         }
 
+        public DbSet<SaleItemDetails> SaleItemDetails { get; set; }
+        private void OnCreateSaleItemDetails(EntityTypeBuilder<SaleItemDetails> e)
+        {
+            e.HasKey(r => r.Id);
+            e.Property(r => r.Id).ValueGeneratedOnAdd();
+            e.HasOne(d => d.Item);
+                //.WithMany(p => p.SaleItemDetails)
+                //.HasForeignKey(d => d.ItemId);
+            e.HasOne(d => d.SaleItemList)
+                .WithMany(p => p.SaleItemDetails)
+                .HasForeignKey(d => d.SaleItemListId);
+
+            e.HasData(
+                new { Id = -1, ItemId = -1, AvailableQuantity = 2, Price = 2.5, SaleItemListId = -1 }
+                );
+        }
+
+        public DbSet<SaleItemList> SaleItemLists { get; set; }
+        private void OnCreateSaleItemList(EntityTypeBuilder<SaleItemList> e)
+        {
+            e.HasKey(r => r.Id);
+            e.Property(r => r.Id).ValueGeneratedOnAdd();
+            e.Ignore(r => r.SaleItemDetails);
+            e.HasOne(d => d.Sale)
+                .WithOne(p => p.SaleItemList)
+                .HasForeignKey("Sale", "Id");
+            e.HasData(
+                new {Id = -1, SaleId = -1}
+                );
+        }
+
+        public DbSet<Sale> Sales { get; set; }
+        private void OnCreateSale(EntityTypeBuilder<Sale> e)
+        {
+            e.HasKey(r => r.Id);
+            e.Property(r => r.Id).ValueGeneratedOnAdd();
+    
+            e.HasData(
+                new { Id = -1, TimeStarted = "20200707" }
+                );
+        }
 
         public DbSet<PermissionType> PermissionTypes { get; set; }
         private void OnCreatePermissionTypes(EntityTypeBuilder<PermissionType> entityTypeBuilder)
@@ -165,9 +209,9 @@ namespace Models
         {
             e.HasKey(r => r.Id);
             e.Property(r => r.Id).ValueGeneratedOnAdd();
-            e.HasOne(d => d.Item)
-                .WithMany(p => p.TradeItemDetails)
-                .HasForeignKey(d => d.ItemId);
+            e.HasOne(d => d.Item);
+                //.WithMany(p => p.TradeItemDetails)
+                //.HasForeignKey(d => d.ItemId);
             e.HasOne(d => d.TradeItemList)
                 .WithMany(p => p.TradeItemDetails)
                 .HasForeignKey(d => d.TradeItemListId);

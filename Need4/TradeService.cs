@@ -13,20 +13,18 @@ namespace Need4
     {
         public override Task<ActionResponse> CreateTrade(Trade request, ServerCallContext context)
         {
-            using (Need4Context db = new Need4Context())
+            using Need4Context db = new Need4Context();
+            bool created = db.Database.EnsureCreated();
+            //Console.WriteLine("Database was created (true), or existing (false): {0}", created);
+            try
             {
-                bool created = db.Database.EnsureCreated();
-                //Console.WriteLine("Database was created (true), or existing (false): {0}", created);
-                try
-                {
-                    db.Add(request);
-                    db.SaveChanges();
-                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
-                }
-                catch
-                {
-                    return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
-                }
+                db.Add(request);
+                db.SaveChanges();
+                return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
+            }
+            catch
+            {
+                return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
             }
         }
         public override Task<TradeActionResponse> GetTradeActions(TradeActionRequest request, ServerCallContext context)
