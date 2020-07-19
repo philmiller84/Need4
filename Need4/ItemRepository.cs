@@ -19,13 +19,13 @@ namespace Need4
         public override Task<ItemList> GetMatchingItems(Item itemToMatch, ServerCallContext context)
         {
             ItemList i = new ItemList();
-            this.GenericWrappedInvoke<Item>( itemToMatch, db => from r in db.Items where r.Name == itemToMatch.Name select r, (x) => i.Items.Add(x) );
+            this.GenericWrappedInvoke<Item>( itemToMatch, (db,itemToMatch) => from r in db.Items where r.Name == itemToMatch.Name select r, (x) => i.Items.Add(x) );
             return Task.FromResult(i);
         }
         public override Task<ItemList> GetAllItems(Google.Protobuf.WellKnownTypes.Empty empty, ServerCallContext context)
         {
             ItemList i = new ItemList();
-            this.GenericWrappedInvoke<Item>( null, db => from r in db.Items select r, (x) => i.Items.Add(x) );
+            this.GenericWrappedInvoke<Item>( null, (db,empty) => from r in db.Items select r, (x) => i.Items.Add(x) );
             return Task.FromResult(i);
         }
     }

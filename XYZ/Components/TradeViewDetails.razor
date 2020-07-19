@@ -1,51 +1,47 @@
-﻿@page "/TradeViewDetails"
+﻿@page "/TradeViewDetails/{tradeId:int}"
 
 <h3>TradeViewDetails</h3>
 
-<div class="row ">
-    <div class="col-md-8 themed-grid-col">
-        <div class="pb-3">
-            .col-md-8
-        </div>
-        <div class="row">
-            <div style="@style_display" class="col-md-6 themed-grid-col">.col-md-6</div>
-            <div style="display:none" class="col-md-6 themed-grid-col">.col-md-6</div>
-        </div>
-    </div>
-</div>
-<div class="row ">
-    <div class="col-md-8 themed-grid-col">
-        <div class="pb-3">
-            .col-md-8
-        </div>
-        <div class="row">
-            <div class="col-md-6 themed-grid-col">.col-md-6</div>
-            <div class="col-md-6 themed-grid-col">.col-md-6</div>
-        </div>
-    </div>
-</div>
-
+<TradeViewSmall trade="@trade"></TradeViewSmall>
 <div class="container">
     <div class="col-md-6">
-    @foreach(ActionDetails a in actions)
-    {
-        <button type="button" class="btn btn-primary">@a.Name</button>
-    }
+        @foreach (ActionDetails a in actions)
+        {
+            <button type="button" class="btn btn-primary" @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId+1)))">@a.Name</button>
+        }
     </div>
 </div>
 
 @code {
+    [Parameter]
+    public int tradeId { get; set; }
+
     bool show = true;
-    string style_display { get { return show?"display:show":"display:none"; } }
+    string style_display { get { return show ? "display:show" : "display:none"; } }
 
     List<ActionDetails> actions;
     TradeService.TradeServiceClient tradeClient;
+    Trade trade;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        tradeClient = Need4Service.GetTradeClient();
+        await base.SetParametersAsync(parameters);
+    }
+
+    protected override void OnParametersSet()
+    {
+        var grpcInt = new Google.Protobuf.WellKnownTypes.Int32Value { Value = Convert.ToInt32(tradeId) };
+        trade = tradeClient.GetDetailedTradeView(grpcInt);
+        var response = tradeClient.GetTradeActions(new TradeActionRequest { TradeId = tradeId, UserId = -1 });
+        actions = response.Actions.ToList();
+
+    }
 
     protected override void OnInitialized()
     {
-        tradeClient = Need4Service.GetTradeClient();
-        var response = tradeClient.GetTradeActions(new TradeActionRequest { UserId = -1 });
-        actions = response.Actions.ToList();
+        // THIS DOES NOT GET CALLED WHEN A PARAMETER CHANGES!!!
+        // Note: when using NavigationManager, and changing the param, this gets SKIPPED!
     }
 }
 

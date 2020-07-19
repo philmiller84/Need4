@@ -59,10 +59,10 @@ namespace Models
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData(
-                new { Id = -1, Name = "GetTradeData", Category = "Trade", Description = "/get/trade/{0}" },
-                new { Id = -2, Name = "ExcludeUser", Category = "Trade", Description = "/update/trade/{0}/user/{1}/exclude" },
-                new { Id = -3, Name = "SplitTrade", Category = "Trade", Description = "/update/trade/{0}/split" },
-                new { Id = -4, Name = "FinalizeTrade", Category = "Trade", Description = "/update/trade/{0}/finalize" }
+                new { Id = -1, Name = "GetTradeData", Category = "Trade", Method = "/TradeViewDetails/{0}" },
+                new { Id = -2, Name = "ExcludeUser", Category = "Trade", Method = "/update/trade/{0}/user/{1}/exclude" },
+                new { Id = -3, Name = "SplitTrade", Category = "Trade", Method = "/update/trade/{0}/split" },
+                new { Id = -4, Name = "FinalizeTrade", Category = "Trade", Method = "/update/trade/{0}/finalize" }
                 );
         }
 
@@ -143,7 +143,8 @@ namespace Models
                 .WithMany(p => p.Trades)
                 .HasForeignKey(d => d.TradeItemListId);
             e.HasData(
-                new { Id = -1, TimeStarted = "20200707", TradeItemListId = -1 }
+                new { Id = -1, TimeStarted = "20200707", TradeItemListId = -1 },
+                new { Id = -2, TimeStarted = "20200708", TradeItemListId = -2 }
                 ); ;
         }
 
@@ -154,7 +155,8 @@ namespace Models
             e.Property(r => r.Id).ValueGeneratedOnAdd();
             e.Ignore(r => r.TradeItemDetails);
             e.HasData(
-                new { Id = -1, TradeItemDetailsId = -1 }
+                new { Id = -1 },
+                new { Id = -2 }
                 );
         }
 
@@ -170,7 +172,12 @@ namespace Models
                 .WithMany(p => p.TradeItemDetails)
                 .HasForeignKey(d => d.TradeItemListId);
             e.HasData(
-                new { Id = -1, ItemId = -1, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -1 }
+                new { Id = -1, ItemId = -1, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -1 },
+                new { Id = -2, ItemId = -2, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -1 },
+                new { Id = -3, ItemId = -3, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -1 },
+                new { Id = -4, ItemId = -4, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -2 },
+                new { Id = -5, ItemId = -5, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -2 },
+                new { Id = -6, ItemId = -6, FulfilledQuantity= 0, NeedOffset = 1, TradeItemListId = -2 }
                 );
         }
       }

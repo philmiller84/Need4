@@ -1,14 +1,22 @@
-﻿<p>Trade started: 10/10/2020 11:30am</p>
-
+﻿
 @*@<a href="/TradeViewDetails">Details</a>*@
 
-<div class="row mb-3">
-@foreach (TradeItemDetails i in trade.TradeItemList.TradeItemDetails.ToList())
+@if (TradeIsPopulated(@trade))
 {
-    <div class="col-lg-4 themed-grid-col">@i.Item.Name</div>
-}
+<div @onclick="@(_ => NavigationManager.NavigateTo(String.Format("/TradeViewDetails/{0}", trade.Id)))">
+    <p>Trade started: @trade.TimeStarted</p>
+    <div class="row mb-3">
+    @foreach (TradeItemDetails i in trade.TradeItemList.TradeItemDetails.ToList())
+    {
+        <div class="col-lg-4 themed-grid-col">@i.Item.Name</div>
+    }
+    </div>
 </div>
-
+}
+else
+{
+    <p>No trade with ID "@trade.Id" exists</p>
+}
 
 @code {
     [Parameter]
@@ -16,6 +24,9 @@
 
     override protected void OnParametersSet()
     {
-
+    }
+    bool TradeIsPopulated(Trade t)
+    {
+        return trade.TradeItemList != null && trade.TradeItemList.TradeItemDetails != null;
     }
 }
