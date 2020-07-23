@@ -10,16 +10,11 @@ namespace XYZ.Data
     {
         private readonly ItemRepository.ItemRepositoryClient itemClient;
         private readonly TradeService.TradeServiceClient tradeClient;
+        private readonly SaleService.SaleServiceClient saleClient;
         
-        public ItemRepository.ItemRepositoryClient GetItemClient()
-        {
-            return itemClient;
-        }
-
-        public TradeService.TradeServiceClient GetTradeClient()
-        {
-            return tradeClient;
-        }
+        public ItemRepository.ItemRepositoryClient GetItemClient() { return itemClient; }
+        public TradeService.TradeServiceClient GetTradeClient() { return tradeClient; }
+        public SaleService.SaleServiceClient GetSaleClient() { return saleClient; }
 
         private readonly Channel channel;
         private readonly int port = 50051;
@@ -31,6 +26,7 @@ namespace XYZ.Data
             channel = new Channel(connection, ChannelCredentials.Insecure);
             itemClient = new ItemRepository.ItemRepositoryClient(channel);
             tradeClient = new TradeService.TradeServiceClient(channel);
+            saleClient = new SaleService.SaleServiceClient(channel);
         }
     }
 }

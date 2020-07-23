@@ -11,23 +11,32 @@
 @foreach (Trade t in openTrades)
 {
     <TradeViewSmall trade="t"></TradeViewSmall>
+}
 
+@foreach (Sale s in ongoingSales)
+{
+    <SaleViewSmall sale="s"></SaleViewSmall>
 }
 @*<CreateItem></CreateItem>*@
 
 @code {
-    TradeService.TradeServiceClient client;
+    TradeService.TradeServiceClient TradeClient;
+    SaleService.SaleServiceClient SaleClient;
 
     List<Trade> openTrades;
+    List<Sale> ongoingSales;
 
     protected override void OnInitialized()
     {
-        client = Need4Service.GetTradeClient();
+        TradeClient = Need4Service.GetTradeClient();
+        SaleClient = Need4Service.GetSaleClient();
+
     }
 
     protected override void OnParametersSet()
     {
-        openTrades = client.GetOpenTrades(new Google.Protobuf.WellKnownTypes.Empty()).Trades.ToList() ;
+        openTrades = TradeClient.GetOpenTrades(new Empty()).Trades.ToList() ;
+        ongoingSales = SaleClient.GetSales(new Empty()).Sales.ToList();
     }
 
 

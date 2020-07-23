@@ -1,11 +1,7 @@
-﻿using Grpc.Core;
-using Models;
+﻿using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using Need4Protocol;
-using System.Net;
-using System.Linq;
 using System.Threading.Tasks;
-using Google.Protobuf.WellKnownTypes;
-using Microsoft.EntityFrameworkCore;
 
 namespace Need4
 {
@@ -14,13 +10,10 @@ namespace Need4
         public override Task<SaleList> GetSales(Empty e, ServerCallContext context)
         {
             var s = new SaleList();
+            var SaleItemList = new SaleItemList { Id = -1, SaleId = -1 };
+            SaleItemList.SaleItemDetails.Add(new SaleItemDetails { Item = new Item { Name = "Fruit", EstimatedCost = 2.5 } });
+            s.Sales.Add(new Sale { Id = -1, SaleItemList = SaleItemList });
             return Task.FromResult(s);
         }
-
-        //    public override Task<ActionResponse> CreateTrade(Trade request, ServerCallContext context)
-        //    {
-        //        using (Need4Context db = new Need4Context())
-        //        { }
-        //    }
     }
 }

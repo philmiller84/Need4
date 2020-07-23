@@ -14,7 +14,8 @@ namespace Need4
             {
                 Services = { 
                     ItemRepository.BindService(new ItemRepositoryImpl()) ,
-                    TradeService.BindService(new TradeServiceImpl())
+                    TradeService.BindService(new TradeServiceImpl()),
+                    SaleService.BindService(new SaleServiceImpl())
                 },
                 Ports = { new ServerPort("127.0.0.1", Port, ServerCredentials.Insecure) }
             };
