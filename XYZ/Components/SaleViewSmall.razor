@@ -1,11 +1,14 @@
-﻿<h3>SaleViewSmall</h3>
-
+﻿
 
 <p>Sale ID: @sale.Id</p>
-@foreach(var d in sale.SaleItemList.SaleItemDetails)
+@foreach (var d in sale.SaleItemList.SaleItemDetails)
 {
-	<p>@d.Item.Name</p>
+    <div class="row mb-3">
+        <div class="col-lg-4 themed-grid-col">@d.Item.Name</div>
+        <div class="col-lg-4 themed-grid-col">@d.Item.EstimatedCost</div>
+    </div>
 }
+
 @code {
     [Parameter]
     public Sale sale { get; set; }

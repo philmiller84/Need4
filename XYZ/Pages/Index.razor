@@ -1,9 +1,7 @@
 ﻿@page "/"
 @inject NavigationManager NavigationManager
 
-
 <div class="starter-template">
-
     <h1>Upcoming Trades</h1>
     <p class="lead">Browse trades-in-progress and participate!</p>
 </div>
@@ -12,6 +10,11 @@
 {
     <TradeViewSmall trade="t"></TradeViewSmall>
 }
+
+<div class="starter-template">
+    <h1>Ongoing Sales</h1>
+    <p class="lead">What are you selling? What are you buying?</p>
+</div>
 
 @foreach (Sale s in ongoingSales)
 {
