@@ -1,4 +1,5 @@
 ﻿@page "/"
+@attribute [Authorize]
 @inject NavigationManager NavigationManager
 
 <div class="starter-template">
@@ -38,7 +39,7 @@
 
     protected override void OnParametersSet()
     {
-        openTrades = TradeClient.GetOpenTrades(new Empty()).Trades.ToList() ;
+        openTrades = TradeClient.GetOpenTrades(new Empty()).Trades.ToList();
         ongoingSales = SaleClient.GetSales(new Empty()).Sales.ToList();
     }
 
