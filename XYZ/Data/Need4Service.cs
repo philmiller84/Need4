@@ -1,4 +1,5 @@
 using Grpc.Core;
+using Grpc.Net.Client;
 using Need4Protocol;
 using System;
 using System.Linq;
@@ -16,14 +17,11 @@ namespace XYZ.Data
         public TradeService.TradeServiceClient GetTradeClient() { return tradeClient; }
         public SaleService.SaleServiceClient GetSaleClient() { return saleClient; }
 
-        private readonly Channel channel;
-        private readonly int port = 50051;
-        private readonly string localhost_ip = "127.0.0.1";
+        private readonly GrpcChannel channel;
         public Need4Service()
         {
-               // This is the client startup
-            string connection = string.Format("{0}:{1}", localhost_ip, port);
-            channel = new Channel(connection, ChannelCredentials.Insecure);
+            var serverAddress = "https://localhost:50051";
+            channel = GrpcChannel.ForAddress(serverAddress);
             itemClient = new ItemRepository.ItemRepositoryClient(channel);
             tradeClient = new TradeService.TradeServiceClient(channel);
             saleClient = new SaleService.SaleServiceClient(channel);
