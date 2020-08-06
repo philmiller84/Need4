@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Need4
 {
@@ -27,6 +28,8 @@ namespace Need4
                 return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
             }
         }
+
+        //[Authorize]
         public override Task<TradeActionResponse> GetTradeActions(TradeActionRequest request, ServerCallContext context)
         {
             //NOTE: THIS IS NOT IMPLEMENTED, JUST A STUB HERE

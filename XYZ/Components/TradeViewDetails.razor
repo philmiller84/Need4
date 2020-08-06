@@ -33,6 +33,16 @@
     {
         var grpcInt = new Google.Protobuf.WellKnownTypes.Int32Value { Value = Convert.ToInt32(tradeId) };
         trade = tradeClient.GetDetailedTradeView(grpcInt);
+
+
+        ////TODO: WHEN USER IS LOGGED OUT, MAKE SURE THIS FAILS!!!!
+        ////TODO: FOR EACH USER, NEED TO HAVE A SCOPED ACCESS TO THE ACCESS TOKEN
+        ////TODO: GET THIS IN ASYNC
+        //string accessToken = Need4Service.GetAccessToken().Result;
+        //var headers = new Metadata();
+        //headers.Add("Authorization", $"Bearer {accessToken}");
+
+        //var response = tradeClient.GetTradeActions(new TradeActionRequest { TradeId = tradeId, UserId = -1 }, headers);
         var response = tradeClient.GetTradeActions(new TradeActionRequest { TradeId = tradeId, UserId = -1 });
         actions = response.Actions.ToList();
 

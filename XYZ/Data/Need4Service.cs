@@ -1,9 +1,5 @@
-using Grpc.Core;
 using Grpc.Net.Client;
 using Need4Protocol;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace XYZ.Data
 {
@@ -26,5 +22,36 @@ namespace XYZ.Data
             tradeClient = new TradeService.TradeServiceClient(channel);
             saleClient = new SaleService.SaleServiceClient(channel);
         }
+
+        //public static async Task<string> GetAccessToken()
+        //{
+        //    try
+        //    {
+        //        // TODO: THIS FUNCTION IS PROBABLY NOT THE RIGHT PLACE OR LAYER. FIX THAT!
+        //        var appAuth0Settings = Program.GetAppSettings().GetSection("Need4-API");
+        //        var auth0Client = new AuthenticationApiClient(appAuth0Settings["Domain"]);
+        //        var tokenRequest = new ClientCredentialsTokenRequest()
+        //        {
+        //            ClientId = appAuth0Settings["ClientId"],
+        //            ClientSecret = appAuth0Settings["ClientSecret"],
+        //            Audience = appAuth0Settings["Audience"]
+        //        };
+        //        //var tokenResponse = await auth0Client.GetTokenAsync(tokenRequest);
+        //        var tokenResponse = auth0Client.GetTokenAsync(tokenRequest).Result;
+        //        var user = auth0Client.GetUserInfoAsync(tokenResponse.AccessToken).Result;
+        //        //TODO: CHECK THESE CLAIMS SOMEWHERE
+        //        var claims = new List<Claim>()
+        //            {
+        //                new Claim(ClaimTypes.NameIdentifier, user.UserId),
+        //                new Claim(ClaimTypes.Name, user.UserId)
+        //            };
+
+        //        return tokenResponse.AccessToken;
+        //    }
+        //    catch
+        //    {
+        //        return String.Empty;
+        //    }
+        //}
     }
 }

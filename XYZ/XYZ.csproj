@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Auth0.Core" Version="7.0.9" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
     <PackageReference Include="Grpc" Version="2.30.0" />
     <PackageReference Include="Grpc.Core" Version="2.30.0" />
