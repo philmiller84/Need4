@@ -31,6 +31,8 @@ namespace Need4
             //});
             //services.AddAuthorization();
             services.AddGrpc();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +54,7 @@ namespace Need4
                 endpoints.MapGrpcService<ItemRepositoryImpl>();
                 endpoints.MapGrpcService<TradeServiceImpl>();
                 endpoints.MapGrpcService<SaleServiceImpl>();
+                endpoints.MapGrpcService<UserServiceImpl>();
 
                 endpoints.MapGet("/", async context =>
                 {

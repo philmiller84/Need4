@@ -10,14 +10,16 @@ import "protos/Trade.proto";
 
 
 service UserService {
-	rpc GetUserTrades (google.protobuf.Int32Value) returns (TradeList);
-	rpc GetUser (google.protobuf.Int32Value) returns (User);
-	rpc CreateUser (google.protobuf.Int32Value) returns (User);
+	rpc GetUser (User) returns (User);
+	rpc CreateUser (User) returns (User);
+	rpc GetUserTrades (User) returns (TradeList);
 }
 
 message User {
 	int32 id = 1;
 	string name = 2;
+	string email = 3;
+	bool created = 4;
 }
 
 

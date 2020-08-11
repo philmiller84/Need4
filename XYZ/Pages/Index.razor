@@ -1,6 +1,8 @@
 ﻿@page "/"
 @*@attribute [Authorize]*@
 @inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
 
 <div class="starter-template">
     <h1>Upcoming Trades</h1>
@@ -34,6 +36,7 @@
     {
         TradeClient = Need4Service.GetTradeClient();
         SaleClient = Need4Service.GetSaleClient();
+        var userInfo = httpContextAccessor;
 
     }
 

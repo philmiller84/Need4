@@ -8,10 +8,12 @@ namespace XYZ.Data
         private readonly ItemRepository.ItemRepositoryClient itemClient;
         private readonly TradeService.TradeServiceClient tradeClient;
         private readonly SaleService.SaleServiceClient saleClient;
-        
+        private readonly UserService.UserServiceClient userClient;
+
         public ItemRepository.ItemRepositoryClient GetItemClient() { return itemClient; }
         public TradeService.TradeServiceClient GetTradeClient() { return tradeClient; }
         public SaleService.SaleServiceClient GetSaleClient() { return saleClient; }
+        public UserService.UserServiceClient GetUserClient() { return userClient; }
 
         private readonly GrpcChannel channel;
         public Need4Service()
@@ -21,6 +23,7 @@ namespace XYZ.Data
             itemClient = new ItemRepository.ItemRepositoryClient(channel);
             tradeClient = new TradeService.TradeServiceClient(channel);
             saleClient = new SaleService.SaleServiceClient(channel);
+            userClient = new UserService.UserServiceClient(channel);
         }
 
         //public static async Task<string> GetAccessToken()
