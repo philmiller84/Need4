@@ -55,7 +55,6 @@ namespace XYZ
             .AddOpenIdConnect("Auth0", options => authenticationHelper.SetOpenIdConnectOptions(options));
 
             services.AddHttpContextAccessor();
-
             services.AddScoped<Need4Service>();
             services.AddScoped<Models.Need4Context>();
         }

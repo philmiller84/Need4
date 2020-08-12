@@ -1,34 +1,57 @@
 ﻿@page "/"
 @*@attribute [Authorize]*@
 @inject NavigationManager NavigationManager
-@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor httpContextAccessor
 
-<div class="starter-template">
-    <h1>Upcoming Trades</h1>
-    <p class="lead">Browse trades-in-progress and participate!</p>
+
+
+<AuthorizeView>
+    <Authorized>
+        <h1 class="collapse-toggle" data-toggle="collapse" data-target="#my-trades" aria-expanded="true">My Trades</h1>
+        <div id="my-trades" class="collapse show" >
+            @if(myTrades.Count == 0)
+            {
+                <p class="lead">Looks like your docket is clear. Take a look at upcoming trades!</p>
+            }
+            else
+            {
+                <p class="lead">Monitor your in-progress trades</p>
+                @foreach (Trade t in myTrades)
+                {
+                    <TradeViewSmall trade="t"></TradeViewSmall>
+                }
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+<h1 class="collapse-toggle" data-toggle="collapse" data-target="#upcoming-trades" aria-expanded="true">Upcoming Trades</h1>
+<div id="upcoming-trades" class="collapse show">
+    <p class="lead">Browse open trades and participate!</p>
+    @foreach (Trade t in openTrades)
+    {
+        <TradeViewSmall trade="t"></TradeViewSmall>
+    }
 </div>
 
-@foreach (Trade t in openTrades)
-{
-    <TradeViewSmall trade="t"></TradeViewSmall>
-}
-
-<div class="starter-template">
-    <h1>Ongoing Sales</h1>
-    <p class="lead">What are you selling? What are you buying?</p>
+<h1 class="collapse-toggle" data-toggle="collapse" data-target="#sales" aria-expanded="true">Ongoing Sales</h1>
+<div id="sales" class="collapse show">
+    <p class="lead">What are you buying? What are you selling?</p>
+    @foreach (Sale s in ongoingSales)
+    {
+        <SaleViewSmall sale="s"></SaleViewSmall>
+    }
 </div>
-
-@foreach (Sale s in ongoingSales)
-{
-    <SaleViewSmall sale="s"></SaleViewSmall>
-}
-@*<CreateItem></CreateItem>*@
 
 @code {
     TradeService.TradeServiceClient TradeClient;
     SaleService.SaleServiceClient SaleClient;
 
+    bool hide_my_trades { get; set; }
+    bool hide_upcoming { get; set; }
+    bool hide_sales { get; set; }
+
+    List<Trade> myTrades;
     List<Trade> openTrades;
     List<Sale> ongoingSales;
 
@@ -37,16 +60,13 @@
         TradeClient = Need4Service.GetTradeClient();
         SaleClient = Need4Service.GetSaleClient();
         var userInfo = httpContextAccessor;
-
     }
 
     protected override void OnParametersSet()
     {
+        myTrades = new List<Trade>();
         openTrades = TradeClient.GetOpenTrades(new Empty()).Trades.ToList();
         ongoingSales = SaleClient.GetSales(new Empty()).Sales.ToList();
     }
-
-
-
 
 }

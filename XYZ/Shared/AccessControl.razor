@@ -1,11 +1,29 @@
-﻿// Shared/AccessControl.razor
+﻿@inject IHttpContextAccessor httpContextAccessor
 
 <AuthorizeView>
     <Authorized>
+        @if(name != null)
+        {
+            <span>Welcome @name! </span>
+        }
         <a href="logout">Log out</a>
     </Authorized>
     <NotAuthorized>
+        @if(name != null)
+        {
+            <span>Welcome @name! Please </span>
+        }
         <a href="login?redirectUri=/">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
+
+@code
+{
+    string name { get; set; }
+    protected override void OnInitialized()
+    {
+        var userClaims = httpContextAccessor.HttpContext.User.Claims;
+        name = (from c in userClaims where c.Type == "name" select c.Value).FirstOrDefault(); ;
+    }
+}
 
