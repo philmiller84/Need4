@@ -1,16 +1,6 @@
 ﻿syntax = "proto3";
-
 package Need4Protocol;
-
-import "google/protobuf/empty.proto";
-import "google/protobuf/wrappers.proto";
-import "protos/Action.proto";
 import "protos/Item.proto";
-
-service SaleService {
-	rpc CreateSale (Sale) returns (ActionResponse);
-	rpc GetSales (google.protobuf.Empty) returns (SaleList);
-}
 
 message SaleList {
 	repeated Sale Sales = 1;

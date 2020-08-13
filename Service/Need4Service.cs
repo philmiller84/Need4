@@ -1,7 +1,7 @@
 using Grpc.Net.Client;
 using Need4Protocol;
 
-namespace XYZ.Data
+namespace Service
 {
     public class Need4Service 
     {

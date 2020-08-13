@@ -1,0 +1,38 @@
+﻿syntax = "proto3";
+package Need4Protocol;
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "protos/Action.proto";
+import "protos/Item.proto";
+import "protos/Sale.proto";
+import "protos/Permission.proto";
+import "protos/User.proto";
+import "protos/Trade.proto";
+
+service TradeService {
+	rpc CreateTrade (Trade) returns (ActionResponse);
+	rpc GetOpenTrades (google.protobuf.Empty) returns (TradeList);
+	rpc GetDetailedTradeView (google.protobuf.Int32Value) returns (Trade);
+	rpc GetTradeActions (TradeActionRequest) returns (TradeActionResponse);
+	rpc GetUserTrades (User) returns (TradeList);
+}
+
+service PermissionService {
+	rpc IsUserPermissioned (UserPermission) returns (ActionResponse);
+}
+
+service ItemRepository {
+	rpc AddNewItem (Item) returns (ActionResponse);
+	rpc GetAllItems (google.protobuf.Empty) returns (ItemList);
+	rpc GetMatchingItems (Item) returns (ItemList);
+}
+
+service SaleService {
+	rpc CreateSale (Sale) returns (ActionResponse);
+	rpc GetSales (google.protobuf.Empty) returns (SaleList);
+}
+
+service UserService {
+	rpc GetUser (User) returns (User);
+	rpc CreateUser (User) returns (User);
+}

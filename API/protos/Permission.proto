@@ -1,14 +1,8 @@
 ﻿syntax = "proto3";
-
 package Need4Protocol;
-
 import "google/protobuf/wrappers.proto";
 import "protos/Action.proto";
 import "protos/User.proto";
-
-service PermissionService {
-	rpc IsUserPermissioned (UserPermission) returns (ActionResponse);
-}
 
 message UserPermission {
 	User user = 1;

@@ -34,6 +34,7 @@ namespace Models
             OnCreateItemList(modelBuilder.Entity<ItemList>());
             OnCreateItemList_Item(modelBuilder.Entity<ItemList_Item>());
             OnCreateTrade(modelBuilder.Entity<Trade>());
+            OnCreateTradeUser(modelBuilder.Entity<TradeUser>());
             OnCreateTradeItemLists(modelBuilder.Entity<TradeItemList>());
             OnCreateTradeItemDetails(modelBuilder.Entity<TradeItemDetails>());
             OnCreateSaleItemDetails(modelBuilder.Entity<SaleItemDetails>());
@@ -115,7 +116,7 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
-            //entityTypeBuilder.HasData( new { Id = -1, Name = "Phil", Created = true, Email="phil.miller84@gmail.com" } );
+            entityTypeBuilder.HasData( new { Id = -1, Name = "Phil", Created = true, Email="phil.miller84@gmail.com" } );
         }
         public DbSet<Permission> Permissions { get; set; }
         private void OnCreatePermissions(EntityTypeBuilder<Permission> entity)
@@ -186,10 +187,28 @@ namespace Models
             e.HasOne(d => d.TradeItemList)
                 .WithMany(p => p.Trades)
                 .HasForeignKey(d => d.TradeItemListId);
+            //e.HasOne(d => d.TradeUserList)
+            //    .WithMany(p => p.Trades)
+            //    .HasForeignKey(d => d.TradeItemListId);
             e.HasData(
-                new { Id = -1, TimeStarted = "20200707", TradeItemListId = -1 },
-                new { Id = -2, TimeStarted = "20200708", TradeItemListId = -2 }
+                new { Id = -1, TimeStarted = "20200707", TradeItemListId = -1},
+                new { Id = -2, TimeStarted = "20200708", TradeItemListId = -2}
                 ); ;
+        }
+
+
+        // Do not need this in the entity, only on the SQL database
+        public DbSet<TradeUser> TradeUsers{ get; set; }
+        public void OnCreateTradeUser(EntityTypeBuilder<TradeUser> e)
+        {
+            e.HasKey(t => new { t.TradeId, t.UserId });
+            e.HasOne(d => d.Trade)
+                .WithMany(p => p.TradeUser)
+                .HasForeignKey(d => d.TradeId);
+            e.HasOne(d => d.User)
+                .WithMany(p => p.TradeUser)
+                .HasForeignKey(d => d.UserId);
+            e.HasData(new { TradeId = -1, UserId = -1 });
         }
 
         public DbSet<TradeItemList> TradeItemLists { get; set; }

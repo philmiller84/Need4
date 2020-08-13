@@ -18,3 +18,7 @@ MISSING DATA?
 
 DIRECT EDITS TO THE DB NOT WORKING?
  Seed data may be getting re-added. 
+
+MANY TO MANY JOINS NOT WORKING?
+ Check the link below. Check that the seed data exists on both sides of the join. Surprisingly, it seems to work as described in this article.
+ https://www.thereformedprogrammer.net/updating-many-to-many-relationships-in-entity-framework-core/

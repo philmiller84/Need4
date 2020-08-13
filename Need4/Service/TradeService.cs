@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Need4
 {
@@ -57,6 +58,23 @@ namespace Need4
                 (x) => trade = x);
 
             return Task.FromResult(trade);
+        }
+        public override Task<TradeList> GetUserTrades(User u, ServerCallContext context)
+        {
+            TradeList tl = new TradeList();
+            this.GenericWrappedInvoke<User, Trade>(
+                 u,
+                (db, u) => from t in db.Trades
+                           .Include(l => l.TradeItemList)
+                           .ThenInclude(y => y.TradeItemDetails)
+                           .ThenInclude(z => z.Item)
+                           join x in db.TradeUsers
+                           on u.Id equals x.UserId
+                           where t.Id == x.TradeId
+                           select t,
+                (x) => tl.Trades.Add(x));
+
+            return Task.FromResult(tl);
         }
         public override Task<TradeList> GetOpenTrades(Empty e, ServerCallContext context)
         {

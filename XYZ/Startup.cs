@@ -1,19 +1,11 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using System.Linq;
-using XYZ.Data;
-
-
 
 namespace XYZ
 {
@@ -40,9 +32,9 @@ namespace XYZ
 				options.MinimumSameSitePolicy = SameSiteMode.None;
 			});
 
-            services.AddSingleton<AuthenticationHelper>(new AuthenticationHelper(Configuration));
-            var lookup = from s in services where s.ServiceType == typeof(AuthenticationHelper) select s;
-            var authenticationHelper = (AuthenticationHelper) lookup.First().ImplementationInstance;
+            services.AddSingleton<Helpers.Authentication>(new Helpers.Authentication(Configuration));
+            var lookup = from s in services where s.ServiceType == typeof(Helpers.Authentication) select s;
+            var authenticationHelper = (Helpers.Authentication) lookup.First().ImplementationInstance;
 
             // Add authentication services
             services.AddAuthentication(options =>
@@ -55,7 +47,7 @@ namespace XYZ
             .AddOpenIdConnect("Auth0", options => authenticationHelper.SetOpenIdConnectOptions(options));
 
             services.AddHttpContextAccessor();
-            services.AddScoped<Need4Service>();
+            services.AddScoped<Service.Need4Service>();
             services.AddScoped<Models.Need4Context>();
         }
  

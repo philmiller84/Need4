@@ -24,11 +24,11 @@ namespace Need4Protocol
 
     public partial class ItemList_Item
     {
-        public int ItemListId { get; set; }
+        public virtual Item Item { get; set; }
         public int ItemId { get; set; }
 
-        public virtual Item Item { get; set; }
         public virtual ItemList ItemList { get; set; }
+        public int ItemListId { get; set; }
     }
 
 
@@ -67,6 +67,23 @@ namespace Need4Protocol
         public int TradeItemListId { get; set; }
     }
 
+    public class TradeUser
+    {
+        public int TradeId { get; set; }
+        public int UserId { get; set; }
+        public Trade Trade { get; set; }
+        public User User { get; set; }
+    }
+
+    //public partial class TradeUserList
+    //{
+    //    partial void OnConstruction()
+    //    {
+    //        Trades = new HashSet<Trade>();
+    //    }
+    //    public ICollection<Trade> Trades { get; set; }
+    //}
+
     public partial class TradeItemList
     {
         partial void OnConstruction()
@@ -78,8 +95,13 @@ namespace Need4Protocol
     }
 
     public partial class Trade
-    { 
-        public  int TradeItemListId { get; set; }
+    {
+        partial void OnConstruction()
+        {
+            TradeUser = new HashSet<TradeUser>();
+        }
+        public ICollection<TradeUser> TradeUser { get; set; }
+        public int TradeItemListId { get; set; }
     }
 
     public partial class SaleItemDetails
@@ -100,6 +122,16 @@ namespace Need4Protocol
         public int SaleId { get; set; }
     }
 
+
+    public partial class User
+    {
+        partial void OnConstruction()
+        {
+            TradeUser = new HashSet<TradeUser>();
+        }
+
+        public ICollection<TradeUser> TradeUser { get; set; }
+    }
     //////////////////////////////////////////////////////////////////////////////////////////////////
     //  DON'T DO THIS!!!! DON'T BE LAZY!!!! NO NEED FOR PERSISTENCE, JUST MAKE THE HTML MANUALLY!!!
     //////////////////////////////////////////////////////////////////////////////////////////////////

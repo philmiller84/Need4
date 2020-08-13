@@ -3,8 +3,6 @@
 @inject NavigationManager NavigationManager
 @inject IHttpContextAccessor httpContextAccessor
 
-
-
 <AuthorizeView>
     <Authorized>
         <h1 class="collapse-toggle" data-toggle="collapse" data-target="#my-trades" aria-expanded="true">My Trades</h1>
@@ -46,10 +44,8 @@
 @code {
     TradeService.TradeServiceClient TradeClient;
     SaleService.SaleServiceClient SaleClient;
+    UserService.UserServiceClient UserClient;
 
-    bool hide_my_trades { get; set; }
-    bool hide_upcoming { get; set; }
-    bool hide_sales { get; set; }
 
     List<Trade> myTrades;
     List<Trade> openTrades;
@@ -59,12 +55,17 @@
     {
         TradeClient = Need4Service.GetTradeClient();
         SaleClient = Need4Service.GetSaleClient();
-        var userInfo = httpContextAccessor;
+        UserClient = Need4Service.GetUserClient();
     }
 
     protected override void OnParametersSet()
     {
-        myTrades = new List<Trade>();
+        string email = Helpers.Claims.GetEmailFromClaimsIdentity(httpContextAccessor.HttpContext.User.Claims);
+        if (email != null)
+        { 
+            User user = UserClient.GetUser(new User { Email = email });
+            myTrades = TradeClient.GetUserTrades(user).Trades.ToList();
+        }
         openTrades = TradeClient.GetOpenTrades(new Empty()).Trades.ToList();
         ongoingSales = SaleClient.GetSales(new Empty()).Sales.ToList();
     }

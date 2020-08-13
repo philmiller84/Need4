@@ -2,18 +2,16 @@
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Service;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using XYZ.Data;
 
-namespace XYZ
+namespace Helpers
 {
-    public class AuthenticationHelper
+    public class Authentication
     {
-        public AuthenticationHelper(IConfiguration configuration) { Configuration = configuration; }
+        public Authentication(IConfiguration configuration) { Configuration = configuration; }
         public IConfiguration Configuration { get; private set; }
 
 
@@ -77,7 +75,8 @@ namespace XYZ
                 }
                 var service = new Need4Service();
                 var userService = service.GetUserClient();
-                var user = new Need4Protocol.User { Id = 0, Name = "phil", Email = "phil.miller84@gmail.com", Created = false };
+                string email = Claims.GetEmailFromClaimsIdentity(context.Principal.Claims);
+                var user = new Need4Protocol.User { Email = email };
                 var response = userService.GetUser(user);
                 if (!response.Created)
                 {

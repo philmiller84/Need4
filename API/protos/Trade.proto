@@ -1,18 +1,9 @@
 ﻿syntax = "proto3";
-
 package Need4Protocol;
-
 import "google/protobuf/empty.proto";
-import "google/protobuf/wrappers.proto";
 import "protos/Action.proto";
 import "protos/Item.proto";
-
-service TradeService {
-	rpc CreateTrade (Trade) returns (ActionResponse);
-	rpc GetOpenTrades (google.protobuf.Empty) returns (TradeList);
-	rpc GetDetailedTradeView (google.protobuf.Int32Value) returns (Trade);
-	rpc GetTradeActions (TradeActionRequest) returns (TradeActionResponse);
-}
+import "protos/User.proto";
 
 message TradeActionRequest {
 	int32 trade_id = 1;
@@ -23,7 +14,6 @@ message TradeActionResponse {
 	repeated ActionDetails actions = 1;
 }
 
-
 message TradeList {
 	repeated Trade Trades = 1;
 }
@@ -32,6 +22,11 @@ message Trade {
 	int32 id = 1;
     string time_started = 2;
 	TradeItemList TradeItemList = 3;
+}
+
+message TradeUserList {
+	int32 id = 1;
+	repeated User User = 2;
 }
 
 message TradeItemList {

@@ -1,14 +1,5 @@
 ﻿syntax = "proto3";
-
 package Need4Protocol;
-import "protos/Action.proto";
-import "google/protobuf/empty.proto";
-
-service ItemRepository {
-	rpc AddNewItem (Item) returns (ActionResponse);
-	rpc GetAllItems (google.protobuf.Empty) returns (ItemList);
-	rpc GetMatchingItems (Item) returns (ItemList);
-}
 
 message ItemList {
 	int32 id = 1;
