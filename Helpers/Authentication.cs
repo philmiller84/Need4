@@ -75,7 +75,7 @@ namespace Helpers
                 }
                 var service = new Need4Service();
                 var userService = service.GetUserClient();
-                string email = Claims.GetEmailFromClaimsIdentity(context.Principal.Claims);
+                string email = Claims.GetEmail(context.Principal.Claims);
                 var user = new Need4Protocol.User { Email = email };
                 var response = userService.GetUser(user);
                 if (!response.Created)

@@ -1,7 +1,7 @@
 ﻿@page "/"
-@*@attribute [Authorize]*@
 @inject NavigationManager NavigationManager
 @inject IHttpContextAccessor httpContextAccessor
+@using XYZ.Utility 
 
 <AuthorizeView>
     <Authorized>
@@ -60,10 +60,11 @@
 
     protected override void OnParametersSet()
     {
-        string email = Helpers.Claims.GetEmailFromClaimsIdentity(httpContextAccessor.HttpContext.User.Claims);
-        if (email != null)
-        { 
-            User user = UserClient.GetUser(new User { Email = email });
+
+        User user = Utility.GetUser(httpContextAccessor, UserClient);
+
+        if(user != null)
+        {
             myTrades = TradeClient.GetUserTrades(user).Trades.ToList();
         }
         openTrades = TradeClient.GetOpenTrades(new Empty()).Trades.ToList();

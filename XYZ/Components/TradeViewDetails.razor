@@ -1,16 +1,23 @@
 ﻿@page "/TradeViewDetails/{tradeId:int}"
+@inject IHttpContextAccessor httpContextAccessor
 
 <h3>TradeViewDetails</h3>
 
 <TradeViewSmall trade="@trade"></TradeViewSmall>
-<div class="container">
-    <div class="col-md-6">
-        @foreach (ActionDetails a in actions)
-        {
-            <button type="button" class="btn btn-primary" @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId, 0)))">@a.Name</button>
-        }
-    </div>
-</div>
+<AuthorizeView>
+    <Authorized>
+        <div class="container">
+            <div class="col-md-6">
+                @foreach (ActionDetails a in actions)
+                {
+                    <button type="button" class="btn btn-primary"
+                            @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId, 0)))">@a.Name</button>
+                }
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
 
 @code {
     [Parameter]
