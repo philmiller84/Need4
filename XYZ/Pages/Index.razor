@@ -1,7 +1,6 @@
 ﻿@page "/"
 @inject NavigationManager NavigationManager
-@inject IHttpContextAccessor httpContextAccessor
-@using XYZ.Utility 
+@inject XYZ.Utility Utility
 
 <AuthorizeView>
     <Authorized>
@@ -61,12 +60,13 @@
     protected override void OnParametersSet()
     {
 
-        User user = Utility.GetUser(httpContextAccessor, UserClient);
+        User user = Utility.GetUser();
 
         if(user != null)
         {
             myTrades = TradeClient.GetUserTrades(user).Trades.ToList();
         }
+
         openTrades = TradeClient.GetOpenTrades(new Empty()).Trades.ToList();
         ongoingSales = SaleClient.GetSales(new Empty()).Sales.ToList();
     }

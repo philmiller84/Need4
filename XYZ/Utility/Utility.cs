@@ -6,18 +6,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace XYZ.Utility
+namespace XYZ
 {
-    public class Utility
+    public class Utility 
     {
+        private readonly IHttpContextAccessor _context;
+        private readonly Service.Need4Service _need4Service;
 
-        static public User GetUser(IHttpContextAccessor context, UserService.UserServiceClient UserClient)
+        public Utility(IHttpContextAccessor context, Service.Need4Service need4Service)
         {
-            string email = Helpers.Claims.GetEmail(context.HttpContext.User.Claims);
+            _context = context;
+            _need4Service = need4Service;
+        }
+        public User GetUser()
+        {
+            string email = Helpers.Claims.GetEmail(_context.HttpContext.User.Claims);
             if (email == null)
                 return null;
 
-            return UserClient.GetUser(new User { Email = email });
+            return _need4Service.GetUserClient().GetUser(new User { Email = email });
         }
     }
 }

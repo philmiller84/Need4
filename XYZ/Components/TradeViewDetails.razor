@@ -1,5 +1,5 @@
 ﻿@page "/TradeViewDetails/{tradeId:int}"
-@inject IHttpContextAccessor httpContextAccessor
+@inject XYZ.Utility Utility
 
 <h3>TradeViewDetails</h3>
 
@@ -50,6 +50,7 @@
         //headers.Add("Authorization", $"Bearer {accessToken}");
 
         //var response = tradeClient.GetTradeActions(new TradeActionRequest { TradeId = tradeId, UserId = -1 }, headers);
+        User user = Utility.GetUser();
         var response = tradeClient.GetTradeActions(new TradeActionRequest { TradeId = tradeId, UserId = -1 });
         actions = response.Actions.ToList();
 
