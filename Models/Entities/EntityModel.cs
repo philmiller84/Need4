@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Need4Protocol;
 using System;
@@ -29,7 +30,9 @@ namespace Models
             OnCreatePermissionTypes(modelBuilder.Entity<PermissionType>());
             OnCreateActionDetails(modelBuilder.Entity<ActionDetails>());
             OnCreateUsers(modelBuilder.Entity<User>());
+            OnCreateRelationshipTypes(modelBuilder.Entity<RelationshipType>());
             OnCreatePermissions(modelBuilder.Entity<Permission>());
+            OnCreateRequirements(modelBuilder.Entity<Requirement>());
             OnCreateItems(modelBuilder.Entity<Item>());
             OnCreateItemList(modelBuilder.Entity<ItemList>());
             OnCreateItemList_Item(modelBuilder.Entity<ItemList_Item>());
@@ -90,11 +93,11 @@ namespace Models
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData(
-                new { Id = -1, Name = "Admin", Description = "The user is admin" },
-                new { Id = -2, Name = "Owner", Description = "The entity is owned" },
-                new { Id = -3, Name = "Reviewer", Description = "The entity is being reviewed" },
-                new { Id = -4, Name = "Participant", Description = "The entity is being participated in" },
-                new { Id = -5, Name = "Any", Description = "Any status has permission to entity" }
+                new { Id = -1, Name = "Administer", Description = "Is admin" },
+                new { Id = -2, Name = "Own", Description = "Owns the entity" },
+                new { Id = -3, Name = "Review", Description = "Reviewing the entity" },
+                new { Id = -4, Name = "Participate", Description = "Participating in the entity" },
+                new { Id = -5, Name = "View", Description = "Viewing the entity" }
                 );
         }
 
@@ -104,10 +107,12 @@ namespace Models
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData(
-                new { Id = -1, Name = "GetTradeData", Category = "Trade", Method = "/TradeViewDetails/{0}" },
-                new { Id = -2, Name = "ExcludeUser", Category = "Trade", Method = "/update/trade/{0}/user/{1}/exclude" },
-                new { Id = -3, Name = "SplitTrade", Category = "Trade", Method = "/update/trade/{0}/split" },
-                new { Id = -4, Name = "FinalizeTrade", Category = "Trade", Method = "/update/trade/{0}/finalize" }
+                new { Id = -1, Name = "GetTradeData", Category = "View", Method = "TradeViewDetails/{0}" },
+                new { Id = -2, Name = "ExcludeUser", Category = "TradeAction", Method = "update/trade/{0}/user/{1}/exclude" },
+                new { Id = -3, Name = "SplitTrade", Category = "TradeAction", Method = "update/trade/{0}/split" },
+                new { Id = -4, Name = "FinalizeTrade", Category = "TradeAction", Method = "update/trade/{0}/finalize" },
+                new { Id = -5, Name = "WithdrawFromTrade", Category = "TradeAction", Method = "update/trade/{0}/user{1}/withdraw" },
+                new { Id = -6, Name = "JoinTrade", Category = "TradeAction", Method = "update/trade/{0}/user{1}/join" }
                 );
         }
 
@@ -118,25 +123,58 @@ namespace Models
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData( new { Id = -1, Name = "Phil", Created = true, Email="phil.miller84@gmail.com" } );
         }
+        public DbSet<Requirement> Requirements { get; set; }
+        private void OnCreateRequirements(EntityTypeBuilder<Requirement> entity)
+        {
+            entity.HasKey(r => r.Id);
+            entity.Property(r => r.Id).ValueGeneratedOnAdd();
+            entity.Ignore(r => r.RelationshipType);
+
+            //entity.HasOne(d => d.ActionDetails)
+            //    .WithMany(p => p.Permissions)
+            //    .HasForeignKey(d => d.ActionDetailsId);
+
+            entity.HasOne(d => d.PermissionType)
+                .WithMany(p => p.Requirements)
+                .HasForeignKey(d => d.PermissionTypeId);
+
+            entity.HasOne(d => d.RelationshipType);
+
+            entity.HasData(
+                new { Id = -1, PermissionTypeId = -4, RelationshipTypeId = -1, ActionId = -2 },
+                new { Id = -2, PermissionTypeId = -4, RelationshipTypeId = -1, ActionId = -3 },
+                new { Id = -3, PermissionTypeId = -4, RelationshipTypeId = -1, ActionId = -4 },
+                new { Id = -4, PermissionTypeId = -4, RelationshipTypeId = -1, ActionId = -5 },
+                new { Id = -5, PermissionTypeId = -5, RelationshipTypeId = -1, ActionId = -6 }
+                );
+        }
+        public DbSet<RelationshipType> RelationshipType { get; set; }
+        private void OnCreateRelationshipTypes(EntityTypeBuilder<RelationshipType> e)
+        {
+            e.HasKey(r => r.Id);
+            //e.Property(r => r.Id).ValueGeneratedOnAdd();
+            e.HasData( new { Id = -1, Name = "TradeUser" });
+        }
         public DbSet<Permission> Permissions { get; set; }
         private void OnCreatePermissions(EntityTypeBuilder<Permission> entity)
         {
             entity.HasKey(r => r.Id);
             entity.Property(r => r.Id).ValueGeneratedOnAdd();
-            entity.HasOne(d => d.ActionDetails)
-                .WithMany(p => p.Permissions)
-                .HasForeignKey(d => d.ActionDetailsId);
+            entity.Ignore(r => r.RelationshipType);
+
+            //entity.HasOne(d => d.ActionDetails)
+            //    .WithMany(p => p.Permissions)
+            //    .HasForeignKey(d => d.ActionDetailsId);
 
             entity.HasOne(d => d.PermissionType)
                 .WithMany(p => p.Permissions)
                 .HasForeignKey(d => d.PermissionTypeId);
 
-            entity.HasData(
-                new { Id = -1, PermissionTypeId = -1, ActionDetailsId = -1 },
-                new { Id = -2, PermissionTypeId = -1, ActionDetailsId = -2 },
-                new { Id = -3, PermissionTypeId = -1, ActionDetailsId = -3 },
-                new { Id = -4, PermissionTypeId = -1, ActionDetailsId = -4 }
-                );
+            entity.HasOne(d => d.RelationshipType);
+
+            //entity.HasData(
+            //    new { Id = -1, PermissionTypeId= -4, RelationshipTypeId = -1, RelationshipId = -1 }
+            //    );
         }
 
         public DbSet<Item> Items { get; set; }
@@ -201,14 +239,16 @@ namespace Models
         public DbSet<TradeUser> TradeUsers{ get; set; }
         public void OnCreateTradeUser(EntityTypeBuilder<TradeUser> e)
         {
-            e.HasKey(t => new { t.TradeId, t.UserId });
+            e.HasKey(t => t.Id);
+            e.Property(t => t.Id).ValueGeneratedOnAdd();
+
             e.HasOne(d => d.Trade)
                 .WithMany(p => p.TradeUser)
                 .HasForeignKey(d => d.TradeId);
             e.HasOne(d => d.User)
                 .WithMany(p => p.TradeUser)
                 .HasForeignKey(d => d.UserId);
-            e.HasData(new { TradeId = -1, UserId = -1 });
+            e.HasData(new { Id = -1, TradeId = -1, UserId = -1 });
         }
 
         public DbSet<TradeItemList> TradeItemLists { get; set; }

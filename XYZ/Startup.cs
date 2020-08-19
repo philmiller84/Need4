@@ -48,7 +48,6 @@ namespace XYZ
 
             services.AddHttpContextAccessor();
             services.AddScoped<Service.Need4Service>();
-            services.AddScoped<Models.Need4Context>();
             services.AddScoped<XYZ.Utility>();
         }
  

@@ -1,17 +1,14 @@
-﻿@* Client/Pages/Authentication.razor *@
-
-@page "/authentication/{action}"
+﻿@page "/authentication/{action}"
 @using Microsoft.Extensions.Configuration
 
-@inject NavigationManager Navigation
 @inject IConfiguration Configuration
 
-        @{
-            var authority = (string)Configuration["Auth0:Authority"];
-            var clientId = (string)Configuration["Auth0:ClientId"];
+@{
+    var authority = (string)Configuration["Auth0:Authority"];
+    var clientId = (string)Configuration["Auth0:ClientId"];
 
-            Navigation.NavigateTo($"{authority}/v2/logout?client_id={clientId}");
-        }
+    NavigationManager.NavigateTo($"{authority}/v2/logout?client_id={clientId}");
+}
 
 @code{
     [Parameter] public string Action { get; set; }

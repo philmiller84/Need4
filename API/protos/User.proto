@@ -7,5 +7,3 @@ message User {
 	string email = 3;
 	bool created = 4;
 }
-
-

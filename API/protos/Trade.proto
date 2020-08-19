@@ -4,10 +4,19 @@ import "google/protobuf/empty.proto";
 import "protos/Action.proto";
 import "protos/Item.proto";
 import "protos/User.proto";
+import "protos/Permission.proto";
 
-message TradeActionRequest {
+message TradeUserRequest {
 	int32 trade_id = 1;
-	int32 user_id = 2;
+	oneof user_info {
+		int32 authenticated_user_id = 2;
+		google.protobuf.Empty unauthenticated_user = 3;
+	}
+}
+
+message TradeUserPermissionRequest {
+	TradeUserRequest trade_user_request = 1;
+	Permission permission = 2;
 }
 
 message TradeActionResponse {

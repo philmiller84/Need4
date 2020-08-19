@@ -1,22 +1,18 @@
 ﻿@page "/TradeViewDetails/{tradeId:int}"
 @inject XYZ.Utility Utility
 
-<h3>TradeViewDetails</h3>
 
+<h3>TradeViewDetails</h3>
 <TradeViewSmall trade="@trade"></TradeViewSmall>
-<AuthorizeView>
-    <Authorized>
-        <div class="container">
-            <div class="col-md-6">
-                @foreach (ActionDetails a in actions)
-                {
-                    <button type="button" class="btn btn-primary"
-                            @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId, 0)))">@a.Name</button>
-                }
-            </div>
-        </div>
-    </Authorized>
-</AuthorizeView>
+<div class="container">
+    <div class="col-md-6">
+        @foreach (ActionDetails a in actions)
+        {
+            <button type="button" class="btn btn-primary"
+                    @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId, 0)))">@a.Name</button>
+        }
+    </div>
+</div>
 
 
 @code {
@@ -36,30 +32,50 @@
         await base.SetParametersAsync(parameters);
     }
 
-    protected override void OnParametersSet()
-    {
-        var grpcInt = new Google.Protobuf.WellKnownTypes.Int32Value { Value = Convert.ToInt32(tradeId) };
-        trade = tradeClient.GetDetailedTradeView(grpcInt);
-
-
-        ////TODO: WHEN USER IS LOGGED OUT, MAKE SURE THIS FAILS!!!!
-        ////TODO: FOR EACH USER, NEED TO HAVE A SCOPED ACCESS TO THE ACCESS TOKEN
-        ////TODO: GET THIS IN ASYNC
-        //string accessToken = Need4Service.GetAccessToken().Result;
-        //var headers = new Metadata();
-        //headers.Add("Authorization", $"Bearer {accessToken}");
-
-        //var response = tradeClient.GetTradeActions(new TradeActionRequest { TradeId = tradeId, UserId = -1 }, headers);
-        User user = Utility.GetUser();
-        var response = tradeClient.GetTradeActions(new TradeActionRequest { TradeId = tradeId, UserId = -1 });
-        actions = response.Actions.ToList();
-
-    }
-
     protected override void OnInitialized()
     {
         // THIS DOES NOT GET CALLED WHEN A PARAMETER CHANGES!!!
         // Note: when using NavigationManager, and changing the param, this gets SKIPPED!
+    }
+
+    protected override void OnParametersSet()
+    {
+        var viewRequest = new TradeUserRequest { TradeId = tradeId };
+        trade = tradeClient.GetDetailedTradeView(viewRequest);
+
+        var relationshipType = new RelationshipType { Name = "TradeUser" };
+
+        bool auth = true;
+        User user = Utility.GetUser();
+        if (user == null)
+        {
+            user = new User { Id = -9999 };
+            auth = false;
+        }
+
+        TradeUserRequest tradeUserRequest = auth ?
+            new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = tradeId } :
+            new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = tradeId };
+
+        PermissionSet ps = tradeClient.GetPermissions(tradeUserRequest);
+
+        if(auth == true && user != null && (ps == null || ps.Permissions.Count == 0))
+        {
+
+            var viewPermissionType = new PermissionType { Name = "View" };
+            var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationshipId = tradeId };
+            var tradeUserPermissionRequest = new TradeUserPermissionRequest { Permission = viewPermission, TradeUserRequest = tradeUserRequest };
+
+            tradeClient.AddPermission(tradeUserPermissionRequest);
+        }
+
+        TradeUserRequest request = user != null?
+            new TradeUserRequest { TradeId = tradeId, AuthenticatedUserId = user.Id } :
+            new TradeUserRequest { TradeId = tradeId, UnauthenticatedUser = new Empty() };
+
+        TradeActionResponse response = tradeClient.GetTradeActions(request);
+
+        actions = response.Actions.ToList();
     }
 }
 

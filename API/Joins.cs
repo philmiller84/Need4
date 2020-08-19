@@ -3,14 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Need4Protocol
 {
-    public partial class ActionDetails
-    {
-        partial void OnConstruction()
-        {
-            Permissions = new HashSet<Permission>();
-        }
-        public ICollection<Permission> Permissions { get; set; } 
-    }
+    //public partial class ActionDetails
+    //{
+    //    partial void OnConstruction()
+    //    {
+    //        Permissions = new HashSet<Permission>();
+    //    }
+    //    public ICollection<Permission> Permissions { get; set; } 
+    //}
 
     public partial class ItemList
     {
@@ -39,25 +39,39 @@ namespace Need4Protocol
             ItemList_Item = new HashSet<ItemList_Item>();
             //TradeItemDetails = new HashSet<TradeItemDetails>();
         }
-
         public  ICollection<ItemList_Item> ItemList_Item { get; set; }
         //public  ICollection<TradeItemDetails> TradeItemDetails { get; set; }
     }
 
     public partial class Permission
     {
-        public  int ActionDetailsId { get; set; }
         public  int PermissionTypeId { get; set; }
+        public  int RelationshipTypeId { get; set; }
+        //public RelationshipType RelationshipType { get; set; }
     }
 
+    public partial class Requirement
+    {
+        public  int PermissionTypeId { get; set; }
+        public int RelationshipTypeId { get; set; }
+        //public RelationshipType RelationshipType { get; set; }
+    }
+
+    public partial class RelationshipType
+    {
+        //public int Id;
+        //public string Name;
+    }
     public partial class PermissionType
     {
         partial void OnConstruction()
         {
             Permissions = new HashSet<Permission>();
+            Requirements = new HashSet<Requirement>();
         }
 
         public ICollection<Permission> Permissions { get; set; }
+        public ICollection<Requirement> Requirements { get; set; }
     }
 
     public partial class TradeItemDetails
@@ -69,6 +83,7 @@ namespace Need4Protocol
 
     public class TradeUser
     {
+        public int Id { get; set; }
         public int TradeId { get; set; }
         public int UserId { get; set; }
         public Trade Trade { get; set; }

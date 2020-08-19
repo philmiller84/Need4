@@ -1,5 +1,6 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Models;
 using Need4Protocol;
 using System.Threading.Tasks;
 
@@ -7,6 +8,12 @@ namespace Need4
 {
     public class SaleServiceImpl : SaleService.SaleServiceBase, IGenericCRUD
     {
+        public SaleServiceImpl(Need4Context db)
+        {
+            this.db = db;
+        }
+        private readonly Need4Context db;
+
         public override Task<SaleList> GetSales(Empty e, ServerCallContext context)
         {
             var s = new SaleList();

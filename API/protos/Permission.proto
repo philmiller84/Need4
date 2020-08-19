@@ -9,10 +9,28 @@ message UserPermission {
 	Permission permission = 2;
 }
 
+message ActionRequirement {
+	ActionDetails action = 1;
+	Permission requirement = 2;
+}
+
+message RelationshipType {
+	int32 id = 1;
+	string name = 2;
+}
+
 message Permission {
 	int32 id = 1;
 	PermissionType permission_type = 2;
-	ActionDetails action_details = 3;
+	RelationshipType relationship_type = 3;
+	int32 relationship_id = 4;
+}
+
+message Requirement {
+	int32 id = 1;
+	PermissionType permission_type = 2;
+	RelationshipType relationship_type = 3;
+	int32 action_id = 4;
 }
 
 message PermissionSet {

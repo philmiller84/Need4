@@ -1,5 +1,4 @@
 ﻿@page "/"
-@inject NavigationManager NavigationManager
 @inject XYZ.Utility Utility
 
 <AuthorizeView>
@@ -43,8 +42,6 @@
 @code {
     TradeService.TradeServiceClient TradeClient;
     SaleService.SaleServiceClient SaleClient;
-    UserService.UserServiceClient UserClient;
-
 
     List<Trade> myTrades;
     List<Trade> openTrades;
@@ -54,7 +51,6 @@
     {
         TradeClient = Need4Service.GetTradeClient();
         SaleClient = Need4Service.GetSaleClient();
-        UserClient = Need4Service.GetUserClient();
     }
 
     protected override void OnParametersSet()

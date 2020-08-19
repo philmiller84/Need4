@@ -9,7 +9,7 @@ If you need to make a foreign key, will need to seed the child entity first, the
 If you need join tables, use the Joins.cs in the API project
 
 HOW TO UPDATE DATABASE? 
- 1. Delete Migrations folder
+ 1. Delete Migrations folder, 
  2. Add-Migration init
  3. Update-Database
 
