@@ -97,7 +97,7 @@ namespace Models
                 new { Id = -2, Name = "Own", Description = "Owns the entity" },
                 new { Id = -3, Name = "Review", Description = "Reviewing the entity" },
                 new { Id = -4, Name = "Participate", Description = "Participating in the entity" },
-                new { Id = -5, Name = "View", Description = "Viewing the entity" }
+                new { Id = -5, Name = Constants.VIEW_PERMISSION, Description = "Viewing the entity" }
                 );
         }
 
@@ -107,13 +107,13 @@ namespace Models
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData(
-                new { Id = -1, Name = "GetTradeData", Category = "View", Method = "TradeViewDetails/{0}" },
-                new { Id = -2, Name = "ExcludeUser", Category = "TradeAction", Method = "update/trade/{0}/user/{1}/exclude" },
-                new { Id = -3, Name = "SplitTrade", Category = "TradeAction", Method = "update/trade/{0}/split" },
-                new { Id = -4, Name = "FinalizeTrade", Category = "TradeAction", Method = "update/trade/{0}/finalize" },
-                new { Id = -5, Name = "WithdrawFromTrade", Category = "TradeAction", Method = "update/trade/{0}/user{1}/withdraw" },
-                new { Id = -6, Name = "JoinTrade", Category = "TradeAction", Method = "update/trade/{0}/user{1}/join" }
-                );
+                new { Id = -1, Name = "GetTradeData", Category = Constants.VIEW_CATEGORY, Method = "TradeViewDetails/{0}" },
+                new { Id = -2, Name = "ExcludeUser", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/exclude/{0}/{1}" },
+                new { Id = -3, Name = "SplitTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/split/{0}" },
+                new { Id = -4, Name = "FinalizeTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/finalize/{0}" },
+                new { Id = -5, Name = "WithdrawFromTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/withdraw/{0}/{1}" },
+                new { Id = -6, Name = "JoinTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = Constants.JOIN_TRADE_ROUTE }
+                ); 
         }
 
         public DbSet<User> Users { get; set; }

@@ -9,7 +9,7 @@
         @foreach (ActionDetails a in actions)
         {
             <button type="button" class="btn btn-primary"
-                    @onclick="@(_ => NavigationManager.NavigateTo(String.Format(a.Method, tradeId, 0)))">@a.Name</button>
+                    @onclick="@(_ => NavigationManager.NavigateTo(Utility.ActionRoute(a.Method, actionKeyValuePairs)))">@a.Name</button>
         }
     </div>
 </div>
@@ -18,6 +18,8 @@
 @code {
     [Parameter]
     public int tradeId { get; set; }
+    private User user { get; set; }
+    private Dictionary<string,string> actionKeyValuePairs { get; set; }
 
     bool show = true;
     string style_display { get { return show ? "display:show" : "display:none"; } }
@@ -40,42 +42,24 @@
 
     protected override void OnParametersSet()
     {
-        var viewRequest = new TradeUserRequest { TradeId = tradeId };
-        trade = tradeClient.GetDetailedTradeView(viewRequest);
+        user = Utility.GetUser();
 
-        var relationshipType = new RelationshipType { Name = "TradeUser" };
-
-        bool auth = true;
-        User user = Utility.GetUser();
-        if (user == null)
-        {
-            user = new User { Id = -9999 };
-            auth = false;
-        }
-
-        TradeUserRequest tradeUserRequest = auth ?
+        TradeUserRequest tradeUserRequest = user != null ?
             new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = tradeId } :
             new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = tradeId };
 
-        PermissionSet ps = tradeClient.GetPermissions(tradeUserRequest);
+        trade = tradeClient.GetDetailedTradeView(tradeUserRequest);
 
-        if(auth == true && user != null && (ps == null || ps.Permissions.Count == 0))
-        {
+        tradeClient.CheckPermissions(tradeUserRequest);
 
-            var viewPermissionType = new PermissionType { Name = "View" };
-            var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationshipId = tradeId };
-            var tradeUserPermissionRequest = new TradeUserPermissionRequest { Permission = viewPermission, TradeUserRequest = tradeUserRequest };
+        TradeActionResponse actionResponse = tradeClient.GetTradeActions(tradeUserRequest);
 
-            tradeClient.AddPermission(tradeUserPermissionRequest);
-        }
+        actions = actionResponse.Actions.ToList();
 
-        TradeUserRequest request = user != null?
-            new TradeUserRequest { TradeId = tradeId, AuthenticatedUserId = user.Id } :
-            new TradeUserRequest { TradeId = tradeId, UnauthenticatedUser = new Empty() };
+        actionKeyValuePairs = new Dictionary<string, string> { { "tradeId", tradeId.ToString()}, { "userId", user.Id.ToString() } };
 
-        TradeActionResponse response = tradeClient.GetTradeActions(request);
 
-        actions = response.Actions.ToList();
     }
+
 }
 

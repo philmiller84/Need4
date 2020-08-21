@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Need4Protocol;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace XYZ
 {
@@ -20,6 +23,29 @@ namespace XYZ
                 return null;
 
             return _need4Service.GetUserClient().GetUser(new User { Email = email });
+        }
+
+        const string actionToken = @"(\{[a-zA-Z0-9_]*\})+";
+        public List<string> GetFormatElements(string actionString)
+        {
+            var elements = new List<string>();
+
+            foreach (Match match in Regex.Matches(actionString, actionToken))
+            {
+                elements.Add(match.Value);
+            }
+
+            return elements;
+        }
+
+        public string ActionRoute(string actionString, IDictionary<string, string> keyValuePairs)
+        {
+            foreach (Match match in Regex.Matches(actionString, actionToken))
+            {
+                actionString = Regex.Replace(actionString, match.Value, keyValuePairs[match.Value.ToString().Trim(new char[]{ '{', '}'})]);
+            }
+
+            return actionString;
         }
     }
 }

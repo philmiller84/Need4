@@ -15,6 +15,7 @@ service TradeService {
 	rpc GetTradeActions (TradeUserRequest) returns (TradeActionResponse);
 	rpc GetPermissions (TradeUserRequest) returns (PermissionSet);
 	rpc AddPermission (TradeUserPermissionRequest) returns (PermissionSet);
+	rpc CheckPermissions (TradeUserRequest) returns (PermissionSet);
 	rpc GetUserTrades (User) returns (TradeList);
 }
 

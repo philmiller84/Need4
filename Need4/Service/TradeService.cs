@@ -26,18 +26,38 @@ namespace Need4
             //using Need4Context db = new Need4Context();
             bool created = db.Database.EnsureCreated();
             //Console.WriteLine("Database was created (true), or existing (false): {0}", created);
+
+            int result;
             try
             {
                 db.Add(request);
                 db.SaveChanges();
-                return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
+                result = (int)HttpStatusCode.OK;
             }
             catch
             {
-                return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
+                result = (int)HttpStatusCode.Forbidden;
             }
+                
+            return Task.FromResult(new ActionResponse {Result  = result});
         }
 
+        public override Task<PermissionSet> CheckPermissions(TradeUserRequest request, ServerCallContext context)
+        {
+            var ps = GetPermissions(request, context).Result;
+
+            bool authenticated = request.UnauthenticatedUser == null;
+            if (authenticated && (ps == null || ps.Permissions.Count == 0))
+            {
+                var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
+                var viewPermissionType = new PermissionType { Name = Models.Constants.VIEW_PERMISSION };
+                var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationshipId = request.TradeId};
+                var tradeUserPermissionRequest = new TradeUserPermissionRequest { Permission = viewPermission, TradeUserRequest = request };
+
+                AddPermission(tradeUserPermissionRequest, context);
+            }
+            return Task.FromResult(ps);
+        }
         public IQueryable<Permission> GetPermissionSet(Permission request)
         {
             return this.GenericWrappedInvoke<Permission, Permission>(
@@ -54,9 +74,6 @@ namespace Need4
                 (_) => {; }
                 );
         }
-
-
-
 
         public override Task<PermissionSet> AddPermission(TradeUserPermissionRequest request, ServerCallContext context)
         {
@@ -131,11 +148,11 @@ namespace Need4
             if(relationshipId == null)
                 return Task.FromResult(t);
 
-            string relationshipType = "TradeUser";
+            string relationshipType = Constants.TRADE_USER_TABLE;
             var permissionRequest = new Permission { RelationshipId = relationshipId.Value, RelationshipType = new RelationshipType { Name = relationshipType } };
             var permissionSet = GetPermissionSet(permissionRequest);
 
-            string actionCategory = "TradeAction";
+            string actionCategory = Constants.TRADE_ACTION_CATEGORY;
             this.GenericWrappedInvoke<TradeUserRequest, ActionDetails>(
                 db,
                 request,

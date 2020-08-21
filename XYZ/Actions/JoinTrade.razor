@@ -1,0 +1,14 @@
+﻿@page "/trade/join/{tradeId:int}/{userId:int}" 
+@*Models.Constants.JOIN_TRADE_ROUTE*@
+
+<h3>JoinTrade</h3>
+<p> called with variables:</p>
+<p> tradeId: @tradeId </p>
+<p> userId: @userId </p>
+
+@code {
+    [Parameter]
+    public int tradeId { get;set; }
+    [Parameter]
+    public int userId { get; set; }
+}
