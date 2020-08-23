@@ -65,6 +65,8 @@ namespace Need4
                 request,
                 (db, request) =>
                     from p in db.Permissions
+                    .Include(r => r.PermissionType)
+                    .Include(r => r.RelationshipType)
                     join rt in db.RelationshipType
                     on p.RelationshipTypeId equals rt.Id
                     join tu in db.TradeUsers

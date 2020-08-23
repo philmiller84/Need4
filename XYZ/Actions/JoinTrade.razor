@@ -1,5 +1,11 @@
-﻿@page "/trade/join/{tradeId:int}/{userId:int}" 
+﻿@page "/trade/join/{tradeId:int}/{userId:int}"
 @*Models.Constants.JOIN_TRADE_ROUTE*@
+@attribute [Authorize(Policy = "Email")]
+
+@*<AuthorizeView Policy="Email">
+    <p>You can only see this if you satisfy the "Email" policy.</p>
+</AuthorizeView>*@
+
 
 <h3>JoinTrade</h3>
 <p> called with variables:</p>
@@ -8,7 +14,28 @@
 
 @code {
     [Parameter]
-    public int tradeId { get;set; }
+    public int tradeId { get; set; }
     [Parameter]
     public int userId { get; set; }
+
+
+    [CascadingParameter] 
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private User user { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        var tradeClient = Need4Service.GetTradeClient();
+        user = Utility.GetUser();
+        TradeUserRequest tradeUserRequest = user != null ?
+            new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = tradeId } :
+            new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = tradeId };
+
+        var permissions = tradeClient.CheckPermissions(tradeUserRequest);
+    }
 }

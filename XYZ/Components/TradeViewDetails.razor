@@ -1,5 +1,4 @@
 ﻿@page "/TradeViewDetails/{tradeId:int}"
-@inject XYZ.Utility Utility
 
 
 <h3>TradeViewDetails</h3>
@@ -25,12 +24,10 @@
     string style_display { get { return show ? "display:show" : "display:none"; } }
 
     List<ActionDetails> actions;
-    TradeService.TradeServiceClient tradeClient;
     Trade trade;
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
-        tradeClient = Need4Service.GetTradeClient();
         await base.SetParametersAsync(parameters);
     }
 
@@ -42,23 +39,21 @@
 
     protected override void OnParametersSet()
     {
+        var tradeClient = Need4Service.GetTradeClient();
         user = Utility.GetUser();
-
         TradeUserRequest tradeUserRequest = user != null ?
             new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = tradeId } :
             new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = tradeId };
 
         trade = tradeClient.GetDetailedTradeView(tradeUserRequest);
 
-        tradeClient.CheckPermissions(tradeUserRequest);
+        var permissions = tradeClient.CheckPermissions(tradeUserRequest);
 
         TradeActionResponse actionResponse = tradeClient.GetTradeActions(tradeUserRequest);
 
         actions = actionResponse.Actions.ToList();
 
         actionKeyValuePairs = new Dictionary<string, string> { { "tradeId", tradeId.ToString()}, { "userId", user.Id.ToString() } };
-
-
     }
 
 }
