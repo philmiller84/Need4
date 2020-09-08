@@ -1,7 +1,7 @@
 ﻿@page "/"
 @inject XYZ.Utility Utility
 
-<AuthorizeView>
+<AuthorizeView Policy=@Helpers.Policies.HAS_TRADES_TYPE>
     <Authorized>
         <h1 class="collapse-toggle" data-toggle="collapse" data-target="#my-trades" aria-expanded="true">My Trades</h1>
         <div id="my-trades" class="collapse show" >
@@ -56,7 +56,7 @@
     protected override void OnParametersSet()
     {
 
-        User user = Utility.GetUser();
+        Need4Protocol.User user = Utility.GetUser();
 
         if(user != null)
         {

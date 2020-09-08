@@ -17,7 +17,9 @@ namespace Need4
         private readonly Need4Context db;
         public override Task<ActionResponse> AddNewItem(Item request, ServerCallContext context)
         {
-            return this.GenericCreate<Item>(db, request);
+            this.GenericCreate<Item>(db, request);
+            return (Task<ActionResponse>)Task.CompletedTask;
+            //return this.GenericCreate<Item>(db, request);
         }
 
         public override Task<ItemList> GetMatchingItems(Item itemToMatch, ServerCallContext context)

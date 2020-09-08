@@ -1,6 +1,6 @@
 ﻿@page "/trade/join/{tradeId:int}/{userId:int}"
 @*Models.Constants.JOIN_TRADE_ROUTE*@
-@attribute [Authorize(Policy = "Email")]
+@attribute [Authorize(Policy = @Helpers.Policies.JOIN_TRADE_TYPE)]
 
 @*<AuthorizeView Policy="Email">
     <p>You can only see this if you satisfy the "Email" policy.</p>

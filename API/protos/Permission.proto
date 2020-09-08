@@ -23,7 +23,7 @@ message Permission {
 	int32 id = 1;
 	PermissionType permission_type = 2;
 	RelationshipType relationship_type = 3;
-	int32 relationship_id = 4;
+	int32 relation_id = 4;
 }
 
 message Requirement {

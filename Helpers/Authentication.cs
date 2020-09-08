@@ -73,14 +73,23 @@ namespace Helpers
                         identity.AddClaim(new Claim(tokenName, tokenValue));
                     }
                 }
+
+                identity.AddClaim(new Claim(Claims.HAS_TRADES_TYPE, "false"));
+
                 var service = new Need4Service();
                 var userService = service.GetUserClient();
+                var permissionService = service.GetPermissionClient();
                 string email = Claims.GetEmail(context.Principal.Claims);
                 var user = new Need4Protocol.User { Email = email };
                 var response = userService.GetUser(user);
                 if (!response.Created)
                 {
                     response = userService.CreateUser(user);
+                }
+                else
+                {
+                    var permissions = permissionService.GetAllPermissions(user);
+
                 }
             }
 

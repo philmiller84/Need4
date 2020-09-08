@@ -51,7 +51,7 @@ namespace Need4
             {
                 var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
                 var viewPermissionType = new PermissionType { Name = Models.Constants.VIEW_PERMISSION };
-                var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationshipId = request.TradeId};
+                var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationId = request.TradeId};
                 var tradeUserPermissionRequest = new TradeUserPermissionRequest { Permission = viewPermission, TradeUserRequest = request };
 
                 AddPermission(tradeUserPermissionRequest, context);
@@ -69,9 +69,10 @@ namespace Need4
                     .Include(r => r.RelationshipType)
                     join rt in db.RelationshipType
                     on p.RelationshipTypeId equals rt.Id
-                    join tu in db.TradeUsers
-                    on request.RelationshipId equals tu.Id
+                    //join tu in db.TradeUsers
+                    //on request.RelationId equals tu.Id
                     where request.RelationshipType.Name == rt.Name
+                    && p.RelationId == request.RelationId
                     select p,
                 (_) => {; }
                 );
@@ -101,17 +102,19 @@ namespace Need4
                         select pt,
                     (_) => {; }).FirstOrDefault();
 
+            var tradeUserEntity = this.GenericCreate<TradeUser>(db, new TradeUser(request.TradeUserRequest));
+
             if(permissionType == null || relationshipType == null)
                 return Task.FromResult(ps);
 
             request.Permission.PermissionType = permissionType;
             request.Permission.PermissionTypeId = permissionType.Id;
             request.Permission.RelationshipType = relationshipType;
-            request.Permission.RelationshipId = relationshipType.Id;
+            request.Permission.RelationId = tradeUserEntity.Result.Id;
             var s = this.GenericCreate<Permission>(db, request.Permission);
 
-            if(s.Result.Result == (int) HttpStatusCode.Forbidden)
-                return Task.FromResult(ps);
+            //if(s.Result == null)
+                //return Task.FromResult(ps);
 
             ps.Permissions.Add(request.Permission);
             return Task.FromResult(ps);
@@ -124,7 +127,7 @@ namespace Need4
             {
                 Permission permissionRequest = new Permission { 
                     RelationshipType = new RelationshipType { Name = "TradeUser" }, 
-                    RelationshipId = relationshipId.Value 
+                    RelationId = relationshipId.Value 
                 };
 
                 ps.Permissions.AddRange(GetPermissionSet(permissionRequest));
@@ -151,7 +154,7 @@ namespace Need4
                 return Task.FromResult(t);
 
             string relationshipType = Constants.TRADE_USER_TABLE;
-            var permissionRequest = new Permission { RelationshipId = relationshipId.Value, RelationshipType = new RelationshipType { Name = relationshipType } };
+            var permissionRequest = new Permission { RelationId = relationshipId.Value, RelationshipType = new RelationshipType { Name = relationshipType } };
             var permissionSet = GetPermissionSet(permissionRequest);
 
             string actionCategory = Constants.TRADE_ACTION_CATEGORY;
@@ -178,7 +181,7 @@ namespace Need4
                 //        join p in db.Permissions
                 //        on r.PermissionTypeId equals p.PermissionTypeId
                 //        join tu in db.TradeUsers
-                //        on p.RelationshipId equals tu.Id
+                //        on p.RelationId equals tu.Id
                 //        join t in db.Trades
                 //        on tu.TradeId equals t.Id
                 //        join u in db.Users

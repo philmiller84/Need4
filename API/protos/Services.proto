@@ -21,6 +21,7 @@ service TradeService {
 
 service PermissionService {
 	rpc IsUserPermissioned (UserPermission) returns (ActionResponse);
+	rpc GetAllPermissions(User) returns (PermissionSet);
 }
 
 service ItemRepository {

@@ -83,6 +83,14 @@ namespace Need4Protocol
 
     public class TradeUser
     {
+        public TradeUser(){ }
+
+        public TradeUser(TradeUserRequest r)
+        {
+            this.TradeId = r.TradeId;
+            this.UserId = r.AuthenticatedUserId;
+        }
+
         public int Id { get; set; }
         public int TradeId { get; set; }
         public int UserId { get; set; }

@@ -33,7 +33,6 @@ namespace Need4
         {
             // STUB IMPLEMENTATION FOR TESTING
             var reply = this.GenericCreate(db, u);
-            u.Created = (reply.Result.Result == (int)HttpStatusCode.OK);
             return Task.FromResult(u);
         }
 

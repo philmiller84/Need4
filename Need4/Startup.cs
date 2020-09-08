@@ -55,6 +55,7 @@ namespace Need4
                 endpoints.MapGrpcService<TradeServiceImpl>();
                 endpoints.MapGrpcService<SaleServiceImpl>();
                 endpoints.MapGrpcService<UserServiceImpl>();
+                endpoints.MapGrpcService<PermissionServiceImpl>();
 
                 endpoints.MapGet("/", async context =>
                 {

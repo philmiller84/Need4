@@ -173,7 +173,7 @@ namespace Models
             entity.HasOne(d => d.RelationshipType);
 
             //entity.HasData(
-            //    new { Id = -1, PermissionTypeId= -4, RelationshipTypeId = -1, RelationshipId = -1 }
+            //    new { Id = -1, PermissionTypeId= -4, RelationshipTypeId = -1, RelationId = -1 }
             //    );
         }
 

@@ -9,11 +9,13 @@ namespace Service
         private readonly TradeService.TradeServiceClient tradeClient;
         private readonly SaleService.SaleServiceClient saleClient;
         private readonly UserService.UserServiceClient userClient;
+        private readonly PermissionService.PermissionServiceClient permissionClient;
 
         public ItemRepository.ItemRepositoryClient GetItemClient() { return itemClient; }
         public TradeService.TradeServiceClient GetTradeClient() { return tradeClient; }
         public SaleService.SaleServiceClient GetSaleClient() { return saleClient; }
         public UserService.UserServiceClient GetUserClient() { return userClient; }
+        public PermissionService.PermissionServiceClient GetPermissionClient() { return permissionClient; }
 
         private readonly GrpcChannel channel;
         public Need4Service()
@@ -24,6 +26,7 @@ namespace Service
             tradeClient = new TradeService.TradeServiceClient(channel);
             saleClient = new SaleService.SaleServiceClient(channel);
             userClient = new UserService.UserServiceClient(channel);
+            permissionClient = new PermissionService.PermissionServiceClient(channel);
         }
 
         //public static async Task<string> GetAccessToken()

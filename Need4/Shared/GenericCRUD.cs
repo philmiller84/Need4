@@ -15,20 +15,12 @@ namespace Need4
     public static class GenericCRUDExtensions
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extension method")]
-        public static Task<ActionResponse> GenericCreate<T>(this IGenericCRUD i, Need4Context db, T inputObject)
+        public static Task<T> GenericCreate<T>(this IGenericCRUD i, Need4Context db, T inputObject)
         {
-            try
-            {
-                bool created = db.Database.EnsureCreated();
-                db.Add(inputObject);
-                db.SaveChanges();
-
-                return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.OK });
-            }
-            catch
-            {
-                return Task.FromResult(new ActionResponse { Result = (int)HttpStatusCode.Forbidden });
-            }
+            bool created = db.Database.EnsureCreated();
+            db.Add(inputObject);
+            db.SaveChanges();
+            return Task.FromResult(inputObject);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Extension method")]

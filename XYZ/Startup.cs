@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -46,17 +47,13 @@ namespace XYZ
             .AddCookie()
             .AddOpenIdConnect("Auth0", options => authenticationHelper.SetOpenIdConnectOptions(options));
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Email", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"));
-
-            });
+            services.AddAuthorization(options => { Helpers.Policies.SetPolicies(options); });
 
             services.AddHttpContextAccessor();
             services.AddScoped<Service.Need4Service>();
             services.AddScoped<XYZ.Utility>();
         }
- 
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

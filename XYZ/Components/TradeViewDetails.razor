@@ -15,8 +15,8 @@
 
 
 @code {
-    [Parameter]
-    public int tradeId { get; set; }
+        [Parameter]
+        public int tradeId { get; set; }
     private User user { get; set; }
     private Dictionary<string,string> actionKeyValuePairs { get; set; }
 
@@ -53,7 +53,10 @@
 
         actions = actionResponse.Actions.ToList();
 
-        actionKeyValuePairs = new Dictionary<string, string> { { "tradeId", tradeId.ToString()}, { "userId", user.Id.ToString() } };
+        if(actions.Count > 0)
+        {
+            actionKeyValuePairs = new Dictionary<string, string> { { "tradeId", tradeId.ToString()}, { "userId", user.Id.ToString() } };
+        }
     }
 
 }
