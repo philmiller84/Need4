@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -47,9 +48,13 @@ namespace XYZ
             .AddCookie()
             .AddOpenIdConnect("Auth0", options => authenticationHelper.SetOpenIdConnectOptions(options));
 
-            services.AddAuthorization(options => { Helpers.Policies.SetPolicies(options); });
-
             services.AddHttpContextAccessor();
+
+            services.AddAuthorization(options => { Helpers.Policies.SetPolicies(options); });
+            services.AddScoped<HttpContextAccessor>();
+            //services.AddScoped<AuthenticationStateProvider, Helpers.TestAuthStateProvider>();
+            Helpers.Requirements.RegisterRequirements(services);
+
             services.AddScoped<Service.Need4Service>();
             services.AddScoped<XYZ.Utility>();
         }

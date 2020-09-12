@@ -1,11 +1,12 @@
 ﻿@page "/"
 @inject XYZ.Utility Utility
 
-<AuthorizeView Policy=@Helpers.Policies.HAS_TRADES_TYPE>
+@*<AuthorizeView Policy=@Helpers.Policies.HAS_TRADES_TYPE>*@
+<AuthorizeView>
     <Authorized>
         <h1 class="collapse-toggle" data-toggle="collapse" data-target="#my-trades" aria-expanded="true">My Trades</h1>
-        <div id="my-trades" class="collapse show" >
-            @if(myTrades.Count == 0)
+        <div id="my-trades" class="collapse show">
+            @if (myTrades.Count == 0)
             {
                 <p class="lead">Looks like your docket is clear. Take a look at upcoming trades!</p>
             }
@@ -37,6 +38,7 @@
     {
         <SaleViewSmall sale="s"></SaleViewSmall>
     }
+
 </div>
 
 @code {
@@ -58,7 +60,7 @@
 
         Need4Protocol.User user = Utility.GetUser();
 
-        if(user != null)
+        if (user != null)
         {
             myTrades = TradeClient.GetUserTrades(user).Trades.ToList();
         }

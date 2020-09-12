@@ -74,8 +74,6 @@ namespace Helpers
                     }
                 }
 
-                identity.AddClaim(new Claim(Claims.HAS_TRADES_TYPE, "false"));
-
                 var service = new Need4Service();
                 var userService = service.GetUserClient();
                 var permissionService = service.GetPermissionClient();
@@ -89,7 +87,6 @@ namespace Helpers
                 else
                 {
                     var permissions = permissionService.GetAllPermissions(user);
-
                 }
             }
 

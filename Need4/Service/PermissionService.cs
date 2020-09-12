@@ -1,10 +1,8 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using Models;
 using Need4Protocol;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Need4
@@ -16,6 +14,24 @@ namespace Need4
             this.db = db;
         }
         private readonly Need4Context db;
+        //public override Task<ClaimSet> GetPermissionsAsClaims(PermissionSet s, ServerCallContext context)
+        //{
+        //    ClaimSet cs = new ClaimSet();
+
+        //    var setPermissions = (from y in s.Permissions select y.Id).ToList();
+        //    this.GenericWrappedInvoke<PermissionSet, Claim>(
+        //        db,
+        //        s,
+        //        (db, s) => from x in db.Permissions
+        //                   join y in db.TradeUsers
+        //                   on x.RelationId equals y.Id
+        //                   where setPermissions.Contains(x.Id)
+        //                   select new Claim { ClaimType = Helpers.Claims.JOIN_TRADE_TYPE, ClaimValue = y.TradeId.ToString() },
+        //        (x) => cs.Claims.Add(x));
+
+        //    return Task.FromResult(cs);
+        //}
+
         public override Task<PermissionSet> GetAllPermissions(User u, ServerCallContext context)
         {
             // STUB IMPLEMENTATION FOR TESTING
