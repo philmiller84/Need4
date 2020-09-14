@@ -2,11 +2,17 @@
 package Need4Protocol;
 import "google/protobuf/empty.proto";
 import "protos/Action.proto";
+import "protos/Activity.proto";
 import "protos/Item.proto";
-import "protos/Sale.proto";
 import "protos/Permission.proto";
-import "protos/User.proto";
+import "protos/Sale.proto";
 import "protos/Trade.proto";
+import "protos/User.proto";
+
+
+service ActivityService {
+	rpc GetAllActivities (User) returns (ActivityResponse);
+}
 
 service TradeService {
 	rpc CreateTrade (Trade) returns (ActionResponse);

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Need4Protocol;
 using System;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Models
 {
@@ -29,6 +30,7 @@ namespace Models
             // PERSISTED ENTITIES
             OnCreatePermissionTypes(modelBuilder.Entity<PermissionType>());
             OnCreateActionDetails(modelBuilder.Entity<ActionDetails>());
+            OnCreateActivityDetails(modelBuilder.Entity<ActivityDetails>());
             OnCreateUsers(modelBuilder.Entity<User>());
             OnCreateRelationshipTypes(modelBuilder.Entity<RelationshipType>());
             OnCreatePermissions(modelBuilder.Entity<Permission>());
@@ -43,6 +45,39 @@ namespace Models
             OnCreateSaleItemDetails(modelBuilder.Entity<SaleItemDetails>());
             OnCreateSaleItemList(modelBuilder.Entity<SaleItemList>());
             OnCreateSale(modelBuilder.Entity<Sale>());
+        }
+
+        public DbSet<ActivityDetails> ActivityDetails { get; set; }
+        private void OnCreateActivityDetails(EntityTypeBuilder<ActivityDetails> e)
+        {
+            e.HasKey(x => x.Id);
+            //e.Property(x => x.Id).ValueGeneratedOnAdd();
+
+            e.HasData(
+
+                new { Id = 10, Name = "Create New Listing", Category = Constants.SALES_CATEGORY, Method = "/sales/new" },
+                new { Id = 11, Name = "My Sales", Category = Constants.SALES_CATEGORY, Method = "/sales" },
+                new { Id = 12, Name = "Public Sales", Category = Constants.SALES_CATEGORY, Method = "/sales/public" },
+
+                new { Id = 20, Name = "Create New Trade", Category = Constants.TRADES_CATEGORY, Method = "/trades/new" },
+                new { Id = 21, Name = "My Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades" },
+                new { Id = 22, Name = "Public Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades/public" },
+                new { Id = 23, Name = "Open Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades/open" },
+                new { Id = 24, Name = "Recent Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades/recent" },
+
+                new { Id = 30, Name = "Open Chat", Category = Constants.CHAT_CATEGORY, Method = "/chat" },
+                new { Id = 31, Name = "History", Category = Constants.CHAT_CATEGORY, Method = "/chat/history" },
+
+                new { Id = 40, Name = "Invite New Member", Category = Constants.MEMBERS_CATEGORY, Method = "/members/invite" },
+                new { Id = 41, Name = "Show Member List", Category = Constants.MEMBERS_CATEGORY, Method = "/members" },
+                new { Id = 42, Name = "Vote on Decisions", Category = Constants.MEMBERS_CATEGORY, Method = "/members/vote" },
+                new { Id = 43, Name = "Report Scammer/Spammer", Category = Constants.MEMBERS_CATEGORY, Method = "/members/report" },
+
+                new { Id = 51, Name = "About Communities", Category = Constants.COMMUNITIES_CATEGORY, Method = "/communities/about" },
+                new { Id = 52, Name = "Show Communities", Category = Constants.COMMUNITIES_CATEGORY, Method = "/communities" },
+                new { Id = 53, Name = "Join a Community", Category = Constants.COMMUNITIES_CATEGORY, Method = "/communities/join" }
+
+                );
         }
 
         public DbSet<SaleItemDetails> SaleItemDetails { get; set; }
@@ -91,7 +126,7 @@ namespace Models
         private void OnCreatePermissionTypes(EntityTypeBuilder<PermissionType> entityTypeBuilder)
         {
             entityTypeBuilder.HasKey(r => r.Id);
-            entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
+            //entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData(
                 new { Id = -1, Name = "Administer", Description = "Is admin" },
                 new { Id = -2, Name = "Own", Description = "Owns the entity" },
@@ -105,7 +140,7 @@ namespace Models
         private void OnCreateActionDetails(EntityTypeBuilder<ActionDetails> entityTypeBuilder)
         {
             entityTypeBuilder.HasKey(r => r.Id);
-            entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
+            //entityTypeBuilder.Property(r => r.Id).ValueGeneratedOnAdd();
             entityTypeBuilder.HasData(
                 new { Id = -1, Name = "GetTradeData", Category = Constants.VIEW_CATEGORY, Method = "TradeViewDetails/{0}" },
                 new { Id = -2, Name = "ExcludeUser", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/exclude/{0}/{1}" },

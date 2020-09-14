@@ -1,13 +1,14 @@
 ﻿syntax = "proto3";
 package Need4Protocol;
 
-message ActionResponse {
-	int32 result = 1;
+message ActivityResponse {
+	repeated ActivityDetails activities = 1;
 }
 
-message ActionDetails {
+message ActivityDetails {
 	int32 id = 1;
 	string name = 2;
 	string category = 3;
 	string method = 4;
 }
+

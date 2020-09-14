@@ -10,7 +10,7 @@ If you need join tables, use the Joins.cs in the API project
 
 HOW TO UPDATE DATABASE? 
  1. Delete Migrations folder, 
- 2. Add-Migration init
+ 2. Add-Migration Init
  3. Update-Database
 
 MISSING DATA?
