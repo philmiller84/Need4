@@ -57,7 +57,7 @@
                 <div class="dropdown-menu" aria-labelledby="dropdown02">
                     @foreach(var activity in activities[category])
                     {
-                        <a class="dropdown-item" href="#">@(activity.Name) </a>
+                        <a class="dropdown-item" href=@activity.Method>@(activity.Name) </a>
                     }
                 </div>
                 </li>

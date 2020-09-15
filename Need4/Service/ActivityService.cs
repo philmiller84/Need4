@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Need4
 {
-    public class ActivityServiceImp : ActivityService.ActivityServiceBase, IGenericCRUD
+    public class ActivityServiceImpl : ActivityService.ActivityServiceBase, IGenericCRUD
     {
-        public ActivityServiceImp(Need4Context db)
+        public ActivityServiceImpl(Need4Context db)
         {
             this.db = db;
         }

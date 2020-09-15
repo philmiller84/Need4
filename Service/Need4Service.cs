@@ -11,6 +11,7 @@ namespace Service
         private readonly UserService.UserServiceClient userClient;
         private readonly PermissionService.PermissionServiceClient permissionClient;
         private readonly ActivityService.ActivityServiceClient activityClient;
+        private readonly CommunityService.CommunityServiceClient communityClient;
 
         public ItemRepository.ItemRepositoryClient GetItemClient() { return itemClient; }
         public TradeService.TradeServiceClient GetTradeClient() { return tradeClient; }
@@ -18,6 +19,7 @@ namespace Service
         public UserService.UserServiceClient GetUserClient() { return userClient; }
         public PermissionService.PermissionServiceClient GetPermissionClient() { return permissionClient; }
         public ActivityService.ActivityServiceClient GetActivityClient() { return activityClient; }
+        public CommunityService.CommunityServiceClient GetCommunityClient() { return communityClient; }
 
         private readonly GrpcChannel channel;
         public Need4Service()
@@ -30,6 +32,7 @@ namespace Service
             userClient = new UserService.UserServiceClient(channel);
             permissionClient = new PermissionService.PermissionServiceClient(channel);
             activityClient = new ActivityService.ActivityServiceClient(channel);
+            communityClient = new CommunityService.CommunityServiceClient(channel);
         }
 
         //public static async Task<string> GetAccessToken()

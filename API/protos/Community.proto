@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+package Need4Protocol;
+
+message CommunityList {
+	repeated CommunityDetails communities=1;
+}
+
+message CommunityDetails {
+	int32 id = 1;
+	string name = 2;
+	int32 tier = 3;
+}

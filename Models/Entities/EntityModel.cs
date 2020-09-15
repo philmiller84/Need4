@@ -31,6 +31,7 @@ namespace Models
             OnCreatePermissionTypes(modelBuilder.Entity<PermissionType>());
             OnCreateActionDetails(modelBuilder.Entity<ActionDetails>());
             OnCreateActivityDetails(modelBuilder.Entity<ActivityDetails>());
+            OnCreateCommunities(modelBuilder.Entity<CommunityDetails>());
             OnCreateUsers(modelBuilder.Entity<User>());
             OnCreateRelationshipTypes(modelBuilder.Entity<RelationshipType>());
             OnCreatePermissions(modelBuilder.Entity<Permission>());
@@ -45,6 +46,21 @@ namespace Models
             OnCreateSaleItemDetails(modelBuilder.Entity<SaleItemDetails>());
             OnCreateSaleItemList(modelBuilder.Entity<SaleItemList>());
             OnCreateSale(modelBuilder.Entity<Sale>());
+        }
+
+
+        public DbSet<CommunityDetails> CommunityDetails { get; set; }
+        private void OnCreateCommunities(EntityTypeBuilder<CommunityDetails> e)
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.Id).ValueGeneratedOnAdd();
+            e.HasData(
+                new { Id = -1, Name = "Newmarket", Tier = 1 },
+                new { Id = -2, Name = "Millside", Tier = 2 },
+                new { Id = -3, Name = "Bramble", Tier = 3 },
+                new { Id = -4, Name = "The Harbour", Tier = 4 },
+                new { Id = -5, Name = "Weaversfield", Tier = 5 }
+                );
         }
 
         public DbSet<ActivityDetails> ActivityDetails { get; set; }
@@ -86,8 +102,7 @@ namespace Models
             e.HasKey(r => r.Id);
             e.Property(r => r.Id).ValueGeneratedOnAdd();
             e.HasOne(d => d.Item);
-                //.WithMany(p => p.SaleItemDetails)
-                //.HasForeignKey(d => d.ItemId);
+
             e.HasOne(d => d.SaleItemList)
                 .WithMany(p => p.SaleItemDetails)
                 .HasForeignKey(d => d.SaleItemListId);
