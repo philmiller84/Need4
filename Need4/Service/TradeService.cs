@@ -10,9 +10,21 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
+using System;
+using System.Linq.Expressions;
 
 namespace Need4
 {
+    public class Relation
+    {
+        public int key1 {get;set;}
+        public int key2 {get;set;}
+        public Relation(int key1, int key2)
+        {
+            this.key1 = key1;
+            this.key2 = key2;
+        }
+    }
     public class TradeServiceImpl : TradeService.TradeServiceBase, IGenericCRUD
     {
         public TradeServiceImpl(Need4Context db)
@@ -41,6 +53,33 @@ namespace Need4
                 
             return Task.FromResult(new ActionResponse {Result  = result});
         }
+        public Task<int> GetRelation<T>(IQueryable<T> ts, Expression<Func<T,int>> s, Expression<Func<T,bool>> w)
+        {
+            var q = this.GenericWrappedInvoke<IQueryable<T>, int>(
+                db,
+                ts,
+                (db, ts) => ts.Where(w).Select(s),
+                x => {; }
+                );
+
+            var relationId = q.FirstOrDefault();
+
+            return Task.FromResult(relationId);
+        }
+
+        public Task<int?> GetRelationId(RelationshipType relationshipType, Relation relation)
+        {
+            int? relationId = null;
+            switch(relationshipType.Name)
+            {
+                case "TradeUser":
+                    Expression<Func<TradeUser, int>> s = x => x.Id;
+                    Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.key1 && x.UserId == relation.key2;
+                    relationId = GetRelation<TradeUser>(db.TradeUsers, s, w).Result;
+                    break;
+            }
+            return Task.FromResult(relationId);
+        }
 
         public override Task<PermissionSet> CheckPermissions(TradeUserRequest request, ServerCallContext context)
         {
@@ -51,7 +90,11 @@ namespace Need4
             {
                 var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
                 var viewPermissionType = new PermissionType { Name = Models.Constants.VIEW_PERMISSION };
-                var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationId = request.TradeId};
+                var relationId = GetRelationId(relationshipType, new Relation(request.TradeId, request.AuthenticatedUserId)).Result;
+                if (relationId == null)
+                    return Task.FromResult(ps);
+
+                var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationId = relationId.Value};
                 var tradeUserPermissionRequest = new TradeUserPermissionRequest { Permission = viewPermission, TradeUserRequest = request };
 
                 AddPermission(tradeUserPermissionRequest, context);
@@ -69,8 +112,6 @@ namespace Need4
                     .Include(r => r.RelationshipType)
                     join rt in db.RelationshipType
                     on p.RelationshipTypeId equals rt.Id
-                    //join tu in db.TradeUsers
-                    //on request.RelationId equals tu.Id
                     where request.RelationshipType.Name == rt.Name
                     && p.RelationId == request.RelationId
                     select p,
@@ -122,14 +163,18 @@ namespace Need4
         public override Task<PermissionSet> GetPermissions(TradeUserRequest request, ServerCallContext context)
         {
             var ps = new PermissionSet();
-            int? relationshipId = GetTradeRelationship(request);
-            if (relationshipId != null)
-            {
-                Permission permissionRequest = new Permission { 
-                    RelationshipType = new RelationshipType { Name = "TradeUser" }, 
-                    RelationId = relationshipId.Value 
-                };
+            string relationshipType = "TradeUser";
+            int? relationId = GetRelationId(
+                new RelationshipType { Name = relationshipType }, 
+                new Relation(request.TradeId, request.AuthenticatedUserId)).Result;
+                
+            Permission permissionRequest = new Permission { 
+                RelationshipType = new RelationshipType { Name = relationshipType }, 
+                RelationId = relationId.Value
+            };
 
+            if(relationId != null)
+            {
                 ps.Permissions.AddRange(GetPermissionSet(permissionRequest));
             }
 

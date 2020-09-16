@@ -19,3 +19,4 @@ message MemberInvite {
 	int32 new_member_id = 3;
 	int32 status = 4;
 }
+

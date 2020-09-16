@@ -1,6 +1,12 @@
 ﻿@page "/members/invite"
 <h3>Invite</h3>
 
+<EditForm Model="@EmailForm">
+    <InputText id="email" @bind-Value="EmailForm.NewMemberEmail"/>
+    <input type="submit" value="Invite" class="btn btn-primary" />
+</EditForm>
+
 @code {
 
+    public MemberInvite EmailForm =new MemberInvite();
 }
