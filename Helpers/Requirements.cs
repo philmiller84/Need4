@@ -41,7 +41,7 @@ namespace Helpers
             //    context.Succeed(requirement);
             //}
             var hasJoinTradePermission = (from p in permissions.Permissions
-                                          where p.PermissionType.Name == "JoinTrade"
+                                          where p.PermissionType.Name == StaticData.Constants.JOIN_PERMISSION
                                           select p).Any();
             if(hasJoinTradePermission)
             {

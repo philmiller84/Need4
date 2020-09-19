@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Need4Protocol;
 using System;
 using System.Security.Cryptography.X509Certificates;
+using StaticData;
 
 namespace Models
 {

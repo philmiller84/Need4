@@ -11,6 +11,7 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System;
+using StaticData;
 using System.Linq.Expressions;
 
 namespace Need4
@@ -98,8 +99,8 @@ namespace Need4
             bool authenticated = request.UnauthenticatedUser == null;
             if (authenticated)
             {
-                var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
-                var viewPermissionType = new PermissionType { Name = Models.Constants.VIEW_PERMISSION };
+                var relationshipType = new RelationshipType { Name = StaticData.Constants.TRADE_USER_TABLE };
+                var viewPermissionType = new PermissionType { Name = StaticData.Constants.VIEW_PERMISSION };
                 var relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
                 var relationId = GetRelationId(relationshipType, relation).Result;
                 if (relationId == null)
@@ -149,10 +150,10 @@ namespace Need4
                 if (state.Result == null)
                     return Task.FromResult(ps);
 
-                if (state.Result.Description == Constants.TRADE_USER_IOI)
+                if (state.Result.Description == StaticData.Constants.TRADE_USER_IOI)
                 {
-                    var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
-                    var permissionType = new PermissionType { Name = Models.Constants.JOIN_PERMISSION };
+                    var relationshipType = new RelationshipType { Name = StaticData.Constants.TRADE_USER_TABLE };
+                    var permissionType = new PermissionType { Name = StaticData.Constants.JOIN_PERMISSION };
                     var permissionRequest = new PermissionRequest
                     {
                         PermissionType = permissionType,

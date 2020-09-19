@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Server.IIS.Core;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Models
+﻿namespace StaticData
 {
     public class Constants
     {

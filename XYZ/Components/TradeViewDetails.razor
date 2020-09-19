@@ -53,7 +53,7 @@
         if(tradeUserState.Description.Length == 0)
         {
             // add IOI
-            tradeUserRequest.State = new State { Description = Models.Constants.TRADE_USER_IOI };
+            tradeUserRequest.State = new State { Description = StaticData.Constants.TRADE_USER_IOI };
             tradeClient.AddTradeUserState(tradeUserRequest);
         }
 
