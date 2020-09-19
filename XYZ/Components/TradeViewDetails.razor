@@ -15,8 +15,8 @@
 
 
 @code {
-        [Parameter]
-        public int tradeId { get; set; }
+    [Parameter]
+    public int tradeId { get; set; }
     private User user { get; set; }
     private Dictionary<string,string> actionKeyValuePairs { get; set; }
 
@@ -46,6 +46,16 @@
             new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = tradeId };
 
         trade = tradeClient.GetDetailedTradeView(tradeUserRequest);
+
+
+        var tradeUserState = tradeClient.GetTradeUserState(tradeUserRequest);
+
+        if(tradeUserState.Description.Length == 0)
+        {
+            // add IOI
+            tradeUserRequest.State = new State { Description = Models.Constants.TRADE_USER_IOI };
+            tradeClient.AddTradeUserState(tradeUserRequest);
+        }
 
         var permissions = tradeClient.CheckPermissions(tradeUserRequest);
 

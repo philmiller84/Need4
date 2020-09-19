@@ -12,10 +12,26 @@ message ActionRequirement {
 	ActionDetails action = 1;
 	Permission requirement = 2;
 }
+message State {
+	int32 id = 1;
+	string description = 2;
+}
+
+message Relation {
+	int32 key1 = 1;
+	int32 key2 = 2;
+}
 
 message RelationshipType {
 	int32 id = 1;
 	string name = 2;
+}
+ 
+message Relationship {
+	int32 id = 1;
+	RelationshipType relationship_type = 2;
+	Relation relation = 3;
+	State state = 4;
 }
 
 message Permission {
@@ -47,4 +63,12 @@ message PermissionCondition {
 	int32 id = 1;
 	string name = 2;
 	string description = 3;
+}
+
+
+message PermissionRequest {
+	int32 key1 = 1;
+	int32 key2 = 2;
+	RelationshipType relationship_type = 3;
+	PermissionType permission_type = 4;
 }

@@ -12,11 +12,7 @@ message TradeUserRequest {
 		int32 authenticated_user_id = 2;
 		google.protobuf.Empty unauthenticated_user = 3;
 	}
-}
-
-message TradeUserPermissionRequest {
-	TradeUserRequest trade_user_request = 1;
-	Permission permission = 2;
+	State state = 4;
 }
 
 message TradeActionResponse {

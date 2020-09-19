@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.VisualBasic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Need4Protocol
@@ -89,13 +90,16 @@ namespace Need4Protocol
         {
             this.TradeId = r.TradeId;
             this.UserId = r.AuthenticatedUserId;
+            this.State = null;
         }
 
         public int Id { get; set; }
         public int TradeId { get; set; }
         public int UserId { get; set; }
+        public int? StateId { get; set; }
         public Trade Trade { get; set; }
         public User User { get; set; }
+        public State State { get; set; }
     }
 
     //public partial class TradeUserList

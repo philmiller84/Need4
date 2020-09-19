@@ -15,16 +15,16 @@ using System.Linq.Expressions;
 
 namespace Need4
 {
-    public class Relation
-    {
-        public int key1 {get;set;}
-        public int key2 {get;set;}
-        public Relation(int key1, int key2)
-        {
-            this.key1 = key1;
-            this.key2 = key2;
-        }
-    }
+    //public class Relation
+    //{
+    //    public int key1 {get;set;}
+    //    public int key2 {get;set;}
+    //    public Relation(int key1, int key2)
+    //    {
+    //        this.key1 = key1;
+    //        this.key2 = key2;
+    //    }
+    //}
     public class TradeServiceImpl : TradeService.TradeServiceBase, IGenericCRUD
     {
         public TradeServiceImpl(Need4Context db)
@@ -53,16 +53,16 @@ namespace Need4
                 
             return Task.FromResult(new ActionResponse {Result  = result});
         }
-        public Task<int> GetRelation<T>(IQueryable<T> ts, Expression<Func<T,int>> s, Expression<Func<T,bool>> w)
+        public Task<int?> GetRelation<T>(IQueryable<T> ts, Expression<Func<T,int?>> s, Expression<Func<T,bool>> w)
         {
-            var q = this.GenericWrappedInvoke<IQueryable<T>, int>(
+            var q = this.GenericWrappedInvoke<IQueryable<T>, int?>(
                 db,
                 ts,
                 (db, ts) => ts.Where(w).Select(s),
                 x => {; }
                 );
 
-            var relationId = q.FirstOrDefault();
+            int? relationId = q.FirstOrDefault();
 
             return Task.FromResult(relationId);
         }
@@ -73,12 +73,67 @@ namespace Need4
             switch(relationshipType.Name)
             {
                 case "TradeUser":
-                    Expression<Func<TradeUser, int>> s = x => x.Id;
-                    Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.key1 && x.UserId == relation.key2;
+                    Expression<Func<TradeUser, int?>> s = x => new int?(x.Id);
+                    Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.Key1 && x.UserId == relation.Key2;
                     relationId = GetRelation<TradeUser>(db.TradeUsers, s, w).Result;
                     break;
             }
             return Task.FromResult(relationId);
+        }
+        
+        private Task<State> GetRelationshipState(Relationship relationship, ServerCallContext context)
+        {
+            var st = this.GenericWrappedInvoke<Relationship, State>( db, relationship,
+                    (db, relationship) => from x in db.TradeUsers
+                                        where x.Id == relationship.Id
+                                        select x.State,
+                    (x) => { });
+            return Task.FromResult(st.FirstOrDefault());
+        }
+        
+        public override Task<State> GetTradeUserState(TradeUserRequest request, ServerCallContext context)
+        {
+            var st = new State();
+
+            bool authenticated = request.UnauthenticatedUser == null;
+            if (authenticated)
+            {
+                var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
+                var viewPermissionType = new PermissionType { Name = Models.Constants.VIEW_PERMISSION };
+                var relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
+                var relationId = GetRelationId(relationshipType, relation).Result;
+                if (relationId == null)
+                    return Task.FromResult(st);
+                var relationship = new Relationship { Id = relationId.Value, Relation = relation, RelationshipType = relationshipType };
+                //st.RelationId = relationId.Value;
+                st = GetRelationshipState(relationship, context).Result;
+            }
+
+            return Task.FromResult(st);
+        }
+
+        public override Task<State> AddTradeUserState(TradeUserRequest request, ServerCallContext context)
+        {
+            var st = new State();
+            bool authenticated = request.UnauthenticatedUser == null;
+            if (authenticated)
+            {
+                var state = this.GenericWrappedInvoke<State>(
+                    db,
+                    request.State,
+                    (db, req) => from x in db.States
+                                 where req.Description == x.Description
+                                 select x,
+                    (x) => { });
+
+                if(state.Count() == 0)
+                    return Task.FromResult(st);
+
+                var t = new TradeUser { State = state.First(), TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
+                this.GenericCreate(db, t);
+            }
+
+            return Task.FromResult(st);
         }
 
         public override Task<PermissionSet> CheckPermissions(TradeUserRequest request, ServerCallContext context)
@@ -88,16 +143,26 @@ namespace Need4
             bool authenticated = request.UnauthenticatedUser == null;
             if (authenticated && (ps == null || ps.Permissions.Count == 0))
             {
-                var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
-                var viewPermissionType = new PermissionType { Name = Models.Constants.VIEW_PERMISSION };
-                var relationId = GetRelationId(relationshipType, new Relation(request.TradeId, request.AuthenticatedUserId)).Result;
-                if (relationId == null)
+
+                var state = GetTradeUserState(request, context);
+
+                if (state.Result == null)
                     return Task.FromResult(ps);
 
-                var viewPermission = new Permission { PermissionType = viewPermissionType, RelationshipType = relationshipType, RelationId = relationId.Value};
-                var tradeUserPermissionRequest = new TradeUserPermissionRequest { Permission = viewPermission, TradeUserRequest = request };
+                if (state.Result.Description == Constants.TRADE_USER_IOI)
+                {
+                    var relationshipType = new RelationshipType { Name = Models.Constants.TRADE_USER_TABLE };
+                    var permissionType = new PermissionType { Name = Models.Constants.JOIN_PERMISSION };
+                    var permissionRequest = new PermissionRequest
+                    {
+                        PermissionType = permissionType,
+                        RelationshipType = relationshipType,
+                        Key1 = request.TradeId,
+                        Key2 = request.AuthenticatedUserId
+                    };
 
-                AddPermission(tradeUserPermissionRequest, context);
+                    AddPermission(permissionRequest, context);
+                }
             }
             return Task.FromResult(ps);
         }
@@ -119,45 +184,54 @@ namespace Need4
                 );
         }
 
-        public override Task<PermissionSet> AddPermission(TradeUserPermissionRequest request, ServerCallContext context)
+        public override Task<PermissionSet> AddPermission(PermissionRequest request, ServerCallContext context)
         {
             var ps = new PermissionSet();
 
-            var relationshipType = this.GenericWrappedInvoke<TradeUserPermissionRequest, RelationshipType>(
+            var relationshipType = this.GenericWrappedInvoke<PermissionRequest, RelationshipType>(
                     db,
                     request,
                     (db, request) =>
                         from rt in db.RelationshipType
-                        where rt.Name == request.Permission.RelationshipType.Name
+                        where rt.Name == request.RelationshipType.Name
                         select rt,
                     (_) => {; }).FirstOrDefault();
 
-            var permissionType = this.GenericWrappedInvoke<TradeUserPermissionRequest, PermissionType>(
+            var permissionType = this.GenericWrappedInvoke<PermissionRequest, PermissionType>(
                     db,
                     request,
                     (db, request) =>
                         from pt in db.PermissionTypes
                         join rt in db.RelationshipType
-                        on request.Permission.RelationshipType.Name equals rt.Name
-                        where pt.Name == request.Permission.PermissionType.Name
+                        on request.RelationshipType.Name equals rt.Name
+                        where pt.Name == request.PermissionType.Name
                         select pt,
                     (_) => {; }).FirstOrDefault();
-
-            var tradeUserEntity = this.GenericCreate<TradeUser>(db, new TradeUser(request.TradeUserRequest));
 
             if(permissionType == null || relationshipType == null)
                 return Task.FromResult(ps);
 
-            request.Permission.PermissionType = permissionType;
-            request.Permission.PermissionTypeId = permissionType.Id;
-            request.Permission.RelationshipType = relationshipType;
-            request.Permission.RelationId = tradeUserEntity.Result.Id;
-            var s = this.GenericCreate<Permission>(db, request.Permission);
+            var relationId = GetRelationId(relationshipType, new Relation { Key1 = request.Key1, Key2 = request.Key2 }).Result;
+            //var tradeUserEntity = this.GenericCreate<TradeUser>(db, new TradeUser{TradeId = request.Key1, UserId = request.Key2 });
+
+            if(relationId == null)
+                return Task.FromResult(ps);
+
+
+            Permission newPermission = new Permission
+            {
+                PermissionType = permissionType,
+                PermissionTypeId = permissionType.Id,
+                RelationshipType = relationshipType,
+                RelationId = relationId.Value
+            };
+
+            var s = this.GenericCreate<Permission>(db, newPermission);
 
             //if(s.Result == null)
                 //return Task.FromResult(ps);
 
-            ps.Permissions.Add(request.Permission);
+            ps.Permissions.Add(newPermission);
             return Task.FromResult(ps);
         }
         public override Task<PermissionSet> GetPermissions(TradeUserRequest request, ServerCallContext context)
@@ -165,18 +239,18 @@ namespace Need4
             var ps = new PermissionSet();
             string relationshipType = "TradeUser";
             int? relationId = GetRelationId(
-                new RelationshipType { Name = relationshipType }, 
-                new Relation(request.TradeId, request.AuthenticatedUserId)).Result;
+                new RelationshipType { Name = relationshipType },
+                new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId }).Result;
+
+            if (relationId == null)
+                return Task.FromResult(ps);
                 
             Permission permissionRequest = new Permission { 
                 RelationshipType = new RelationshipType { Name = relationshipType }, 
                 RelationId = relationId.Value
             };
 
-            if(relationId != null)
-            {
-                ps.Permissions.AddRange(GetPermissionSet(permissionRequest));
-            }
+            ps.Permissions.AddRange(GetPermissionSet(permissionRequest));
 
             return Task.FromResult(ps);
         }

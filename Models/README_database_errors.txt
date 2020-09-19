@@ -5,11 +5,10 @@
 
 If you need to make a foreign key, will need to seed the child entity first, then use "ForeignTableId" = # as the entry in the parent table
 
-
 If you need join tables, use the Joins.cs in the API project
 
 HOW TO UPDATE DATABASE? 
- 1. Delete Migrations folder, 
+ 1. Delete Migrations folder, then delete db
  2. Add-Migration Init
  3. Update-Database
 
