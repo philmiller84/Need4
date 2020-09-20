@@ -22,25 +22,27 @@ namespace Helpers
         {
             string email = Helpers.Claims.GetEmail(context.User.Claims);
             if (email == null)
+            {
                 return null;
-            
-            var service = new Need4Service();
-            var userClient = service.GetUserClient();
-            var user = userClient.GetUser(new Need4Protocol.User { Email = email });
+            }
+
+            Need4Service service = new Need4Service();
+            UserService.UserServiceClient userClient = service.GetUserClient();
+            Need4Protocol.User user = userClient.GetUser(new Need4Protocol.User { Email = email });
 
             TradeUserRequest tradeUserRequest = user != null ?
                 new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = resource.Id} :
                 new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = resource.Id };
 
 
-            var tradeClient = service.GetTradeClient();
-            var permissions = tradeClient.GetPermissions(tradeUserRequest);
+            TradeService.TradeServiceClient tradeClient = service.GetTradeClient();
+            PermissionSet permissions = tradeClient.GetPermissions(tradeUserRequest);
 
             //if (context.User.Identity?.Name == resource.Author)
             //{
             //    context.Succeed(requirement);
             //}
-            var hasJoinTradePermission = (from p in permissions.Permissions
+            bool hasJoinTradePermission = (from p in permissions.Permissions
                                           where p.PermissionType.Name == StaticData.Constants.Permissions.JOIN
                                           select p).Any();
             if(hasJoinTradePermission)

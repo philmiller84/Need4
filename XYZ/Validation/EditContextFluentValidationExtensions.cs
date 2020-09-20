@@ -16,7 +16,7 @@ namespace XYZ.Validation
                 throw new ArgumentNullException(nameof(editContext));
             }
 
-            var messages = new ValidationMessageStore(editContext);
+            ValidationMessageStore messages = new ValidationMessageStore(editContext);
 
             editContext.OnValidationRequested +=
                 (sender, eventArgs) => ValidateModel((EditContext)sender, messages);
@@ -29,11 +29,11 @@ namespace XYZ.Validation
 
         private static void ValidateModel(EditContext editContext, ValidationMessageStore messages)
         {
-            var validator = GetValidatorForModel(editContext.Model);
-            var validationResults = validator.Validate(editContext.Model);
+            IValidator validator = GetValidatorForModel(editContext.Model);
+            FluentValidation.Results.ValidationResult validationResults = validator.Validate(editContext.Model);
 
             messages.Clear();
-            foreach (var validationResult in validationResults.Errors)
+            foreach (FluentValidation.Results.ValidationFailure validationResult in validationResults.Errors)
             {
                 messages.Add(editContext.Field(validationResult.PropertyName), validationResult.ErrorMessage);
             }
@@ -43,15 +43,15 @@ namespace XYZ.Validation
 
         private static void ValidateField(EditContext editContext, ValidationMessageStore messages, in FieldIdentifier fieldIdentifier)
         {
-            var properties = new[] { fieldIdentifier.FieldName };
-            var context = new ValidationContext(fieldIdentifier.Model, new PropertyChain(), new MemberNameValidatorSelector(properties));
+            string[] properties = new[] { fieldIdentifier.FieldName };
+            ValidationContext context = new ValidationContext(fieldIdentifier.Model, new PropertyChain(), new MemberNameValidatorSelector(properties));
 
-            var validator = GetValidatorForModel(fieldIdentifier.Model);
-            var validationResults = validator.Validate(context);
+            IValidator validator = GetValidatorForModel(fieldIdentifier.Model);
+            FluentValidation.Results.ValidationResult validationResults = validator.Validate(context);
 
             messages.Clear(fieldIdentifier);
 
-            foreach (var validationResult in validationResults.Errors)
+            foreach (FluentValidation.Results.ValidationFailure validationResult in validationResults.Errors)
             {
                 messages.Add(editContext.Field(validationResult.PropertyName), validationResult.ErrorMessage);
             }
@@ -61,14 +61,14 @@ namespace XYZ.Validation
 
         private static IValidator GetValidatorForModel(object model)
         {
-            var modelType = model.GetType();
-            var abstractConstructor = typeof(AbstractValidator<>);
-            var abstractValidatorType = abstractConstructor.MakeGenericType(modelType);
+            Type modelType = model.GetType();
+            Type abstractConstructor = typeof(AbstractValidator<>);
+            Type abstractValidatorType = abstractConstructor.MakeGenericType(modelType);
             //var executingAssembly = Assembly.GetExecutingAssembly();
-            var validatorAssembly = Assembly.Load("API");
-            var assemblyTypes = validatorAssembly.GetTypes();
-            var modelValidatorType = assemblyTypes.FirstOrDefault(t => t.IsSubclassOf(abstractValidatorType));
-            var modelValidatorInstance = (IValidator)Activator.CreateInstance(modelValidatorType);
+            Assembly validatorAssembly = Assembly.Load("API");
+            Type[] assemblyTypes = validatorAssembly.GetTypes();
+            Type modelValidatorType = assemblyTypes.FirstOrDefault(t => t.IsSubclassOf(abstractValidatorType));
+            IValidator modelValidatorInstance = (IValidator)Activator.CreateInstance(modelValidatorType);
 
             return modelValidatorInstance;
         }

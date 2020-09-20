@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Need4Protocol;
-using System;
-using System.Security.Cryptography.X509Certificates;
 using StaticData.Constants;
+using System;
 
 namespace Models
 {

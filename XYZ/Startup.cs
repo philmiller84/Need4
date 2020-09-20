@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -35,8 +33,8 @@ namespace XYZ
 			});
 
             services.AddSingleton<Helpers.Authentication>(new Helpers.Authentication(Configuration));
-            var lookup = from s in services where s.ServiceType == typeof(Helpers.Authentication) select s;
-            var authenticationHelper = (Helpers.Authentication) lookup.First().ImplementationInstance;
+            System.Collections.Generic.IEnumerable<ServiceDescriptor> lookup = from s in services where s.ServiceType == typeof(Helpers.Authentication) select s;
+            Helpers.Authentication authenticationHelper = (Helpers.Authentication) lookup.First().ImplementationInstance;
 
             // Add authentication services
             services.AddAuthentication(options =>

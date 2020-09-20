@@ -52,12 +52,14 @@ namespace Helpers
         public Task OnTicketReceived(TicketReceivedContext context)
         {
             // Get the ClaimsIdentity
-            var identity = context.Principal.Identity as ClaimsIdentity;
+            ClaimsIdentity identity = context.Principal.Identity as ClaimsIdentity;
             if (identity != null)
             {
                 // Add the Name ClaimType. This is required if we want User.Identity.Name to actually return something!
                 if (!context.Principal.HasClaim(c => c.Type == ClaimTypes.Name) && identity.HasClaim(c => c.Type == "name"))
+                {
                     identity.AddClaim(new Claim(ClaimTypes.Name, identity.FindFirst("name").Value));
+                }
 
                 // Check if token names are stored in Properties
                 if (context.Properties.Items.ContainsKey(".TokenNames"))
@@ -66,7 +68,7 @@ namespace Helpers
                     string[] tokenNames = context.Properties.Items[".TokenNames"].Split(';');
 
                     // Add each token value as Claim
-                    foreach (var tokenName in tokenNames)
+                    foreach (string tokenName in tokenNames)
                     {
                         // Tokens are stored in a Dictionary with the Key ".Token.<token name>"
                         string tokenValue = context.Properties.Items[$".Token.{tokenName}"];
@@ -74,19 +76,19 @@ namespace Helpers
                     }
                 }
 
-                var service = new Need4Service();
-                var userService = service.GetUserClient();
-                var permissionService = service.GetPermissionClient();
+                Need4Service service = new Need4Service();
+                Need4Protocol.UserService.UserServiceClient userService = service.GetUserClient();
+                Need4Protocol.PermissionService.PermissionServiceClient permissionService = service.GetPermissionClient();
                 string email = Claims.GetEmail(context.Principal.Claims);
-                var user = new Need4Protocol.User { Email = email };
-                var response = userService.GetUser(user);
+                Need4Protocol.User user = new Need4Protocol.User { Email = email };
+                Need4Protocol.User response = userService.GetUser(user);
                 if (!response.Created)
                 {
                     response = userService.CreateUser(user);
                 }
                 else
                 {
-                    var permissions = permissionService.GetAllPermissions(user);
+                    Need4Protocol.PermissionSet permissions = permissionService.GetAllPermissions(user);
                 }
             }
 
@@ -95,15 +97,15 @@ namespace Helpers
 
         public Task HandleRedirectToIdentityProviderForSignOut(RedirectContext context)
         {
-            var logoutUri = $"https://{Configuration["Auth0:domain"]}/v2/logout?client_id={Configuration["Auth0:clientId"]}";
+            string logoutUri = $"https://{Configuration["Auth0:domain"]}/v2/logout?client_id={Configuration["Auth0:clientId"]}";
 
-            var postLogoutUri = context.Properties.RedirectUri;
+            string postLogoutUri = context.Properties.RedirectUri;
             if (!string.IsNullOrEmpty(postLogoutUri))
             {
                 if (postLogoutUri.StartsWith("/"))
                 {
                     // transform to absolute
-                    var request = context.Request;
+                    HttpRequest request = context.Request;
                     postLogoutUri = request.Scheme + "://" + request.Host + request.PathBase + postLogoutUri;
                 }
                 logoutUri += $"&returnTo={ Uri.EscapeDataString(postLogoutUri)}";

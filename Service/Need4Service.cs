@@ -24,7 +24,7 @@ namespace Service
         private readonly GrpcChannel channel;
         public Need4Service()
         {
-            var serverAddress = "https://localhost:50051";
+            string serverAddress = "https://localhost:50051";
             channel = GrpcChannel.ForAddress(serverAddress);
             itemClient = new ItemRepository.ItemRepositoryClient(channel);
             tradeClient = new TradeService.TradeServiceClient(channel);

@@ -1,18 +1,13 @@
-﻿using Grpc.Core;
+﻿using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using Models;
 using Need4Protocol;
-using System.Net;
-using System.Linq;
-using System.Threading.Tasks;
-using Google.Protobuf.WellKnownTypes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.IdentityModel.Tokens;
-using System.Collections.Generic;
 using System;
-using StaticData;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Need4
 {
@@ -56,7 +51,7 @@ namespace Need4
         }
         public Task<int?> GetRelation<T>(IQueryable<T> ts, Expression<Func<T,int?>> s, Expression<Func<T,bool>> w)
         {
-            var q = this.GenericWrappedInvoke<IQueryable<T>, int?>(
+            IQueryable<int?> q = this.GenericWrappedInvoke<IQueryable<T>, int?>(
                 db,
                 ts,
                 (db, ts) => ts.Where(w).Select(s),
@@ -84,7 +79,7 @@ namespace Need4
         
         private Task<State> GetRelationshipState(Relationship relationship, ServerCallContext context)
         {
-            var st = this.GenericWrappedInvoke<Relationship, State>( db, relationship,
+            IQueryable<State> st = this.GenericWrappedInvoke<Relationship, State>( db, relationship,
                     (db, relationship) => from x in db.TradeUsers
                                         where x.Id == relationship.Id
                                         select x.State,
@@ -94,18 +89,21 @@ namespace Need4
         
         public override Task<State> GetTradeUserState(TradeUserRequest request, ServerCallContext context)
         {
-            var st = new State();
+            State st = new State();
 
             bool authenticated = request.UnauthenticatedUser == null;
             if (authenticated)
             {
-                var relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
+                RelationshipType relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
                 //var viewPermissionType = new PermissionType { Name = StaticData.Constants.Permissions.VIEW};
-                var relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
-                var relationId = GetRelationId(relationshipType, relation).Result;
+                Relation relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
+                int? relationId = GetRelationId(relationshipType, relation).Result;
                 if (relationId == null)
+                {
                     return Task.FromResult(st);
-                var relationship = new Relationship { Id = relationId.Value, Relation = relation, RelationshipType = relationshipType };
+                }
+
+                Relationship relationship = new Relationship { Id = relationId.Value, Relation = relation, RelationshipType = relationshipType };
                 //st.RelationId = relationId.Value;
                 st = GetRelationshipState(relationship, context).Result;
             }
@@ -115,11 +113,11 @@ namespace Need4
 
         public override Task<State> AddTradeUserState(TradeUserRequest request, ServerCallContext context)
         {
-            var st = new State();
+            State st = new State();
             bool authenticated = request.UnauthenticatedUser == null;
             if (authenticated)
             {
-                var state = this.GenericWrappedInvoke<State>(
+                IQueryable<State> state = this.GenericWrappedInvoke<State>(
                     db,
                     request.State,
                     (db, req) => from x in db.States
@@ -128,9 +126,11 @@ namespace Need4
                     (x) => { });
 
                 if(state.Count() == 0)
+                {
                     return Task.FromResult(st);
+                }
 
-                var t = new TradeUser { State = state.First(), TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
+                TradeUser t = new TradeUser { State = state.First(), TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
                 this.GenericCreate(db, t);
             }
 
@@ -139,22 +139,24 @@ namespace Need4
 
         public override Task<PermissionSet> CheckPermissions(TradeUserRequest request, ServerCallContext context)
         {
-            var ps = GetPermissions(request, context).Result;
+            PermissionSet ps = GetPermissions(request, context).Result;
 
             bool authenticated = request.UnauthenticatedUser == null;
             if (authenticated && (ps == null || ps.Permissions.Count == 0))
             {
 
-                var state = GetTradeUserState(request, context);
+                Task<State> state = GetTradeUserState(request, context);
 
                 if (state.Result == null)
+                {
                     return Task.FromResult(ps);
+                }
 
                 if (state.Result.Description == StaticData.Constants.TradeUserStates.IOI)
                 {
-                    var relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
-                    var permissionType = new PermissionType { Name = StaticData.Constants.Permissions.JOIN};
-                    var permissionRequest = new PermissionRequest
+                    RelationshipType relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
+                    PermissionType permissionType = new PermissionType { Name = StaticData.Constants.Permissions.JOIN};
+                    PermissionRequest permissionRequest = new PermissionRequest
                     {
                         PermissionType = permissionType,
                         RelationshipType = relationshipType,
@@ -187,9 +189,9 @@ namespace Need4
 
         public override Task<PermissionSet> AddPermission(PermissionRequest request, ServerCallContext context)
         {
-            var ps = new PermissionSet();
+            PermissionSet ps = new PermissionSet();
 
-            var relationshipType = this.GenericWrappedInvoke<PermissionRequest, RelationshipType>(
+            RelationshipType relationshipType = this.GenericWrappedInvoke<PermissionRequest, RelationshipType>(
                     db,
                     request,
                     (db, request) =>
@@ -198,7 +200,7 @@ namespace Need4
                         select rt,
                     (_) => {; }).FirstOrDefault();
 
-            var permissionType = this.GenericWrappedInvoke<PermissionRequest, PermissionType>(
+            PermissionType permissionType = this.GenericWrappedInvoke<PermissionRequest, PermissionType>(
                     db,
                     request,
                     (db, request) =>
@@ -210,14 +212,17 @@ namespace Need4
                     (_) => {; }).FirstOrDefault();
 
             if(permissionType == null || relationshipType == null)
+            {
                 return Task.FromResult(ps);
+            }
 
-            var relationId = GetRelationId(relationshipType, new Relation { Key1 = request.Key1, Key2 = request.Key2 }).Result;
+            int? relationId = GetRelationId(relationshipType, new Relation { Key1 = request.Key1, Key2 = request.Key2 }).Result;
             //var tradeUserEntity = this.GenericCreate<TradeUser>(db, new TradeUser{TradeId = request.Key1, UserId = request.Key2 });
 
             if(relationId == null)
+            {
                 return Task.FromResult(ps);
-
+            }
 
             Permission newPermission = new Permission
             {
@@ -227,7 +232,7 @@ namespace Need4
                 RelationId = relationId.Value
             };
 
-            var s = this.GenericCreate<Permission>(db, newPermission);
+            Task<Permission> s = this.GenericCreate<Permission>(db, newPermission);
 
             //if(s.Result == null)
                 //return Task.FromResult(ps);
@@ -237,15 +242,17 @@ namespace Need4
         }
         public override Task<PermissionSet> GetPermissions(TradeUserRequest request, ServerCallContext context)
         {
-            var ps = new PermissionSet();
+            PermissionSet ps = new PermissionSet();
             string relationshipType = "TradeUser";
             int? relationId = GetRelationId(
                 new RelationshipType { Name = relationshipType },
                 new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId }).Result;
 
             if (relationId == null)
+            {
                 return Task.FromResult(ps);
-                
+            }
+
             Permission permissionRequest = new Permission { 
                 RelationshipType = new RelationshipType { Name = relationshipType }, 
                 RelationId = relationId.Value
@@ -257,25 +264,31 @@ namespace Need4
         }
         public override Task<TradeActionResponse> GetTradeActions(TradeUserRequest request, ServerCallContext context)
         {
-            var t = new TradeActionResponse();
+            TradeActionResponse t = new TradeActionResponse();
             bool tradeExists = CheckTradeExists(request);
 
             if (!tradeExists)
+            {
                 return Task.FromResult(t);
+            }
 
             bool authenticated = request.UnauthenticatedUser == null;
 
             if(!authenticated)
+            {
                 return Task.FromResult(t);
+            }
 
             int? relationshipId = GetTradeRelationship(request);
 
             if(relationshipId == null)
+            {
                 return Task.FromResult(t);
+            }
 
             string relationshipType = StaticData.Constants.Tables.TRADE_USER;
-            var permissionRequest = new Permission { RelationId = relationshipId.Value, RelationshipType = new RelationshipType { Name = relationshipType } };
-            var permissionSet = GetPermissionSet(permissionRequest);
+            Permission permissionRequest = new Permission { RelationId = relationshipId.Value, RelationshipType = new RelationshipType { Name = relationshipType } };
+            IQueryable<Permission> permissionSet = GetPermissionSet(permissionRequest);
 
             string actionCategory = StaticData.Constants.Categories.TRADE_ACTION;
             this.GenericWrappedInvoke<TradeUserRequest, ActionDetails>(
