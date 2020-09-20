@@ -15,21 +15,15 @@ namespace Need4
         private readonly Need4Context db;
         public override Task<User> GetUser(User u, ServerCallContext context)
         {
-            // STUB IMPLEMENTATION FOR TESTING
-            this.GenericWrappedInvoke<User, User>(
-                db,
-                u,
-                (db, u) => from x in db.Users
-                           where x.Email == u.Email
-                           select x,
-                (x) => u = x);
+            var q = from x in db.Users
+                    where x.Email == u.Email
+                    select x;
 
-            return Task.FromResult(u);
+            return Task.FromResult(q.First());
         }
 
         public override Task<User> CreateUser(User u, ServerCallContext context)
         {
-            // STUB IMPLEMENTATION FOR TESTING
             Task<User> reply = this.GenericCreate(db, u);
             return Task.FromResult(u);
         }

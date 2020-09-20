@@ -51,16 +51,14 @@ namespace Need4
         }
         public Task<int?> GetRelation<T>(IQueryable<T> ts, Expression<Func<T,int?>> s, Expression<Func<T,bool>> w)
         {
-            IQueryable<int?> q = this.GenericWrappedInvoke<IQueryable<T>, int?>(
-                db,
-                ts,
-                (db, ts) => ts.Where(w).Select(s),
-                x => {; }
-                );
-
-            int? relationId = q.FirstOrDefault();
-
-            return Task.FromResult(relationId);
+            try
+            {
+                return Task.FromResult(ts.Where(w).Select(s).First());
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Task<int?> GetRelationId(RelationshipType relationshipType, Relation relation)
@@ -79,12 +77,15 @@ namespace Need4
         
         private Task<State> GetRelationshipState(Relationship relationship, ServerCallContext context)
         {
-            IQueryable<State> st = this.GenericWrappedInvoke<Relationship, State>( db, relationship,
-                    (db, relationship) => from x in db.TradeUsers
-                                        where x.Id == relationship.Id
-                                        select x.State,
-                    (x) => { });
-            return Task.FromResult(st.FirstOrDefault());
+            try
+            {
+                var q =  from x in db.TradeUsers where x.Id == relationship.Id select x.State;
+                return Task.FromResult(q.First());
+            }
+            catch
+            {
+                return null;
+            }
         }
         
         public override Task<State> GetTradeUserState(TradeUserRequest request, ServerCallContext context)
@@ -117,21 +118,18 @@ namespace Need4
             bool authenticated = request.UnauthenticatedUser == null;
             if (authenticated)
             {
-                IQueryable<State> state = this.GenericWrappedInvoke<State>(
-                    db,
-                    request.State,
-                    (db, req) => from x in db.States
-                                 where req.Description == x.Description
-                                 select x,
-                    (x) => { });
-
-                if(state.Count() == 0)
+                try
                 {
-                    return Task.FromResult(st);
-                }
+                    var q = from x in db.States where request.State.Description == x.Description select x;
+                    var state = q.First();
 
-                TradeUser t = new TradeUser { State = state.First(), TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
-                this.GenericCreate(db, t);
+                    TradeUser t = new TradeUser { State = state, TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
+                    this.GenericCreate(db, t);
+                }
+                catch
+                {
+                    return null;
+                }
             }
 
             return Task.FromResult(st);
@@ -171,45 +169,33 @@ namespace Need4
         }
         public IQueryable<Permission> GetPermissionSet(Permission request)
         {
-            return this.GenericWrappedInvoke<Permission, Permission>(
-                db,
-                request,
-                (db, request) =>
-                    from p in db.Permissions
+            var q = from p in db.Permissions
                     .Include(r => r.PermissionType)
                     .Include(r => r.RelationshipType)
                     join rt in db.RelationshipType
                     on p.RelationshipTypeId equals rt.Id
                     where request.RelationshipType.Name == rt.Name
                     && p.RelationId == request.RelationId
-                    select p,
-                (_) => {; }
-                );
+                    select p;
+            return q;
         }
 
         public override Task<PermissionSet> AddPermission(PermissionRequest request, ServerCallContext context)
         {
             PermissionSet ps = new PermissionSet();
 
-            RelationshipType relationshipType = this.GenericWrappedInvoke<PermissionRequest, RelationshipType>(
-                    db,
-                    request,
-                    (db, request) =>
-                        from rt in db.RelationshipType
+            RelationshipType relationshipType =
+                        (from rt in db.RelationshipType
                         where rt.Name == request.RelationshipType.Name
-                        select rt,
-                    (_) => {; }).FirstOrDefault();
+                        select rt).FirstOrDefault();
 
-            PermissionType permissionType = this.GenericWrappedInvoke<PermissionRequest, PermissionType>(
-                    db,
-                    request,
-                    (db, request) =>
-                        from pt in db.PermissionTypes
+            PermissionType permissionType = 
+                        (from pt in db.PermissionTypes
                         join rt in db.RelationshipType
                         on request.RelationshipType.Name equals rt.Name
                         where pt.Name == request.PermissionType.Name
-                        select pt,
-                    (_) => {; }).FirstOrDefault();
+                        select pt).FirstOrDefault();
+            
 
             if(permissionType == null || relationshipType == null)
             {
@@ -291,119 +277,81 @@ namespace Need4
             IQueryable<Permission> permissionSet = GetPermissionSet(permissionRequest);
 
             string actionCategory = StaticData.Constants.Categories.TRADE_ACTION;
-            this.GenericWrappedInvoke<TradeUserRequest, ActionDetails>(
-                db,
-                request,
-                (db, request) =>
-                    from ps in permissionSet
+            var q = from ps in permissionSet
                     join r in db.Requirements
-                    on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId} equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
+                    on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
                     join a in db.ActionDetails
                     on r.ActionId equals a.Id
                     where a.Category == actionCategory
-                    select a,
-                (x) => t.Actions.Add(x));
+                    select a;
 
-                //TODO: THIS IS NOT IMPLEMENTED, JUST A STUB HERE
-                //this.GenericWrappedInvoke<TradeUserRequest, ActionDetails>(
-                //    request,
-                //    (db, request) =>
-                //        from a in db.ActionDetails
-                //        join r in db.Requirements
-                //        on a.Id equals r.ActionId
-                //        join p in db.Permissions
-                //        on r.PermissionTypeId equals p.PermissionTypeId
-                //        join tu in db.TradeUsers
-                //        on p.RelationId equals tu.Id
-                //        join t in db.Trades
-                //        on tu.TradeId equals t.Id
-                //        join u in db.Users
-                //        on tu.UserId equals u.Id
-                //        where a.Category == actionCategory
-                //        && r.RelationshipTypeId == (from t in db.RelationshipType
-                //                                    where t.Name == relationshipType
-                //                                    select t.Id).First()
-                //        && p.RelationshipTypeId == r.RelationshipTypeId
-                //        && t.Id == request.TradeId
-                //        && u.Id == request.AuthenticatedUserId
-                //        select a,
-                //    (x) => t.Actions.Add(x));
+            foreach( var action in q)
+            {
+                t.Actions.Add(action);
+            }
 
             return Task.FromResult(t);
         }
 
         private int? GetTradeRelationship(TradeUserRequest request)
         {
-            return this.GenericWrappedInvoke<TradeUserRequest, TradeUser>(
-                db,
-                request,
-                (db, request) =>
-                    from tu in db.TradeUsers
+            return (from tu in db.TradeUsers
                     where tu.TradeId == request.TradeId && tu.UserId == request.AuthenticatedUserId
-                    select tu,
-                (_) => {; }).FirstOrDefault()?.Id;
+                    select tu).FirstOrDefault()?.Id;
         }
 
         private bool CheckTradeExists(TradeUserRequest request)
         {
-            bool tradeExists = false;
-            this.GenericWrappedInvoke<Empty, Trade>(
-                db,
-                new Empty(),
-                (db, _) =>
-                    from t in db.Trades
+            var q = from t in db.Trades
                     where t.Id == request.TradeId
-                    select t,
-                (x) => { tradeExists = true; });
-            return tradeExists;
+                    select t;
+            return q.Count() > 0;
         }
 
         public override Task<Trade> GetDetailedTradeView(TradeUserRequest request, ServerCallContext context)
         {
             Trade trade = new Trade();
-            this.GenericWrappedInvoke<int, Trade>(
-                db, 
-                request.TradeId,
-                (db, tradeIdAsInt) => from t in db.Trades
-                                      .Include(l => l.TradeItemList)
-                                      .ThenInclude(y => y.TradeItemDetails)
-                                      .ThenInclude(z => z.Item)
-                                      where t.Id == request.TradeId
-                                      select t,
-                (x) => trade = x);
+            var q = from t in db.Trades
+                    .Include(l => l.TradeItemList)
+                    .ThenInclude(y => y.TradeItemDetails)
+                    .ThenInclude(z => z.Item)
+                    where t.Id == request.TradeId
+                    select t;
 
-            return Task.FromResult(trade);
+            return Task.FromResult(q.First());
         }
         public override Task<TradeList> GetUserTrades(User u, ServerCallContext context)
         {
             TradeList tl = new TradeList();
-            this.GenericWrappedInvoke<User, Trade>(
-                db, 
-                u,
-                (db, u) => from t in db.Trades
-                           .Include(l => l.TradeItemList)
-                           .ThenInclude(y => y.TradeItemDetails)
-                           .ThenInclude(z => z.Item)
-                           join x in db.TradeUsers
-                           on u.Id equals x.UserId
-                           where t.Id == x.TradeId
-                           select t,
-                (x) => tl.Trades.Add(x));
+            var q = from t in db.Trades
+                    .Include(l => l.TradeItemList)
+                    .ThenInclude(y => y.TradeItemDetails)
+                    .ThenInclude(z => z.Item)
+                    join x in db.TradeUsers
+                    on u.Id equals x.UserId
+                    where t.Id == x.TradeId
+                    select t;
+
+            foreach(var trade in q)
+            {
+                tl.Trades.Add(trade);
+            }
 
             return Task.FromResult(tl);
         }
         public override Task<TradeList> GetOpenTrades(Empty e, ServerCallContext context)
         {
             TradeList tl = new TradeList();
-            this.GenericWrappedInvoke<Empty, Trade>(
-                db, 
-                e,
-                (db, e) => from t in db.Trades
-                           .Include(l => l.TradeItemList) 
-                           .ThenInclude(y => y.TradeItemDetails)
-                           .ThenInclude(z => z.Item)
-                           select t,
-                (x) => tl.Trades.Add(x));
+            var q = from t in db.Trades
+                    .Include(l => l.TradeItemList)
+                    .ThenInclude(y => y.TradeItemDetails)
+                    .ThenInclude(z => z.Item)
+                    select t;
+
+            foreach(var trade in q)
+            {
+                tl.Trades.Add(trade);
+            }
 
             return Task.FromResult(tl);
         }

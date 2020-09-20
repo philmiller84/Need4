@@ -34,16 +34,14 @@ namespace Need4
 
         public override Task<PermissionSet> GetAllPermissions(User u, ServerCallContext context)
         {
-            // STUB IMPLEMENTATION FOR TESTING
             PermissionSet ps = new PermissionSet();
-            this.GenericWrappedInvoke<User, Permission>(
-                db,
-                u,
-                (db, u) => from x in db.Permissions
-                           .Include(x => x.PermissionType)
-                           .Include(x => x.RelationshipType)
-                           select x,
-                (x) => {ps.Permissions.Add(x); });
+            var q = from x in db.Permissions
+                    .Include(x => x.PermissionType)
+                    .Include(x => x.RelationshipType)
+                    select x;
+
+            foreach (var permission in q)
+                ps.Permissions.Add(permission);
 
             return Task.FromResult(ps);
         }
@@ -51,7 +49,7 @@ namespace Need4
         public override Task<ActionResponse> IsUserPermissioned(UserPermission u, ServerCallContext context)
         {
             ActionResponse ar = new ActionResponse();
-            //// STUB IMPLEMENTATION FOR TESTING
+            //// 
             //var reply = this.GenericCreate(db, u);
             //u.Created = (reply.Result.Result == (int)HttpStatusCode.OK);
             return Task.FromResult(ar);

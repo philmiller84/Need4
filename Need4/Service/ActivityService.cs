@@ -16,7 +16,7 @@ namespace Need4
  
         public override Task<ActivityResponse> GetAllActivities(User u, ServerCallContext context)
         {
-            // STUB IMPLEMENTATION FOR TESTING
+            // 
             ActivityResponse response = new ActivityResponse();
             //if (u.Name == "Anonymouse")
             //    return Task.FromResult(response);
@@ -25,12 +25,10 @@ namespace Need4
             //    new ActivityDetails { Name = "New Trade", Category = "Trade" }, 
             //    new ActivityDetails { Name = "Public Chat", Category = "Chat" } }.AsQueryable();
 
-            this.GenericWrappedInvoke<User, ActivityDetails>(
-                db,
-                u,
-                (db, u) => from x in db.ActivityDetails
-                           select x,
-                (x) => {response.Activities.Add(x); });
+            var q = from x in db.ActivityDetails select x;
+
+            foreach( var activity in q)
+                response.Activities.Add(activity); 
 
             return Task.FromResult(response);
         }

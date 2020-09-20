@@ -17,13 +17,10 @@ namespace Need4
         public override Task<CommunityList> GetAllCommunities(Empty e, ServerCallContext context)
         {
             CommunityList communityList = new CommunityList();
-            // STUB IMPLEMENTATION FOR TESTING
-            this.GenericWrappedInvoke<Empty, CommunityDetails>(
-                db,
-                e,
-                (db, u) => from x in db.CommunityDetails
-                           select x,
-                (x) => communityList.Communities.Add(x));
+            var q = from x in db.CommunityDetails
+                    select x;
+            foreach(var community in q)
+                communityList.Communities.Add(community);
 
             return Task.FromResult(communityList);
         }
