@@ -64,15 +64,23 @@ namespace Need4
         public Task<int?> GetRelationId(RelationshipType relationshipType, Relation relation)
         {
             int? relationId = null;
-            switch(relationshipType.Name)
+            try
             {
-                case "TradeUser":
-                    Expression<Func<TradeUser, int?>> s = x => new int?(x.Id);
-                    Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.Key1 && x.UserId == relation.Key2;
-                    relationId = GetRelation<TradeUser>(db.TradeUsers, s, w).Result;
-                    break;
+
+                switch(relationshipType.Id)
+                {
+                    case (int)StaticData.Constants.RelationshipType.ID.TRADE_USER:
+                        Expression<Func<TradeUser, int?>> s = x => new int?(x.Id);
+                        Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.Key1 && x.UserId == relation.Key2;
+                        relationId = GetRelation<TradeUser>(db.TradeUsers, s, w).Result;
+                        break;
+                }
+                return Task.FromResult(relationId);
             }
-            return Task.FromResult(relationId);
+            catch
+            {
+                return null;
+            }
         }
         
         private Task<State> GetRelationshipState(Relationship relationship, ServerCallContext context)
@@ -92,24 +100,31 @@ namespace Need4
         {
             State st = new State();
 
-            bool authenticated = request.UnauthenticatedUser == null;
-            if (authenticated)
+            try
             {
-                RelationshipType relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
-                //var viewPermissionType = new PermissionType { Name = StaticData.Constants.Permissions.VIEW};
-                Relation relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
-                int? relationId = GetRelationId(relationshipType, relation).Result;
-                if (relationId == null)
+
+                bool authenticated = request.UnauthenticatedUser == null;
+                if (authenticated)
                 {
-                    return Task.FromResult(st);
+                    RelationshipType relationshipType = new RelationshipType { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER};
+                    //var viewPermissionType = new PermissionType { Name = StaticData.Constants.Permissions.VIEW};
+                    Relation relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
+                    int? relationId = GetRelationId(relationshipType, relation).Result;
+                    if (relationId == null)
+                    {
+                        return Task.FromResult(st);
+                    }
+    
+                    Relationship relationship = new Relationship { Id = relationId.Value, Relation = relation, RelationshipType = relationshipType };
+                    //st.RelationId = relationId.Value;
+                    st = GetRelationshipState(relationship, context).Result;
                 }
-
-                Relationship relationship = new Relationship { Id = relationId.Value, Relation = relation, RelationshipType = relationshipType };
-                //st.RelationId = relationId.Value;
-                st = GetRelationshipState(relationship, context).Result;
+                return Task.FromResult(st);
             }
-
-            return Task.FromResult(st);
+            catch
+            {
+                return Task.FromResult(st);
+            }
         }
 
         public override Task<State> AddTradeUserState(TradeUserRequest request, ServerCallContext context)
@@ -120,7 +135,7 @@ namespace Need4
             {
                 try
                 {
-                    var q = from x in db.States where request.State.Description == x.Description select x;
+                    var q = from x in db.States where request.State.Id == x.Id select x;
                     var state = q.First();
 
                     TradeUser t = new TradeUser { State = state, TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
@@ -150,7 +165,7 @@ namespace Need4
                     return Task.FromResult(ps);
                 }
 
-                if (state.Result.Description == StaticData.Constants.TradeUserStates.IOI)
+                if (state.Result.Id == (int)StaticData.Constants.States.TradeUser.ID.IOI)
                 {
                     RelationshipType relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
                     PermissionType permissionType = new PermissionType { Name = StaticData.Constants.Permissions.JOIN};
@@ -172,10 +187,8 @@ namespace Need4
             var q = from p in db.Permissions
                     .Include(r => r.PermissionType)
                     .Include(r => r.RelationshipType)
-                    join rt in db.RelationshipType
-                    on p.RelationshipTypeId equals rt.Id
-                    where request.RelationshipType.Name == rt.Name
-                    && p.RelationId == request.RelationId
+                    where p.RelationId == request.RelationId
+                    && p.RelationshipTypeId == request.RelationshipType.Id
                     select p;
             return q;
         }
@@ -229,24 +242,29 @@ namespace Need4
         public override Task<PermissionSet> GetPermissions(TradeUserRequest request, ServerCallContext context)
         {
             PermissionSet ps = new PermissionSet();
-            string relationshipType = "TradeUser";
-            int? relationId = GetRelationId(
-                new RelationshipType { Name = relationshipType },
-                new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId }).Result;
-
-            if (relationId == null)
+            try
+            {
+                int? relationId = GetRelationId(
+                    new RelationshipType { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER },
+                    new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId }).Result;
+    
+                if (relationId == null)
+                {
+                    return Task.FromResult(ps);
+                }
+    
+                Permission permissionRequest = new Permission { 
+                    RelationshipType = new RelationshipType { Id=(int)StaticData.Constants.RelationshipType.ID.TRADE_USER }, 
+                    RelationId = relationId.Value
+                };
+    
+                ps.Permissions.AddRange(GetPermissionSet(permissionRequest));
+                return Task.FromResult(ps);
+            }
+            catch
             {
                 return Task.FromResult(ps);
             }
-
-            Permission permissionRequest = new Permission { 
-                RelationshipType = new RelationshipType { Name = relationshipType }, 
-                RelationId = relationId.Value
-            };
-
-            ps.Permissions.AddRange(GetPermissionSet(permissionRequest));
-
-            return Task.FromResult(ps);
         }
         public override Task<TradeActionResponse> GetTradeActions(TradeUserRequest request, ServerCallContext context)
         {
@@ -272,8 +290,11 @@ namespace Need4
                 return Task.FromResult(t);
             }
 
-            string relationshipType = StaticData.Constants.Tables.TRADE_USER;
-            Permission permissionRequest = new Permission { RelationId = relationshipId.Value, RelationshipType = new RelationshipType { Name = relationshipType } };
+            Permission permissionRequest = 
+                new Permission { 
+                    RelationId = relationshipId.Value, 
+                    RelationshipType = new RelationshipType { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER } };
+
             IQueryable<Permission> permissionSet = GetPermissionSet(permissionRequest);
 
             string actionCategory = StaticData.Constants.Categories.TRADE_ACTION;

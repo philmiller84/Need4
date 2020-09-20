@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Need4Protocol;
-using StaticData.Constants;
 using System;
 
 namespace Models
@@ -72,7 +71,7 @@ namespace Models
 
             e.HasData(
 
-                new { Id = 10, Name = "Create New Listing", Category = Categories.SALES, Method = "/sales/new" },
+                new { Id = 10, Name = "Create New Listing", Category = StaticData.Constants.Categories.SALES, Method = "/sales/new" },
                 new { Id = 11, Name = "My Sales", Category = StaticData.Constants.Categories.SALES, Method = "/sales" },
                 new { Id = 12, Name = "Public Sales", Category = StaticData.Constants.Categories.SALES, Method = "/sales/public" },
 
@@ -139,20 +138,6 @@ namespace Models
         }
 
 
-        public DbSet<ActionDetails> ActionDetails { get; set; }
-        private void OnCreateActionDetails(EntityTypeBuilder<ActionDetails> entityTypeBuilder)
-        {
-            entityTypeBuilder.HasKey(r => r.Id);
-            entityTypeBuilder.HasData(
-                new { Id = 1, Name = "GetTradeData", Category = StaticData.Constants.Categories.VIEW, Method = "TradeViewDetails/{0}" },
-                new { Id = 2, Name = "ExcludeUser", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/exclude/{0}/{1}" },
-                new { Id = 3, Name = "SplitTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/split/{0}" },
-                new { Id = 4, Name = "FinalizeTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/finalize/{0}" },
-                new { Id = 5, Name = "WithdrawFromTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/withdraw/{0}/{1}" },
-                new { Id = 6, Name = "JoinTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = StaticData.Constants.ActionRoutes.JOIN_TRADE}
-                ); 
-        }
-
         public DbSet<User> Users { get; set; }
         private void OnCreateUsers(EntityTypeBuilder<User> entityTypeBuilder)
         {
@@ -178,14 +163,29 @@ namespace Models
             entity.HasOne(d => d.RelationshipType);
 
             entity.HasData(
-                new { Id = -1, PermissionTypeId = 4, RelationshipTypeId = 1, ActionId = 2 },
-                new { Id = -2, PermissionTypeId = 4, RelationshipTypeId = 1, ActionId = 3 },
-                new { Id = -3, PermissionTypeId = 4, RelationshipTypeId = 1, ActionId = 4 },
-                new { Id = -4, PermissionTypeId = 4, RelationshipTypeId = 1, ActionId = 5 },
-                new { Id = -5, PermissionTypeId = 6, RelationshipTypeId = 1, ActionId = 6 }
+                new { Id = -1, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = (int)StaticData.Constants.Actions.ID.EXCLUDE_USER },
+                new { Id = -2, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = (int)StaticData.Constants.Actions.ID.SPLIT },
+                new { Id = -3, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = (int)StaticData.Constants.Actions.ID.FINALIZE },
+                //new { Id = -4, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = StaticData.Constants.Actions.ID.WITHDRAW },
+                new { Id = -5, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.JOIN, RelationshipTypeId = 1, ActionId = 7 }
                 );
         }
-        
+       
+        public DbSet<ActionDetails> ActionDetails { get; set; }
+        private void OnCreateActionDetails(EntityTypeBuilder<ActionDetails> entityTypeBuilder)
+        {
+            entityTypeBuilder.HasKey(r => r.Id);
+            entityTypeBuilder.HasData(
+                new { Id = (int)StaticData.Constants.Actions.ID.GET, Name = "GetTradeData", Category = StaticData.Constants.Categories.VIEW, Method = "TradeViewDetails/{0}" },
+                new { Id = (int)StaticData.Constants.Actions.ID.EXCLUDE_USER, Name = "ExcludeUser", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/exclude/{0}/{1}" },
+                new { Id = (int)StaticData.Constants.Actions.ID.SPLIT, Name = "SplitTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/split/{0}" },
+                new { Id = (int)StaticData.Constants.Actions.ID.FINALIZE, Name = "FinalizeTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/finalize/{0}" },
+                new { Id = (int)StaticData.Constants.Actions.ID.WITHDRAW, Name = "WithdrawFromTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/withdraw/{0}/{1}" },
+                new { Id = (int)StaticData.Constants.Actions.ID.WATCH, Name = "WatchTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = StaticData.Constants.ActionRoutes.WATCH_TRADE },
+                new { Id = (int)StaticData.Constants.Actions.ID.JOIN, Name = "JoinTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = StaticData.Constants.ActionRoutes.JOIN_TRADE }
+                );
+        }
+ 
         public DbSet<PermissionType> PermissionTypes { get; set; }
         private void OnCreatePermissionTypes(EntityTypeBuilder<PermissionType> entityTypeBuilder)
         {
@@ -194,9 +194,10 @@ namespace Models
                 new { Id = 1, Name = "Administer", Description = "Is admin" },
                 new { Id = 2, Name = "Own", Description = "Owns the entity" },
                 new { Id = 3, Name = "Review", Description = "Reviewing the entity" },
-                new { Id = 4, Name = "Participate", Description = "Participating in the entity" },
-                new { Id = 5, Name = StaticData.Constants.Permissions.VIEW, Description = "Viewing the entity" },
-                new { Id = 6, Name = StaticData.Constants.Permissions.JOIN, Description = "Joining the entity" }
+                new { Id = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, Name = "Participate", Description = "Participating in the entity" },
+                new { Id = (int)StaticData.Constants.Permissions.ID.VIEW, Name = StaticData.Constants.Permissions.VIEW, Description = "Viewing the entity" },
+                new { Id = (int)StaticData.Constants.Permissions.ID.WATCH, Name = StaticData.Constants.Permissions.WATCH, Description = "Watching the entity" },
+                new { Id = (int)StaticData.Constants.Permissions.ID.JOIN, Name = StaticData.Constants.Permissions.JOIN, Description = "Joining the entity" }
                 );
         }
 
@@ -206,12 +207,13 @@ namespace Models
             e.HasKey(r => r.Id);
             //e.Property(r => r.Id).ValueGeneratedOnAdd();
             e.HasData(
-                new { Id = 1, Description = StaticData.Constants.TradeUserStates.IOI },
-                new { Id = 2, Description = StaticData.Constants.TradeUserStates.JOINED },
-                new { Id = 3, Description = StaticData.Constants.TradeUserStates.CONFIRMED },
-                new { Id = 4, Description = StaticData.Constants.TradeUserStates.EXCLUDED },
-                new { Id = 5, Description = StaticData.Constants.TradeUserStates.EXITED },
-                new { Id = 6, Description = StaticData.Constants.TradeUserStates.ADDED }
+                new { Id = (int)StaticData.Constants.States.TradeUser.ID.IOI, Description = StaticData.Constants.States.TradeUser.IOI },
+                new { Id = (int)StaticData.Constants.States.TradeUser.ID.WATCHING, Description = StaticData.Constants.States.TradeUser.WATCHING },
+                new { Id = (int)StaticData.Constants.States.TradeUser.ID.JOINED, Description = StaticData.Constants.States.TradeUser.JOINED },
+                new { Id = (int)StaticData.Constants.States.TradeUser.ID.CONFIRMED, Description = StaticData.Constants.States.TradeUser.CONFIRMED },
+                new { Id = (int)StaticData.Constants.States.TradeUser.ID.EXCLUDED, Description = StaticData.Constants.States.TradeUser.EXCLUDED },
+                new { Id = (int)StaticData.Constants.States.TradeUser.ID.EXITED, Description = StaticData.Constants.States.TradeUser.EXITED },
+                new { Id = (int)StaticData.Constants.States.TradeUser.ID.ADDED, Description = StaticData.Constants.States.TradeUser.ADDED }
                 );
         }
 
@@ -227,7 +229,7 @@ namespace Models
         {
             e.HasKey(r => r.Id);
             //e.Property(r => r.Id).ValueGeneratedOnAdd();
-            e.HasData( new { Id = 1, Name = "TradeUser" });
+            e.HasData( new { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER, Name = "TradeUser" });
         }
         public DbSet<Permission> Permissions { get; set; }
         private void OnCreatePermissions(EntityTypeBuilder<Permission> entity)
