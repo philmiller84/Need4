@@ -1,26 +1,41 @@
 ﻿namespace StaticData
 {
-    public class Constants
+    namespace Constants
     {
-        public const string CHAT_CATEGORY = "Chat";
-        public const string SALES_CATEGORY = "Sales";
-        public const string TRADES_CATEGORY = "Trades";
-        public const string MEMBERS_CATEGORY = "Members";
-        public const string COMMUNITIES_CATEGORY = "Communities";
+        public class Categories
+        {
+            public const string VIEW = "View";
+            public const string CHAT = "Chat";
+            public const string SALES= "Sales";
+            public const string TRADES= "Trades";
+            public const string MEMBERS= "Members";
+            public const string COMMUNITIES= "Communities";
+            public const string TRADE_ACTION= "TradeAction";
+        }
 
-        public const string TRADE_ACTION_CATEGORY = "TradeAction";
+        public class TradeUserStates
+        {
+            public const string IOI = "IOI";
+            public const string JOINED = "Joined";
+            public const string CONFIRMED = "Confirmed";
+            public const string EXCLUDED = "Excluded";
+            public const string EXITED = "Exited";
+            public const string ADDED = "Added";
+        }
 
-        public const string TRADE_USER_IOI = "IOI";
-        public const string TRADE_USER_JOINED = "Joined";
-        public const string TRADE_USER_CONFIRMED = "Confirmed";
-        public const string TRADE_USER_EXCLUDED = "Excluded";
-        public const string TRADE_USER_EXITED = "Exited";
-        public const string TRADE_USER_ADDED = "Added";
+        public class Permissions
+        {
+            public const string JOIN = "Join";
+            public const string VIEW = "View";
+        }
 
-        public const string JOIN_PERMISSION = "Join";
-        public const string VIEW_PERMISSION = "View";
-        public const string TRADE_USER_TABLE = "TradeUser";
-        public const string JOIN_TRADE_ROUTE = "/trade/join/{tradeId}/{userId}";
-        public const string VIEW_CATEGORY = "View";
+        public class Tables
+        {
+            public const string TRADE_USER= "TradeUser";
+        }
+        public class ActionRoutes
+        {
+            public const string JOIN_TRADE= "/trade/join/{tradeId}/{userId}";
+        }
     }
 }

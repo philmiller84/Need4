@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Need4Protocol;
 using System;
 using System.Security.Cryptography.X509Certificates;
-using StaticData;
+using StaticData.Constants;
 
 namespace Models
 {
@@ -74,27 +74,27 @@ namespace Models
 
             e.HasData(
 
-                new { Id = 10, Name = "Create New Listing", Category = Constants.SALES_CATEGORY, Method = "/sales/new" },
-                new { Id = 11, Name = "My Sales", Category = Constants.SALES_CATEGORY, Method = "/sales" },
-                new { Id = 12, Name = "Public Sales", Category = Constants.SALES_CATEGORY, Method = "/sales/public" },
+                new { Id = 10, Name = "Create New Listing", Category = Categories.SALES, Method = "/sales/new" },
+                new { Id = 11, Name = "My Sales", Category = StaticData.Constants.Categories.SALES, Method = "/sales" },
+                new { Id = 12, Name = "Public Sales", Category = StaticData.Constants.Categories.SALES, Method = "/sales/public" },
 
-                new { Id = 20, Name = "Create New Trade", Category = Constants.TRADES_CATEGORY, Method = "/trades/new" },
-                new { Id = 21, Name = "My Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades" },
-                new { Id = 22, Name = "Public Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades/public" },
-                new { Id = 23, Name = "Open Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades/open" },
-                new { Id = 24, Name = "Recent Trades", Category = Constants.TRADES_CATEGORY, Method = "/trades/recent" },
+                new { Id = 20, Name = "Create New Trade", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/new" },
+                new { Id = 21, Name = "My Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades" },
+                new { Id = 22, Name = "Public Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/public" },
+                new { Id = 23, Name = "Open Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/open" },
+                new { Id = 24, Name = "Recent Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/recent" },
 
-                new { Id = 30, Name = "Open Chat", Category = Constants.CHAT_CATEGORY, Method = "/chat" },
-                new { Id = 31, Name = "History", Category = Constants.CHAT_CATEGORY, Method = "/chat/history" },
+                new { Id = 30, Name = "Open Chat", Category = StaticData.Constants.Categories.CHAT, Method = "/chat" },
+                new { Id = 31, Name = "History", Category = StaticData.Constants.Categories.CHAT, Method = "/chat/history" },
 
-                new { Id = 40, Name = "Invite New Member", Category = Constants.MEMBERS_CATEGORY, Method = "/members/invite" },
-                new { Id = 41, Name = "Show Member List", Category = Constants.MEMBERS_CATEGORY, Method = "/members" },
-                new { Id = 42, Name = "Vote on Decisions", Category = Constants.MEMBERS_CATEGORY, Method = "/members/vote" },
-                new { Id = 43, Name = "Report Scammer/Spammer", Category = Constants.MEMBERS_CATEGORY, Method = "/members/report" },
+                new { Id = 40, Name = "Invite New Member", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members/invite" },
+                new { Id = 41, Name = "Show Member List", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members" },
+                new { Id = 42, Name = "Vote on Decisions", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members/vote" },
+                new { Id = 43, Name = "Report Scammer/Spammer", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members/report" },
 
-                new { Id = 51, Name = "About Communities", Category = Constants.COMMUNITIES_CATEGORY, Method = "/communities/about" },
-                new { Id = 52, Name = "Show Communities", Category = Constants.COMMUNITIES_CATEGORY, Method = "/communities" },
-                new { Id = 53, Name = "Join a Community", Category = Constants.COMMUNITIES_CATEGORY, Method = "/communities/join" }
+                new { Id = 51, Name = "About Communities", Category = StaticData.Constants.Categories.COMMUNITIES, Method = "/communities/about" },
+                new { Id = 52, Name = "Show Communities", Category = StaticData.Constants.Categories.COMMUNITIES, Method = "/communities" },
+                new { Id = 53, Name = "Join a Community", Category = StaticData.Constants.Categories.COMMUNITIES, Method = "/communities/join" }
 
                 );
         }
@@ -146,12 +146,12 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.HasData(
-                new { Id = 1, Name = "GetTradeData", Category = Constants.VIEW_CATEGORY, Method = "TradeViewDetails/{0}" },
-                new { Id = 2, Name = "ExcludeUser", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/exclude/{0}/{1}" },
-                new { Id = 3, Name = "SplitTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/split/{0}" },
-                new { Id = 4, Name = "FinalizeTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/finalize/{0}" },
-                new { Id = 5, Name = "WithdrawFromTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = "/trade/withdraw/{0}/{1}" },
-                new { Id = 6, Name = "JoinTrade", Category = Constants.TRADE_ACTION_CATEGORY, Method = Constants.JOIN_TRADE_ROUTE }
+                new { Id = 1, Name = "GetTradeData", Category = StaticData.Constants.Categories.VIEW, Method = "TradeViewDetails/{0}" },
+                new { Id = 2, Name = "ExcludeUser", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/exclude/{0}/{1}" },
+                new { Id = 3, Name = "SplitTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/split/{0}" },
+                new { Id = 4, Name = "FinalizeTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/finalize/{0}" },
+                new { Id = 5, Name = "WithdrawFromTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/withdraw/{0}/{1}" },
+                new { Id = 6, Name = "JoinTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = StaticData.Constants.ActionRoutes.JOIN_TRADE}
                 ); 
         }
 
@@ -197,8 +197,8 @@ namespace Models
                 new { Id = 2, Name = "Own", Description = "Owns the entity" },
                 new { Id = 3, Name = "Review", Description = "Reviewing the entity" },
                 new { Id = 4, Name = "Participate", Description = "Participating in the entity" },
-                new { Id = 5, Name = Constants.VIEW_PERMISSION, Description = "Viewing the entity" },
-                new { Id = 6, Name = Constants.JOIN_PERMISSION, Description = "Joining the entity" }
+                new { Id = 5, Name = StaticData.Constants.Permissions.VIEW, Description = "Viewing the entity" },
+                new { Id = 6, Name = StaticData.Constants.Permissions.JOIN, Description = "Joining the entity" }
                 );
         }
 
@@ -208,12 +208,12 @@ namespace Models
             e.HasKey(r => r.Id);
             //e.Property(r => r.Id).ValueGeneratedOnAdd();
             e.HasData(
-                new { Id = 1, Description = Constants.TRADE_USER_IOI },
-                new { Id = 2, Description = Constants.TRADE_USER_JOINED },
-                new { Id = 3, Description = Constants.TRADE_USER_CONFIRMED },
-                new { Id = 4, Description = Constants.TRADE_USER_EXCLUDED },
-                new { Id = 5, Description = Constants.TRADE_USER_EXITED },
-                new { Id = 6, Description = Constants.TRADE_USER_ADDED }
+                new { Id = 1, Description = StaticData.Constants.TradeUserStates.IOI },
+                new { Id = 2, Description = StaticData.Constants.TradeUserStates.JOINED },
+                new { Id = 3, Description = StaticData.Constants.TradeUserStates.CONFIRMED },
+                new { Id = 4, Description = StaticData.Constants.TradeUserStates.EXCLUDED },
+                new { Id = 5, Description = StaticData.Constants.TradeUserStates.EXITED },
+                new { Id = 6, Description = StaticData.Constants.TradeUserStates.ADDED }
                 );
         }
 

@@ -99,8 +99,8 @@ namespace Need4
             bool authenticated = request.UnauthenticatedUser == null;
             if (authenticated)
             {
-                var relationshipType = new RelationshipType { Name = StaticData.Constants.TRADE_USER_TABLE };
-                var viewPermissionType = new PermissionType { Name = StaticData.Constants.VIEW_PERMISSION };
+                var relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
+                //var viewPermissionType = new PermissionType { Name = StaticData.Constants.Permissions.VIEW};
                 var relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
                 var relationId = GetRelationId(relationshipType, relation).Result;
                 if (relationId == null)
@@ -150,10 +150,10 @@ namespace Need4
                 if (state.Result == null)
                     return Task.FromResult(ps);
 
-                if (state.Result.Description == StaticData.Constants.TRADE_USER_IOI)
+                if (state.Result.Description == StaticData.Constants.TradeUserStates.IOI)
                 {
-                    var relationshipType = new RelationshipType { Name = StaticData.Constants.TRADE_USER_TABLE };
-                    var permissionType = new PermissionType { Name = StaticData.Constants.JOIN_PERMISSION };
+                    var relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
+                    var permissionType = new PermissionType { Name = StaticData.Constants.Permissions.JOIN};
                     var permissionRequest = new PermissionRequest
                     {
                         PermissionType = permissionType,
@@ -273,11 +273,11 @@ namespace Need4
             if(relationshipId == null)
                 return Task.FromResult(t);
 
-            string relationshipType = Constants.TRADE_USER_TABLE;
+            string relationshipType = StaticData.Constants.Tables.TRADE_USER;
             var permissionRequest = new Permission { RelationId = relationshipId.Value, RelationshipType = new RelationshipType { Name = relationshipType } };
             var permissionSet = GetPermissionSet(permissionRequest);
 
-            string actionCategory = Constants.TRADE_ACTION_CATEGORY;
+            string actionCategory = StaticData.Constants.Categories.TRADE_ACTION;
             this.GenericWrappedInvoke<TradeUserRequest, ActionDetails>(
                 db,
                 request,
