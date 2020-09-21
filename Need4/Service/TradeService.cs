@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 using Need4Protocol;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -21,6 +22,13 @@ namespace Need4
     //        this.key2 = key2;
     //    }
     //}
+
+    public class StateAction
+    {
+        public State state;
+        public ActionDetails action;
+    }
+
     public class TradeServiceImpl : TradeService.TradeServiceBase, IGenericCRUD
     {
         public TradeServiceImpl(Need4Context db)
@@ -266,6 +274,21 @@ namespace Need4
                 return Task.FromResult(ps);
             }
         }
+        public List<int> GetAvailableTradeUserActionsForState(int stateId)
+        {
+            Dictionary<int, List<int>> map = new Dictionary<int, List<int>>
+            {
+                {
+                    (int)StaticData.Constants.States.TradeUser.ID.IOI, 
+                    new List<int>(){
+                        (int)StaticData.Constants.Actions.ID.JOIN,
+                        (int)StaticData.Constants.Actions.ID.WATCH
+                    }
+                }
+            };
+
+            return map[stateId];
+        }
         public override Task<TradeActionResponse> GetTradeActions(TradeUserRequest request, ServerCallContext context)
         {
             TradeActionResponse t = new TradeActionResponse();
@@ -290,6 +313,8 @@ namespace Need4
                 return Task.FromResult(t);
             }
 
+            request.State = GetTradeUserState(request, context).Result;
+
             Permission permissionRequest = 
                 new Permission { 
                     RelationId = relationshipId.Value, 
@@ -297,18 +322,27 @@ namespace Need4
 
             IQueryable<Permission> permissionSet = GetPermissionSet(permissionRequest);
 
-            string actionCategory = StaticData.Constants.Categories.TRADE_ACTION;
-            var q = from ps in permissionSet
-                    join r in db.Requirements
-                    on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
-                    join a in db.ActionDetails
-                    on r.ActionId equals a.Id
-                    where a.Category == actionCategory
-                    select a;
-
-            foreach( var action in q)
+            try
             {
-                t.Actions.Add(action);
+                var stateId = request.State.Id;
+                var nextStates = GetAvailableTradeUserActionsForState(stateId);
+
+                string actionCategory = StaticData.Constants.Categories.TRADE_ACTION;
+                var q = from ps in permissionSet
+                        join r in db.Requirements on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
+                        join a in db.ActionDetails on r.ActionId equals a.Id
+                        where a.Category == actionCategory &&
+                        nextStates.Contains(a.Id)
+                        select a;
+    
+                foreach( var action in q)
+                {
+                    t.Actions.Add(action);
+                }
+            }
+            catch
+            {
+                return null;
             }
 
             return Task.FromResult(t);
@@ -317,6 +351,7 @@ namespace Need4
         private int? GetTradeRelationship(TradeUserRequest request)
         {
             return (from tu in db.TradeUsers
+                    .Include(d => d.State)
                     where tu.TradeId == request.TradeId && tu.UserId == request.AuthenticatedUserId
                     select tu).FirstOrDefault()?.Id;
         }

@@ -324,7 +324,9 @@ namespace Models
             e.HasOne(d => d.User)
                 .WithMany(p => p.TradeUser)
                 .HasForeignKey(d => d.UserId);
-            e.HasOne(d => d.State);
+            e.HasOne(d => d.State)
+                .WithMany(p => p.TradeUser)
+                .HasForeignKey(d => d.StateId);
 
             e.HasData(new { Id = -1, TradeId = -1, UserId = -1, StateId = 1 });
         }

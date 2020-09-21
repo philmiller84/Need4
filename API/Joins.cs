@@ -100,6 +100,17 @@ namespace Need4Protocol
         public State State { get; set; }
     }
 
+    public partial class State
+    {
+        partial void OnConstruction()
+        {
+            TradeUser = new HashSet<TradeUser>();
+        }
+
+        public ICollection<TradeUser> TradeUser { get; set; }
+    }
+
+
     //public partial class TradeUserList
     //{
     //    partial void OnConstruction()
