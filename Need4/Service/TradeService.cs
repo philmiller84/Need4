@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using StaticData.Constants;
 using _States = StaticData.Constants._States;
+using _Actions = StaticData.Constants._Actions;
 
 namespace Need4
 {
@@ -283,8 +284,8 @@ namespace Need4
                 {
                     (int)_States._TradeUser.ID.IOI, 
                     new List<int>(){
-                        (int)_Actions.ID.JOIN,
-                        (int)_Actions.ID.WATCH
+                        (int)_Actions._Trade.ID.JOIN,
+                        (int)_Actions._Trade.ID.WATCH
                     }
                 }
             };

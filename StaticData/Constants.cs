@@ -34,10 +34,6 @@
             public const string COMMUNITY_USER = "CommunityUser";
         }
 
-        public class _Actions
-        {
-            public enum ID {GET=1, EXCLUDE_USER, SPLIT, FINALIZE, WITHDRAW, WATCH, JOIN, IGNORE };
-        }
         public class _Permissions
         {
             public enum ID {ADMINISTER = 1, BASIC, OWN, REVIEW, PARTICIPATE, VIEW, WATCH, JOIN };
@@ -56,13 +52,22 @@
             public const string TRADE_USER= "TradeUser";
         }
 
-        namespace _ActionRoutes
+        namespace _Actions
         {
             public class _Trade
             {
-                public const string JOIN = "/trade/join/{tradeId}/{userId}";
+                public enum ID {GET=1, EXCLUDE_USER, SPLIT, FINALIZE, WITHDRAW, WATCH, JOIN, IGNORE };
+
+                public const string GET = "TradeViewDetails/{0}";
+                public const string EXCLUDE_USER = "/trade/exclude/{0}/{1}";
+                public const string SPLIT = "/trade/split/{0}";
+                public const string FINALIZE = "/trade/finalize/{0}";
+                public const string WITHDRAW = "/trade/withdraw/{0}/{1}";
                 public const string WATCH = "/trade/watch/{tradeId}/{userId}";
+                public const string JOIN = "/trade/join/{tradeId}/{userId}";
                 public const string IGNORE = "/trade/ignore/{tradeId}/{userId}";
+
+
             }
         }
     }

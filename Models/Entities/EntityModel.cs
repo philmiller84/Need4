@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using StaticData.Constants;
 using _States = StaticData.Constants._States;
-using _ActionRoutes = StaticData.Constants._ActionRoutes;
+using _Actions = StaticData.Constants._Actions;
 
 namespace Models
 {
@@ -222,9 +222,9 @@ namespace Models
             entity.HasOne(d => d.RelationshipType);
 
             entity.HasData(
-                new { Id = -1, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions.ID.EXCLUDE_USER },
-                new { Id = -2, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions.ID.SPLIT },
-                new { Id = -3, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions.ID.FINALIZE },
+                new { Id = -1, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.EXCLUDE_USER },
+                new { Id = -2, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.SPLIT },
+                new { Id = -3, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.FINALIZE },
                 //new { Id = -4, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId =  _Actions.ID.WITHDRAW },
                 new { Id = -5, PermissionTypeId = (int) _Permissions.ID.JOIN, RelationshipTypeId = 1, ActionId = 7 }
                 );
@@ -235,14 +235,14 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.HasData(
-                new { Id = (int) _Actions.ID.GET, Name = "GetTradeData", Category =  _Categories.VIEW, Method = "TradeViewDetails/{0}" },
-                new { Id = (int) _Actions.ID.EXCLUDE_USER, Name = "ExcludeUser", Category =  _Categories.TRADE_ACTION, Method = "/trade/exclude/{0}/{1}" },
-                new { Id = (int) _Actions.ID.SPLIT, Name = "SplitTrade", Category =  _Categories.TRADE_ACTION, Method = "/trade/split/{0}" },
-                new { Id = (int) _Actions.ID.FINALIZE, Name = "FinalizeTrade", Category =  _Categories.TRADE_ACTION, Method = "/trade/finalize/{0}" },
-                new { Id = (int) _Actions.ID.WITHDRAW, Name = "WithdrawFromTrade", Category =  _Categories.TRADE_ACTION, Method = "/trade/withdraw/{0}/{1}" },
-                new { Id = (int) _Actions.ID.WATCH, Name = "WatchTrade", Category =  _Categories.TRADE_ACTION, Method =  _ActionRoutes._Trade.WATCH},
-                new { Id = (int) _Actions.ID.JOIN, Name = "JoinTrade", Category =  _Categories.TRADE_ACTION, Method =  _ActionRoutes._Trade.JOIN},
-                new { Id = (int) _Actions.ID.IGNORE, Name = "IgnoreTrade", Category =  _Categories.TRADE_ACTION, Method =  _ActionRoutes._Trade.IGNORE}
+                new { Id = (int) _Actions._Trade.ID.GET, Name = "GetTradeData", Category =  _Categories.VIEW, Method =  _Actions._Trade.GET},
+                new { Id = (int) _Actions._Trade.ID.EXCLUDE_USER, Name = "ExcludeUser", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.EXCLUDE_USER},
+                new { Id = (int) _Actions._Trade.ID.SPLIT, Name = "SplitTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.SPLIT},
+                new { Id = (int) _Actions._Trade.ID.FINALIZE, Name = "FinalizeTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.FINALIZE},
+                new { Id = (int) _Actions._Trade.ID.WITHDRAW, Name = "WithdrawFromTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.WITHDRAW},
+                new { Id = (int) _Actions._Trade.ID.WATCH, Name = "WatchTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.WATCH},
+                new { Id = (int) _Actions._Trade.ID.JOIN, Name = "JoinTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.JOIN},
+                new { Id = (int) _Actions._Trade.ID.IGNORE, Name = "IgnoreTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.IGNORE}
                 );
         }
  
