@@ -5,6 +5,7 @@ using Need4Protocol;
 using Service;
 using System.Linq;
 using System.Threading.Tasks;
+using StaticData.Constants;
 
 namespace Helpers
 {
@@ -44,7 +45,7 @@ namespace Helpers
             //    context.Succeed(requirement);
             //}
             bool hasJoinTradePermission = (from p in permissions.Permissions
-                                          where p.PermissionType.Name == StaticData.Constants.Permissions.JOIN
+                                          where p.PermissionType.Name == _Permissions.JOIN
                                           select p).Any();
             if(hasJoinTradePermission)
             {
@@ -82,7 +83,7 @@ namespace Helpers
             //    context.Succeed(requirement);
             //}
             bool hasJoinTradePermission = (from p in permissions.Permissions
-                                          where p.PermissionType.Name == StaticData.Constants.Permissions.JOIN
+                                          where p.PermissionType.Name == _Permissions.JOIN
                                           select p).Any();
             if(hasJoinTradePermission)
             {

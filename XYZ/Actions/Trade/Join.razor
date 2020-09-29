@@ -1,5 +1,6 @@
 ﻿@page "/trade/join/{tradeId:int}/{userId:int}"
 
+
 @using Helpers
 @inject IAuthorizationService AuthorizationService
 @inject IHttpContextAccessor HttpContextAccessor
@@ -27,6 +28,7 @@ else
 }
 
 @code {
+
     [Parameter]
     public int tradeId { get; set; }
     [Parameter]

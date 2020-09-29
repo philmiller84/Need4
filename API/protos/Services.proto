@@ -5,6 +5,7 @@ import "protos/Action.proto";
 import "protos/Activity.proto";
 import "protos/Community.proto";
 import "protos/Item.proto";
+import "protos/Member.proto";
 import "protos/Permission.proto";
 import "protos/Sale.proto";
 import "protos/Trade.proto";
@@ -12,6 +13,7 @@ import "protos/User.proto";
 
 service CommunityService {
 	rpc GetAllCommunities (google.protobuf.Empty) returns (CommunityList);
+	rpc GetCommunityMembers (Community) returns (MemberList);
 }
 
 service ActivityService {

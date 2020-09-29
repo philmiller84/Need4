@@ -2,6 +2,10 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Need4Protocol;
 using System;
+using System.Diagnostics;
+using StaticData.Constants;
+using _States = StaticData.Constants._States;
+using _ActionRoutes = StaticData.Constants._ActionRoutes;
 
 namespace Models
 {
@@ -26,12 +30,15 @@ namespace Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // PERSISTED ENTITIES
+            OnCreateUsers(modelBuilder.Entity<User>());
             OnCreateStates(modelBuilder.Entity<State>());
             OnCreatePermissionTypes(modelBuilder.Entity<PermissionType>());
             OnCreateActionDetails(modelBuilder.Entity<ActionDetails>());
             OnCreateActivityDetails(modelBuilder.Entity<ActivityDetails>());
-            OnCreateCommunities(modelBuilder.Entity<CommunityDetails>());
-            OnCreateUsers(modelBuilder.Entity<User>());
+            OnCreateMembers(modelBuilder.Entity<Member>());
+            OnCreateCommunities(modelBuilder.Entity<Community>());
+            OnCreateCommunityTrades(modelBuilder.Entity<CommunityTrade>());
+            OnCreateCommunityMembers(modelBuilder.Entity<CommunityMember>());
             //OnCreateRelationshipStates(modelBuilder.Entity<RelationshipState>());
             OnCreateRelationshipTypes(modelBuilder.Entity<RelationshipType>());
             OnCreatePermissions(modelBuilder.Entity<Permission>());
@@ -48,9 +55,61 @@ namespace Models
             OnCreateSale(modelBuilder.Entity<Sale>());
         }
 
+        public DbSet<Member> Members { get; set; }
+        private void OnCreateMembers(EntityTypeBuilder<Member> e)
+        {
+            e.HasKey(t => t.Id);
+            e.Property(t => t.Id).ValueGeneratedOnAdd();
 
-        public DbSet<CommunityDetails> CommunityDetails { get; set; }
-        private void OnCreateCommunities(EntityTypeBuilder<CommunityDetails> e)
+            e.HasOne(d => d.User)
+                .WithMany(p => p.Member)
+                .HasForeignKey(d => d.UserId);
+
+            e.HasMany(d => d.CommunityMember)
+                .WithOne(p => p.Member)
+                .HasForeignKey(d => d.Id);
+
+            e.HasData(
+                new { Id = -1, UserId = -1, CommunityId = 1 }
+                );
+        }
+
+        public DbSet<CommunityTrade> CommunityTrades { get; set; }
+        private void OnCreateCommunityTrades(EntityTypeBuilder<CommunityTrade> e)
+        {
+            e.HasKey(t => t.Id);
+            e.Property(t => t.Id).ValueGeneratedOnAdd();
+
+            e.HasOne(d => d.Trade)
+                .WithMany(p => p.CommunityTrade)
+                .HasForeignKey(d => d.TradeId);
+            e.HasOne(d => d.Community)
+                .WithMany(p => p.CommunityTrade)
+                .HasForeignKey(d => d.CommunityId);
+
+            e.HasData(
+                new { Id = -1, TradeId = -1, CommunityId = 1 },
+                new { Id = -2, TradeId = -2, CommunityId = 1 }
+                );
+        }
+        public DbSet<CommunityMember> CommunityMembers { get; set; }
+        private void OnCreateCommunityMembers(EntityTypeBuilder<CommunityMember> e)
+        {
+            e.HasKey(t => t.Id);
+            e.Property(t => t.Id).ValueGeneratedOnAdd();
+
+            e.HasOne(d => d.Member)
+                .WithMany(p => p.CommunityMember)
+                .HasForeignKey(d => d.MemberId);
+            e.HasOne(d => d.Community)
+                .WithMany(p => p.CommunityMember)
+                .HasForeignKey(d => d.CommunityId);
+
+            e.HasData( new { Id = -1, MemberId = -1, CommunityId = 1 } );
+        }
+
+        public DbSet<Community> Communities { get; set; }
+        private void OnCreateCommunities(EntityTypeBuilder<Community> e)
         {
             e.HasKey(x => x.Id);
             e.Property(x => x.Id).ValueGeneratedOnAdd();
@@ -71,27 +130,27 @@ namespace Models
 
             e.HasData(
 
-                new { Id = 10, Name = "Create New Listing", Category = StaticData.Constants.Categories.SALES, Method = "/sales/new" },
-                new { Id = 11, Name = "My Sales", Category = StaticData.Constants.Categories.SALES, Method = "/sales" },
-                new { Id = 12, Name = "Public Sales", Category = StaticData.Constants.Categories.SALES, Method = "/sales/public" },
+                new { Id = 10, Name = "Create New Listing", Category =  _Categories.SALES, Method = "/sales/new" },
+                new { Id = 11, Name = "My Sales", Category =  _Categories.SALES, Method = "/sales" },
+                new { Id = 12, Name = "Public Sales", Category =  _Categories.SALES, Method = "/sales/public" },
 
-                new { Id = 20, Name = "Create New Trade", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/new" },
-                new { Id = 21, Name = "My Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades" },
-                new { Id = 22, Name = "Public Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/public" },
-                new { Id = 23, Name = "Open Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/open" },
-                new { Id = 24, Name = "Recent Trades", Category = StaticData.Constants.Categories.TRADES, Method = "/trades/recent" },
+                new { Id = 20, Name = "Create New Trade", Category =  _Categories.TRADES, Method = "/trades/new" },
+                new { Id = 21, Name = "My Trades", Category =  _Categories.TRADES, Method = "/trades" },
+                new { Id = 22, Name = "Public Trades", Category =  _Categories.TRADES, Method = "/trades/public" },
+                new { Id = 23, Name = "Open Trades", Category =  _Categories.TRADES, Method = "/trades/open" },
+                new { Id = 24, Name = "Recent Trades", Category =  _Categories.TRADES, Method = "/trades/recent" },
 
-                new { Id = 30, Name = "Open Chat", Category = StaticData.Constants.Categories.CHAT, Method = "/chat" },
-                new { Id = 31, Name = "History", Category = StaticData.Constants.Categories.CHAT, Method = "/chat/history" },
+                new { Id = 30, Name = "Open Chat", Category =  _Categories.CHAT, Method = "/chat" },
+                new { Id = 31, Name = "History", Category =  _Categories.CHAT, Method = "/chat/history" },
 
-                new { Id = 40, Name = "Invite New Member", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members/invite" },
-                new { Id = 41, Name = "Show Member List", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members" },
-                new { Id = 42, Name = "Vote on Decisions", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members/vote" },
-                new { Id = 43, Name = "Report Scammer/Spammer", Category = StaticData.Constants.Categories.MEMBERS, Method = "/members/report" },
+                new { Id = 40, Name = "Invite New Member", Category =  _Categories.MEMBERS, Method = "/members/invite" },
+                new { Id = 41, Name = "Show Member List", Category =  _Categories.MEMBERS, Method = "/members" },
+                new { Id = 42, Name = "Vote on Decisions", Category =  _Categories.MEMBERS, Method = "/members/vote" },
+                new { Id = 43, Name = "Report Scammer/Spammer", Category =  _Categories.MEMBERS, Method = "/members/report" },
 
-                new { Id = 51, Name = "About Communities", Category = StaticData.Constants.Categories.COMMUNITIES, Method = "/communities/about" },
-                new { Id = 52, Name = "Show Communities", Category = StaticData.Constants.Categories.COMMUNITIES, Method = "/communities" },
-                new { Id = 53, Name = "Join a Community", Category = StaticData.Constants.Categories.COMMUNITIES, Method = "/communities/join" }
+                new { Id = 51, Name = "About Communities", Category =  _Categories.COMMUNITIES, Method = "/communities/about" },
+                new { Id = 52, Name = "Show Communities", Category =  _Categories.COMMUNITIES, Method = "/communities" },
+                new { Id = 53, Name = "Join a Community", Category =  _Categories.COMMUNITIES, Method = "/communities/join" }
 
                 );
         }
@@ -163,11 +222,11 @@ namespace Models
             entity.HasOne(d => d.RelationshipType);
 
             entity.HasData(
-                new { Id = -1, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = (int)StaticData.Constants.Actions.ID.EXCLUDE_USER },
-                new { Id = -2, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = (int)StaticData.Constants.Actions.ID.SPLIT },
-                new { Id = -3, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = (int)StaticData.Constants.Actions.ID.FINALIZE },
-                //new { Id = -4, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId = StaticData.Constants.Actions.ID.WITHDRAW },
-                new { Id = -5, PermissionTypeId = (int)StaticData.Constants.Permissions.ID.JOIN, RelationshipTypeId = 1, ActionId = 7 }
+                new { Id = -1, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions.ID.EXCLUDE_USER },
+                new { Id = -2, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions.ID.SPLIT },
+                new { Id = -3, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions.ID.FINALIZE },
+                //new { Id = -4, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId =  _Actions.ID.WITHDRAW },
+                new { Id = -5, PermissionTypeId = (int) _Permissions.ID.JOIN, RelationshipTypeId = 1, ActionId = 7 }
                 );
         }
        
@@ -176,28 +235,31 @@ namespace Models
         {
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.HasData(
-                new { Id = (int)StaticData.Constants.Actions.ID.GET, Name = "GetTradeData", Category = StaticData.Constants.Categories.VIEW, Method = "TradeViewDetails/{0}" },
-                new { Id = (int)StaticData.Constants.Actions.ID.EXCLUDE_USER, Name = "ExcludeUser", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/exclude/{0}/{1}" },
-                new { Id = (int)StaticData.Constants.Actions.ID.SPLIT, Name = "SplitTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/split/{0}" },
-                new { Id = (int)StaticData.Constants.Actions.ID.FINALIZE, Name = "FinalizeTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/finalize/{0}" },
-                new { Id = (int)StaticData.Constants.Actions.ID.WITHDRAW, Name = "WithdrawFromTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = "/trade/withdraw/{0}/{1}" },
-                new { Id = (int)StaticData.Constants.Actions.ID.WATCH, Name = "WatchTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = StaticData.Constants.ActionRoutes.WATCH_TRADE },
-                new { Id = (int)StaticData.Constants.Actions.ID.JOIN, Name = "JoinTrade", Category = StaticData.Constants.Categories.TRADE_ACTION, Method = StaticData.Constants.ActionRoutes.JOIN_TRADE }
+                new { Id = (int) _Actions.ID.GET, Name = "GetTradeData", Category =  _Categories.VIEW, Method = "TradeViewDetails/{0}" },
+                new { Id = (int) _Actions.ID.EXCLUDE_USER, Name = "ExcludeUser", Category =  _Categories.TRADE_ACTION, Method = "/trade/exclude/{0}/{1}" },
+                new { Id = (int) _Actions.ID.SPLIT, Name = "SplitTrade", Category =  _Categories.TRADE_ACTION, Method = "/trade/split/{0}" },
+                new { Id = (int) _Actions.ID.FINALIZE, Name = "FinalizeTrade", Category =  _Categories.TRADE_ACTION, Method = "/trade/finalize/{0}" },
+                new { Id = (int) _Actions.ID.WITHDRAW, Name = "WithdrawFromTrade", Category =  _Categories.TRADE_ACTION, Method = "/trade/withdraw/{0}/{1}" },
+                new { Id = (int) _Actions.ID.WATCH, Name = "WatchTrade", Category =  _Categories.TRADE_ACTION, Method =  _ActionRoutes._Trade.WATCH},
+                new { Id = (int) _Actions.ID.JOIN, Name = "JoinTrade", Category =  _Categories.TRADE_ACTION, Method =  _ActionRoutes._Trade.JOIN},
+                new { Id = (int) _Actions.ID.IGNORE, Name = "IgnoreTrade", Category =  _Categories.TRADE_ACTION, Method =  _ActionRoutes._Trade.IGNORE}
                 );
         }
  
         public DbSet<PermissionType> PermissionTypes { get; set; }
         private void OnCreatePermissionTypes(EntityTypeBuilder<PermissionType> entityTypeBuilder)
         {
+            //Debugger.Launch();
             entityTypeBuilder.HasKey(r => r.Id);
             entityTypeBuilder.HasData(
-                new { Id = 1, Name = "Administer", Description = "Is admin" },
-                new { Id = 2, Name = "Own", Description = "Owns the entity" },
-                new { Id = 3, Name = "Review", Description = "Reviewing the entity" },
-                new { Id = (int)StaticData.Constants.Permissions.ID.PARTICIPATE, Name = "Participate", Description = "Participating in the entity" },
-                new { Id = (int)StaticData.Constants.Permissions.ID.VIEW, Name = StaticData.Constants.Permissions.VIEW, Description = "Viewing the entity" },
-                new { Id = (int)StaticData.Constants.Permissions.ID.WATCH, Name = StaticData.Constants.Permissions.WATCH, Description = "Watching the entity" },
-                new { Id = (int)StaticData.Constants.Permissions.ID.JOIN, Name = StaticData.Constants.Permissions.JOIN, Description = "Joining the entity" }
+                new { Id = (int) _Permissions.ID.ADMINISTER, Name =  _Permissions.ADMINISTER, Description = "Is admin" },
+                new { Id = (int) _Permissions.ID.BASIC, Name =  _Permissions.BASIC, Description = "Basic permission" },
+                new { Id = (int) _Permissions.ID.OWN, Name =  _Permissions.OWN, Description = "Owns the entity" },
+                new { Id = (int) _Permissions.ID.REVIEW, Name =  _Permissions.REVIEW, Description = "Reviewing the entity" },
+                new { Id = (int) _Permissions.ID.PARTICIPATE, Name =  _Permissions.PARTICIPATE, Description = "Participating in the entity" },
+                new { Id = (int) _Permissions.ID.VIEW, Name =  _Permissions.VIEW, Description = "Viewing the entity" },
+                new { Id = (int) _Permissions.ID.WATCH, Name =  _Permissions.WATCH, Description = "Watching the entity" },
+                new { Id = (int) _Permissions.ID.JOIN, Name =  _Permissions.JOIN, Description = "Joining the entity" }
                 );
         }
 
@@ -207,13 +269,13 @@ namespace Models
             e.HasKey(r => r.Id);
             //e.Property(r => r.Id).ValueGeneratedOnAdd();
             e.HasData(
-                new { Id = (int)StaticData.Constants.States.TradeUser.ID.IOI, Description = StaticData.Constants.States.TradeUser.IOI },
-                new { Id = (int)StaticData.Constants.States.TradeUser.ID.WATCHING, Description = StaticData.Constants.States.TradeUser.WATCHING },
-                new { Id = (int)StaticData.Constants.States.TradeUser.ID.JOINED, Description = StaticData.Constants.States.TradeUser.JOINED },
-                new { Id = (int)StaticData.Constants.States.TradeUser.ID.CONFIRMED, Description = StaticData.Constants.States.TradeUser.CONFIRMED },
-                new { Id = (int)StaticData.Constants.States.TradeUser.ID.EXCLUDED, Description = StaticData.Constants.States.TradeUser.EXCLUDED },
-                new { Id = (int)StaticData.Constants.States.TradeUser.ID.EXITED, Description = StaticData.Constants.States.TradeUser.EXITED },
-                new { Id = (int)StaticData.Constants.States.TradeUser.ID.ADDED, Description = StaticData.Constants.States.TradeUser.ADDED }
+                new { Id = (int) _States._TradeUser.ID.IOI, Description =  _States._TradeUser.IOI },
+                new { Id = (int) _States._TradeUser.ID.WATCHING, Description =  _States._TradeUser.WATCHING },
+                new { Id = (int) _States._TradeUser.ID.JOINED, Description =  _States._TradeUser.JOINED },
+                new { Id = (int) _States._TradeUser.ID.CONFIRMED, Description =  _States._TradeUser.CONFIRMED },
+                new { Id = (int) _States._TradeUser.ID.EXCLUDED, Description =  _States._TradeUser.EXCLUDED },
+                new { Id = (int) _States._TradeUser.ID.EXITED, Description =  _States._TradeUser.EXITED },
+                new { Id = (int) _States._TradeUser.ID.ADDED, Description =  _States._TradeUser.ADDED }
                 );
         }
 
@@ -229,7 +291,10 @@ namespace Models
         {
             e.HasKey(r => r.Id);
             //e.Property(r => r.Id).ValueGeneratedOnAdd();
-            e.HasData( new { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER, Name = "TradeUser" });
+            e.HasData( 
+                new { Id = (int) _RelationshipType.ID.TRADE_USER, Name =  _RelationshipType.TRADE_USER },
+                new { Id = (int) _RelationshipType.ID.COMMUNITY_USER, Name =  _RelationshipType.COMMUNITY_USER }
+            );
         }
         public DbSet<Permission> Permissions { get; set; }
         private void OnCreatePermissions(EntityTypeBuilder<Permission> entity)
@@ -248,9 +313,9 @@ namespace Models
 
             entity.HasOne(d => d.RelationshipType);
 
-            //entity.HasData(
-            //    new { Id = -1, PermissionTypeId= -4, RelationshipTypeId = -1, RelationId = -1 }
-            //    );
+            entity.HasData(
+                new { Id = -1, PermissionTypeId = (int) _Permissions.ID.BASIC, RelationshipTypeId = (int) _RelationshipType.ID.COMMUNITY_USER, RelationId = 1 }
+                );
         }
 
         public DbSet<Item> Items { get; set; }

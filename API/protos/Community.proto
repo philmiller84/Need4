@@ -2,11 +2,15 @@
 package Need4Protocol;
 
 message CommunityList {
-	repeated CommunityDetails communities=1;
+	repeated Community communities=1;
+}
+
+message Community{
+	int32 id = 1;
+	string name = 2;
 }
 
 message CommunityDetails {
-	int32 id = 1;
-	string name = 2;
-	int32 tier = 3;
+	int32 community_id = 1;
+	int32 tier = 2;
 }

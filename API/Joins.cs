@@ -80,6 +80,50 @@ namespace Need4Protocol
         public int TradeItemListId { get; set; }
     }
 
+    public class CommunityTrade
+    {
+        public CommunityTrade (){ }
+
+        public int Id { get; set; }
+        public int TradeId { get; set; }
+        public int CommunityId { get; set; }
+        public Trade Trade { get; set; }
+        public Community Community { get; set; }
+    }
+    
+    public partial class Member
+    {
+        partial void OnConstruction()
+        {
+            CommunityMember = new HashSet<CommunityMember>();
+        }
+
+        public ICollection<CommunityMember> CommunityMember { get; set; }
+        public User User { get; set; }
+    }
+    public class CommunityMember
+    {
+        public CommunityMember (){ }
+
+        public int Id { get; set; }
+        public int MemberId { get; set; }
+        public int CommunityId { get; set; }
+        public Member Member { get; set; }
+        public Community Community { get; set; }
+    }
+    public partial class Community
+    {
+        partial void OnConstruction()
+        {
+            Trade= new HashSet<Trade>();
+            CommunityTrade = new HashSet<CommunityTrade>();
+            CommunityMember = new HashSet<CommunityMember>();
+        }
+
+        public ICollection<Trade> Trade{ get; set; }
+        public ICollection<CommunityTrade> CommunityTrade { get; set; }
+        public ICollection<CommunityMember> CommunityMember { get; set; }
+    }
     public class TradeUser
     {
         public TradeUser(){ }
@@ -130,12 +174,15 @@ namespace Need4Protocol
         public ICollection<Trade> Trades { get; set; }
     }
 
+
     public partial class Trade
     {
         partial void OnConstruction()
         {
             TradeUser = new HashSet<TradeUser>();
+            CommunityTrade = new HashSet<CommunityTrade>();
         }
+        public ICollection<CommunityTrade> CommunityTrade { get; set; }
         public ICollection<TradeUser> TradeUser { get; set; }
         public int TradeItemListId { get; set; }
     }
@@ -164,8 +211,10 @@ namespace Need4Protocol
         partial void OnConstruction()
         {
             TradeUser = new HashSet<TradeUser>();
+            Member = new HashSet<Member>();
         }
 
+        public ICollection<Member> Member { get; set; }
         public ICollection<TradeUser> TradeUser { get; set; }
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////

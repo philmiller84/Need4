@@ -9,6 +9,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
+using StaticData.Constants;
+using _States = StaticData.Constants._States;
 
 namespace Need4
 {
@@ -77,7 +79,7 @@ namespace Need4
 
                 switch(relationshipType.Id)
                 {
-                    case (int)StaticData.Constants.RelationshipType.ID.TRADE_USER:
+                    case (int)_RelationshipType.ID.TRADE_USER:
                         Expression<Func<TradeUser, int?>> s = x => new int?(x.Id);
                         Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.Key1 && x.UserId == relation.Key2;
                         relationId = GetRelation<TradeUser>(db.TradeUsers, s, w).Result;
@@ -114,8 +116,8 @@ namespace Need4
                 bool authenticated = request.UnauthenticatedUser == null;
                 if (authenticated)
                 {
-                    RelationshipType relationshipType = new RelationshipType { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER};
-                    //var viewPermissionType = new PermissionType { Name = StaticData.Constants.Permissions.VIEW};
+                    RelationshipType relationshipType = new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER};
+                    //var viewPermissionType = new PermissionType { Name = _Permissions.VIEW};
                     Relation relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
                     int? relationId = GetRelationId(relationshipType, relation).Result;
                     if (relationId == null)
@@ -173,10 +175,10 @@ namespace Need4
                     return Task.FromResult(ps);
                 }
 
-                if (state.Result.Id == (int)StaticData.Constants.States.TradeUser.ID.IOI)
+                if (state.Result.Id == (int)_States._TradeUser.ID.IOI)
                 {
-                    RelationshipType relationshipType = new RelationshipType { Name = StaticData.Constants.Tables.TRADE_USER};
-                    PermissionType permissionType = new PermissionType { Name = StaticData.Constants.Permissions.JOIN};
+                    RelationshipType relationshipType = new RelationshipType { Name = _Tables.TRADE_USER};
+                    PermissionType permissionType = new PermissionType { Name = _Permissions.JOIN};
                     PermissionRequest permissionRequest = new PermissionRequest
                     {
                         PermissionType = permissionType,
@@ -253,7 +255,7 @@ namespace Need4
             try
             {
                 int? relationId = GetRelationId(
-                    new RelationshipType { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER },
+                    new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER },
                     new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId }).Result;
     
                 if (relationId == null)
@@ -262,7 +264,7 @@ namespace Need4
                 }
     
                 Permission permissionRequest = new Permission { 
-                    RelationshipType = new RelationshipType { Id=(int)StaticData.Constants.RelationshipType.ID.TRADE_USER }, 
+                    RelationshipType = new RelationshipType { Id=(int)_RelationshipType.ID.TRADE_USER }, 
                     RelationId = relationId.Value
                 };
     
@@ -279,10 +281,10 @@ namespace Need4
             Dictionary<int, List<int>> map = new Dictionary<int, List<int>>
             {
                 {
-                    (int)StaticData.Constants.States.TradeUser.ID.IOI, 
+                    (int)_States._TradeUser.ID.IOI, 
                     new List<int>(){
-                        (int)StaticData.Constants.Actions.ID.JOIN,
-                        (int)StaticData.Constants.Actions.ID.WATCH
+                        (int)_Actions.ID.JOIN,
+                        (int)_Actions.ID.WATCH
                     }
                 }
             };
@@ -318,7 +320,7 @@ namespace Need4
             Permission permissionRequest = 
                 new Permission { 
                     RelationId = relationshipId.Value, 
-                    RelationshipType = new RelationshipType { Id = (int)StaticData.Constants.RelationshipType.ID.TRADE_USER } };
+                    RelationshipType = new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER } };
 
             IQueryable<Permission> permissionSet = GetPermissionSet(permissionRequest);
 
@@ -327,18 +329,32 @@ namespace Need4
                 var stateId = request.State.Id;
                 var nextStates = GetAvailableTradeUserActionsForState(stateId);
 
-                string actionCategory = StaticData.Constants.Categories.TRADE_ACTION;
-                var q = from ps in permissionSet
-                        join r in db.Requirements on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
-                        join a in db.ActionDetails on r.ActionId equals a.Id
-                        where a.Category == actionCategory &&
-                        nextStates.Contains(a.Id)
-                        select a;
-    
-                foreach( var action in q)
+                string actionCategory = _Categories.TRADE_ACTION;
+
+                //var permissionedActions = 
+                //    from ps in permissionSet
+                //    join r in db.Requirements on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
+                //    join a in allNextActions on r.ActionId equals a.Id
+                //    select a;
+
+                var nextActions =
+                    from a in db.ActionDetails
+                    where a.Category == actionCategory && nextStates.Contains(a.Id)// && !db.ActionDetails.Contains(a)
+                    select a;
+                    //join b in allNextActions on a.Id equals b.Id
+                    //into NextActions
+                    //from ps in permissionSet
+                    //join r in db.Requirements on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
+                    //join next in NextActions on r.ActionId equals next.Id
+                    //into PermissionedActions
+                    //from action in PermissionedActions.DefaultIfEmpty()
+                    //select new { NextActions, ps, action };
+
+                foreach( var action in nextActions)
                 {
                     t.Actions.Add(action);
                 }
+
             }
             catch
             {

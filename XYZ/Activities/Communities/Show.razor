@@ -1,0 +1,44 @@
+﻿@page "/communities"
+<h3>ShowAll</h3>
+
+@foreach(KeyValuePair<string, MemberList> community in communityList)
+{
+    <ul>
+        <li>
+            @community.Key
+        @if(community.Value != null && community.Value.Members != null && community.Value.Members.Count > 0)
+        {
+            @foreach(MemberDetails member in community.Value.Members)
+            {
+                <ul>
+                    <li>@member.Name</li>
+                </ul>
+
+            }
+        }
+        </li>
+    </ul>
+
+}
+
+@code {
+    private readonly Dictionary<string,MemberList> communityList = new Dictionary<string,MemberList>() { {"Newmarket" ,null} };
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var communityClient = Need4Service.GetCommunityClient();
+        var communities = communityClient.GetAllCommunities(new Empty()).Communities.ToList();
+
+        if (communities.Count > 0)
+            communityList.Clear();
+
+        foreach(var community in communities)
+        {
+            MemberList members = communityClient.GetCommunityMembers(community);
+            communityList.Add(community.Name, members);
+        }
+
+    }
+
+}
