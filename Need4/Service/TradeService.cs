@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using StaticData.Constants;
 using _States = StaticData.Constants._States;
 using _Actions = StaticData.Constants._Actions;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Need4
 {
@@ -71,6 +72,11 @@ namespace Need4
                 return null;
             }
         }
+            
+        //int? GetRelationId<T>(IQueryable<T> t, Func<T, int?> s, Func<T, bool> w)
+        //{
+        //    return GetRelation<T>(t, x => s(x), x => w(x)).Result;
+        //}
 
         public Task<int?> GetRelationId(RelationshipType relationshipType, Relation relation)
         {
@@ -81,10 +87,30 @@ namespace Need4
                 switch(relationshipType.Id)
                 {
                     case (int)_RelationshipType.ID.TRADE_USER:
-                        Expression<Func<TradeUser, int?>> s = x => new int?(x.Id);
-                        Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.Key1 && x.UserId == relation.Key2;
-                        relationId = GetRelation<TradeUser>(db.TradeUsers, s, w).Result;
-                        break;
+                        {
+                            Expression<Func<TradeUser, int?>> s = x => new int?(x.Id);
+                            Expression<Func<TradeUser, bool>> w = x => x.TradeId == relation.Key1 && x.UserId == relation.Key2;
+                            relationId = GetRelation<TradeUser>(db.TradeUsers, s, w).Result;
+                            //relationId = GetRelationId<TradeUser>(
+                            //    db.TradeUsers,
+                            //    x => new int?(x.Id),
+                            //    x => x.TradeId == relation.Key1 && x.UserId == relation.Key2 );
+                            break;
+                        }
+                    case (int)_RelationshipType.ID.COMMUNITY_TRADE:
+                        {
+                            Expression<Func<CommunityTrade, int?>> s = x => new int?(x.Id);
+                            Expression<Func<CommunityTrade, bool>> w = x => x.CommunityId == relation.Key1 && x.TradeId == relation.Key2;
+                            relationId = GetRelation<CommunityTrade>(db.CommunityTrades, s, w).Result;
+                            break;
+                        }
+                    case (int)_RelationshipType.ID.COMMUNITY_MEMBER:
+                        {
+                            Expression<Func<CommunityMember, int?>> s = x => new int?(x.Id);
+                            Expression<Func<CommunityMember, bool>> w = x => x.CommunityId == relation.Key1 && x.MemberId == relation.Key2;
+                            relationId = GetRelation<CommunityMember>(db.CommunityMembers, s, w).Result;
+                            break;
+                        } 
                 }
                 return Task.FromResult(relationId);
             }
@@ -146,11 +172,21 @@ namespace Need4
             {
                 try
                 {
-                    var q = from x in db.States where request.State.Id == x.Id select x;
+                    var q = from x in db.States where request.State.Description == x.Description select x;
                     var state = q.First();
 
-                    TradeUser t = new TradeUser { State = state, TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
-                    this.GenericCreate(db, t);
+                    var r = from x in db.TradeUsers where x.TradeId == request.TradeId && x.UserId == request.AuthenticatedUserId select x;
+
+                    if(r.Count() > 0)
+                    {
+                        r.First().State = state;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        TradeUser t = new TradeUser { State = state, TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
+                        this.GenericCreate(db, t);
+                    }
                 }
                 catch
                 {
@@ -227,7 +263,6 @@ namespace Need4
             }
 
             int? relationId = GetRelationId(relationshipType, new Relation { Key1 = request.Key1, Key2 = request.Key2 }).Result;
-            //var tradeUserEntity = this.GenericCreate<TradeUser>(db, new TradeUser{TradeId = request.Key1, UserId = request.Key2 });
 
             if(relationId == null)
             {
@@ -244,39 +279,59 @@ namespace Need4
 
             Task<Permission> s = this.GenericCreate<Permission>(db, newPermission);
 
-            //if(s.Result == null)
-                //return Task.FromResult(ps);
-
             ps.Permissions.Add(newPermission);
+
             return Task.FromResult(ps);
         }
+        private int GetCommunityForMember(int memberId)
+        {
+            return 1;
+        }
+        private int GetActiveMemberIdForUser(int authenticatedUserId)
+        {
+            return -1;
+        }
+
         public override Task<PermissionSet> GetPermissions(TradeUserRequest request, ServerCallContext context)
         {
             PermissionSet ps = new PermissionSet();
+
+            if (request.UnauthenticatedUser != null)
+                return Task.FromResult(ps);
+
             try
             {
-                int? relationId = GetRelationId(
-                    new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER },
-                    new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId }).Result;
-    
-                if (relationId == null)
+                RelationshipType tradeUserType = new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER };
+                int? relationId = GetRelationId(tradeUserType, new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId }).Result;
+
+                if (relationId != null)
                 {
-                    return Task.FromResult(ps);
+                    Permission permissionRequest = new Permission { RelationshipType = tradeUserType, RelationId = relationId.Value };
+                    var permissionSet = GetPermissionSet(permissionRequest);
+                    ps.Permissions.AddRange(permissionSet);
                 }
-    
-                Permission permissionRequest = new Permission { 
-                    RelationshipType = new RelationshipType { Id=(int)_RelationshipType.ID.TRADE_USER }, 
-                    RelationId = relationId.Value
-                };
-    
-                ps.Permissions.AddRange(GetPermissionSet(permissionRequest));
+                int memberId = GetActiveMemberIdForUser(request.AuthenticatedUserId);
+                int communityId = GetCommunityForMember(memberId);
+                RelationshipType communityMemberType = new RelationshipType { Id = (int)_RelationshipType.ID.COMMUNITY_MEMBER };
+                relationId = GetRelationId(communityMemberType, new Relation { Key1 = communityId, Key2 = memberId }).Result;
+
+                if (relationId != null)
+                {
+                    Permission permissionRequest = new Permission { RelationshipType = communityMemberType, RelationId = relationId.Value };
+                    var permissionSet = GetPermissionSet(permissionRequest);
+                    ps.Permissions.AddRange(permissionSet);
+                }
+
                 return Task.FromResult(ps);
             }
             catch
             {
                 return Task.FromResult(ps);
             }
+
         }
+
+ 
         public List<int> GetAvailableTradeUserActionsForState(int stateId)
         {
             Dictionary<int, List<int>> map = new Dictionary<int, List<int>>
@@ -286,6 +341,15 @@ namespace Need4
                     new List<int>(){
                         (int)_Actions._Trade.ID.JOIN,
                         (int)_Actions._Trade.ID.WATCH
+                    }
+                },
+                {
+                    (int)_States._TradeUser.ID.JOINED, 
+                    new List<int>(){
+                        (int)_Actions._Trade.ID.WITHDRAW,
+                        (int)_Actions._Trade.ID.EXCLUDE_USER,
+                        (int)_Actions._Trade.ID.ADD_USER,
+                        (int)_Actions._Trade.ID.FINALIZE
                     }
                 }
             };
@@ -318,12 +382,8 @@ namespace Need4
 
             request.State = GetTradeUserState(request, context).Result;
 
-            Permission permissionRequest = 
-                new Permission { 
-                    RelationId = relationshipId.Value, 
-                    RelationshipType = new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER } };
-
-            IQueryable<Permission> permissionSet = GetPermissionSet(permissionRequest);
+            Task<PermissionSet> permissionSet = GetPermissions(request, context);
+            IQueryable<Permission> permissions = permissionSet.Result.Permissions.AsQueryable<Permission>();
 
             try
             {
@@ -332,24 +392,17 @@ namespace Need4
 
                 string actionCategory = _Categories.TRADE_ACTION;
 
-                //var permissionedActions = 
-                //    from ps in permissionSet
-                //    join r in db.Requirements on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
-                //    join a in allNextActions on r.ActionId equals a.Id
-                //    select a;
+                var permissionedActions =
+                    from ps in permissions
+                    join r in db.Requirements on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
+                    select r.ActionId;
 
                 var nextActions =
-                    from a in db.ActionDetails
-                    where a.Category == actionCategory && nextStates.Contains(a.Id)// && !db.ActionDetails.Contains(a)
+                    from ps in permissionedActions
+                    join a in db.ActionDetails
+                    on ps equals a.Id
+                    where a.Category == actionCategory && nextStates.Contains(a.Id)
                     select a;
-                    //join b in allNextActions on a.Id equals b.Id
-                    //into NextActions
-                    //from ps in permissionSet
-                    //join r in db.Requirements on new { rti = ps.RelationshipTypeId, pti = ps.PermissionTypeId } equals new { rti = r.RelationshipTypeId, pti = r.PermissionTypeId }
-                    //join next in NextActions on r.ActionId equals next.Id
-                    //into PermissionedActions
-                    //from action in PermissionedActions.DefaultIfEmpty()
-                    //select new { NextActions, ps, action };
 
                 foreach( var action in nextActions)
                 {
@@ -402,7 +455,7 @@ namespace Need4
                     .ThenInclude(z => z.Item)
                     join x in db.TradeUsers
                     on u.Id equals x.UserId
-                    where t.Id == x.TradeId
+                    where t.Id == x.TradeId && x.State.Description  == _States._TradeUser.JOINED
                     select t;
 
             foreach(var trade in q)

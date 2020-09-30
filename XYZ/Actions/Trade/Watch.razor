@@ -1,4 +1,4 @@
-﻿@page "/trade/watch/{tradeId:int}/{userId:int}"
+﻿@page "/trade/watch/{tradeId:int}"
 
 @using Helpers
 @inject IAuthorizationService AuthorizationService
@@ -11,7 +11,6 @@
     <p>Have permission</p>
     <p> called with variables:</p>
     <p> tradeId: @tradeId </p>
-    <p> userId: @userId </p>
 }
 else
 {
@@ -21,8 +20,6 @@ else
 @code {
     [Parameter]
     public int tradeId { get; set; }
-    [Parameter]
-    public int userId { get; set; }
 
     private Task<AuthorizationResult> authorization;
 
@@ -45,7 +42,7 @@ else
 
         var permissions = tradeClient.CheckPermissions(tradeUserRequest);
 
-        var requirements = new List<IAuthorizationRequirement> { new Helpers.JoinTradeRequirement() };
+        var requirements = new List<IAuthorizationRequirement> { new Helpers.BasicCommunityRequirement() };
         authorization = AuthorizationService.AuthorizeAsync(HttpContextAccessor.HttpContext.User, new Trade { Id = tradeId }, requirements);
     }
 }

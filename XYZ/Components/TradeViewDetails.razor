@@ -18,8 +18,10 @@
 
 
 @code {
-    [Parameter]
-    public int tradeId { get; set; }
+
+        [Parameter]
+        public int tradeId { get; set; }
+
     private User user { get; set; }
     private Dictionary<string,string> actionKeyValuePairs { get; set; }
 
@@ -56,11 +58,10 @@
         if(tradeUserState.Description.Length == 0)
         {
             // add IOI
-            tradeUserRequest.State = new State { Id = (int)_States._TradeUser.ID.IOI };
+            tradeUserRequest.State = new State { Description = _States._TradeUser.IOI };
             tradeClient.AddTradeUserState(tradeUserRequest);
-        }
 
-        var permissions = tradeClient.CheckPermissions(tradeUserRequest);
+        }
 
         TradeActionResponse actionResponse = tradeClient.GetTradeActions(tradeUserRequest);
 
@@ -68,9 +69,9 @@
 
         if(actions.Count > 0)
         {
-            actionKeyValuePairs = new Dictionary<string, string> { 
-                { "tradeId", tradeId.ToString()}, 
-                { "userId", user.Id.ToString() } 
+            actionKeyValuePairs = new Dictionary<string, string> {
+                { "tradeId", tradeId.ToString()},
+                { "userId", user.Id.ToString() }
             };
         }
     }

@@ -226,7 +226,7 @@ namespace Models
                 new { Id = -2, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.SPLIT },
                 new { Id = -3, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.FINALIZE },
                 //new { Id = -4, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId =  _Actions.ID.WITHDRAW },
-                new { Id = -5, PermissionTypeId = (int) _Permissions.ID.JOIN, RelationshipTypeId = 1, ActionId = 7 }
+                new { Id = -5, PermissionTypeId = (int) _Permissions.ID.BASIC, RelationshipTypeId = (int) _RelationshipType.ID.COMMUNITY_MEMBER, ActionId = (int)_Actions._Trade.ID.JOIN }
                 );
         }
        
@@ -242,7 +242,8 @@ namespace Models
                 new { Id = (int) _Actions._Trade.ID.WITHDRAW, Name = "WithdrawFromTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.WITHDRAW},
                 new { Id = (int) _Actions._Trade.ID.WATCH, Name = "WatchTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.WATCH},
                 new { Id = (int) _Actions._Trade.ID.JOIN, Name = "JoinTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.JOIN},
-                new { Id = (int) _Actions._Trade.ID.IGNORE, Name = "IgnoreTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.IGNORE}
+                new { Id = (int) _Actions._Trade.ID.IGNORE, Name = "IgnoreTrade", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.IGNORE},
+                new { Id = (int) _Actions._Trade.ID.ADD_USER, Name = "AddUser", Category =  _Categories.TRADE_ACTION, Method =  _Actions._Trade.ADD_USER}
                 );
         }
  
@@ -293,9 +294,11 @@ namespace Models
             //e.Property(r => r.Id).ValueGeneratedOnAdd();
             e.HasData( 
                 new { Id = (int) _RelationshipType.ID.TRADE_USER, Name =  _RelationshipType.TRADE_USER },
-                new { Id = (int) _RelationshipType.ID.COMMUNITY_USER, Name =  _RelationshipType.COMMUNITY_USER }
+                new { Id = (int) _RelationshipType.ID.COMMUNITY_MEMBER, Name =  _RelationshipType.COMMUNITY_MEMBER },
+                new { Id = (int) _RelationshipType.ID.COMMUNITY_TRADE, Name =  _RelationshipType.COMMUNITY_TRADE }
             );
         }
+        
         public DbSet<Permission> Permissions { get; set; }
         private void OnCreatePermissions(EntityTypeBuilder<Permission> entity)
         {
@@ -314,7 +317,7 @@ namespace Models
             entity.HasOne(d => d.RelationshipType);
 
             entity.HasData(
-                new { Id = -1, PermissionTypeId = (int) _Permissions.ID.BASIC, RelationshipTypeId = (int) _RelationshipType.ID.COMMUNITY_USER, RelationId = 1 }
+                new { Id = -1, PermissionTypeId = (int) _Permissions.ID.BASIC, RelationshipTypeId = (int) _RelationshipType.ID.COMMUNITY_MEMBER, RelationId = -1 }
                 );
         }
 
