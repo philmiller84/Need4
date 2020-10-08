@@ -57,9 +57,9 @@
         {
             public class _Trade
             {
-                public enum ID {GET=1, EXCLUDE_USER, SPLIT, FINALIZE, WITHDRAW, WATCH, JOIN, IGNORE, ADD_USER };
+                public enum ID {GET=1, EXCLUDE_USER, SPLIT, FINALIZE, WITHDRAW, WATCH, JOIN, IGNORE, ADD_USER, VIEW };
 
-                public const string GET          = "TradeViewDetails/{0}";
+                public const string GET          = "/trade/get/{tradeId}";
                 public const string EXCLUDE_USER = "/trade/exclude/{tradeId}";
                 public const string SPLIT        = "/trade/split/{tradeId}";
                 public const string FINALIZE     = "/trade/finalize/{tradeId}";

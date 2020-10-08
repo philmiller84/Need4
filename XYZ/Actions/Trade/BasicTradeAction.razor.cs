@@ -11,39 +11,42 @@ using System.Threading.Tasks;
 
 namespace XYZ.Actions
 {
-    public abstract class BasicTradeAction : ComponentBase
+
+    public abstract class AuthenticatedTradeAction : BasicTradeAction
     {
-
-        public abstract void DoAction();
-
         [Inject] protected IAuthorizationService AuthorizationService { get; set; }
         [Inject] protected IHttpContextAccessor HttpContextAccessor { get; set; }
+
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+        protected Task<AuthorizationResult> authorization;
+        protected override void InitializeParameters()
+        {
+            base.InitializeParameters();
+
+            var requirements = new List<IAuthorizationRequirement> { new Helpers.BasicCommunityRequirement() };
+            authorization = AuthorizationService.AuthorizeAsync(HttpContextAccessor.HttpContext.User, new Need4Protocol.Trade {Id = tradeId }, requirements);
+            actionKeyValuePairs.Add("userId", user.Id.ToString());
+        }
+        protected override void OnParametersSet()
+        {
+            InitializeParameters();
+            if(authorization.Result.Succeeded)
+                DoAction();
+        }
+    }
+    public abstract class BasicTradeAction : ComponentBase
+    {
+        public abstract void DoAction();
         [Inject] protected Need4Service Need4Service { get; set; }
         [Inject] protected Utility Utility { get; set; }
-
-        //public BasicTradeAction(
-        //    IAuthorizationService AuthorizationService,
-        //    IHttpContextAccessor HttpContextAccessor,
-        //    Need4Service Need4Service,
-        //    Utility Utility)
-        //{
-        //    this.AuthorizationService = AuthorizationService;
-        //    this.HttpContextAccessor = HttpContextAccessor;
-        //    this.Need4Service = Need4Service;
-        //    this.Utility = Utility;
-        //}
 
         [Parameter]
         public int tradeId { get; set; }
 
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
-        private Need4Protocol.User user { get; set; }
-
-        protected Task<AuthorizationResult> authorization;
-
+        protected Dictionary<string,string> actionKeyValuePairs { get; set; }
+        protected Need4Protocol.User user { get; set; }
         protected TradeService.TradeServiceClient tradeClient;
-
         protected TradeUserRequest tradeUserRequest;
 
         protected override void OnInitialized()
@@ -53,22 +56,22 @@ namespace XYZ.Actions
             user = Utility.GetUser();
         }
 
-        protected override void OnParametersSet()
+        protected virtual void InitializeParameters()
         {
+            base.OnParametersSet();
             tradeUserRequest = user != null ?
                 new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = tradeId } :
                 new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = tradeId };
 
-            //var permissions = tradeClient.CheckPermissions(tradeUserRequest);
-
-            var requirements = new List<IAuthorizationRequirement> { new Helpers.BasicCommunityRequirement() };
-            authorization = AuthorizationService.AuthorizeAsync(HttpContextAccessor.HttpContext.User, new Need4Protocol.Trade {Id = tradeId }, requirements);
-
-            if(authorization.Result.Succeeded)
-            {
-                DoAction();
-            }
-            
+            actionKeyValuePairs = new Dictionary<string, string> { { "tradeId", tradeId.ToString()} };
+        }
+        protected override void OnParametersSet()
+        {
+            //NOTE: base.OnParametersSet() is called in InitializeParameters(). 
+            //This function exists so that we can wrap the call to DoAction() in the subclasses.
+            //Otherwise, using the base class call to OnParametersSet() will end up executing DoAction() twice.
+            InitializeParameters();
+            DoAction();
         }
     }
 }

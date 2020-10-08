@@ -223,10 +223,11 @@ namespace Models
 
             entity.HasData(
                 new { Id = -1, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.EXCLUDE_USER },
-                new { Id = -2, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.SPLIT },
+                new { Id = -2, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int)_Actions._Trade.ID.ADD_USER },
                 new { Id = -3, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.FINALIZE },
-                //new { Id = -4, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = 1, ActionId =  _Actions.ID.WITHDRAW },
+                new { Id = -4, PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int)_Actions._Trade.ID.WITHDRAW },
                 new { Id = -5, PermissionTypeId = (int) _Permissions.ID.BASIC, RelationshipTypeId = (int) _RelationshipType.ID.COMMUNITY_MEMBER, ActionId = (int)_Actions._Trade.ID.JOIN }
+                //new { Id = , PermissionTypeId = (int) _Permissions.ID.PARTICIPATE, RelationshipTypeId = (int) _RelationshipType.ID.TRADE_USER, ActionId = (int) _Actions._Trade.ID.SPLIT },
                 );
         }
        

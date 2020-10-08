@@ -23,8 +23,8 @@ service ActivityService {
 service TradeService {
 	rpc CreateTrade (Trade) returns (ActionResponse);
 	rpc GetOpenTrades (google.protobuf.Empty) returns (TradeList);
-	rpc GetDetailedTradeView (TradeUserRequest) returns (Trade);
-	rpc GetTradeActions (TradeUserRequest) returns (TradeActionResponse);
+	rpc GetTradeActions (TradeUserRequest) returns (TradeActionList);
+	rpc DoTradeAction(TradeActionRequest) returns (TradeActionResponse);
 	rpc GetPermissions (TradeUserRequest) returns (PermissionSet);
 	rpc AddPermission (PermissionRequest) returns (PermissionSet);
 	rpc GetTradeUserState (TradeUserRequest) returns (State);

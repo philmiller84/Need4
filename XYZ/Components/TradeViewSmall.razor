@@ -1,9 +1,7 @@
 ﻿
-@*@<a href="/TradeViewDetails">Details</a>*@
-
 @if (TradeIsPopulated(@trade))
 {
-<div @onclick="@(_ => NavigationManager.NavigateTo(String.Format("/TradeViewDetails/{0}", trade.Id)))">
+<div @onclick="@(_ => NavigationManager.NavigateTo(String.Format("/trade/get/{0}", trade.Id)))">
     <p>Trade started: @trade.TimeStarted</p>
     <div class="row mb-3">
     @foreach (TradeItemDetails i in trade.TradeItemList.TradeItemDetails.ToList())

@@ -15,7 +15,17 @@ message TradeUserRequest {
 	State state = 4;
 }
 
-message TradeActionResponse {
+message TradeActionRequest {
+	TradeUserRequest trade_user_request = 1;
+	string action_name = 2;
+}
+
+message TradeActionResponse{
+	Trade trade = 1;
+    TradeActionList next_actions = 2;
+}
+
+message TradeActionList {
 	repeated ActionDetails actions = 1;
 }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Helpers;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,16 @@ namespace Need4
             //    options.Audience = "https://need4-api";
             //});
             //services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("LoggedIn", policy =>
+                    policy.RequireAssertion(context =>
+                        context.User.HasClaim(c =>
+                            (c.Type == Claims.EMAIL_ADDRESS_TYPE))));
+
+            });
+
+                   
             services.AddGrpc();
             services.AddTransient<Models.Need4Context>();
         }
@@ -45,8 +56,8 @@ namespace Need4
 
             app.UseRouting();
 
-            //app.UseAuthentication();  //new statement
-            //app.UseAuthorization();       //new statement
+            //app.UseAuthentication();  
+            app.UseAuthorization();  
 
             app.UseEndpoints(endpoints =>
             {

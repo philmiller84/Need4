@@ -1,0 +1,32 @@
+﻿@page "/trade/get/{tradeId:int}"
+@inherits XYZ.Actions.BasicTradeAction
+@using _Trade = StaticData.Constants._Actions._Trade; 
+
+<h3>Get Trade</h3>
+
+<TradeViewSmall trade="@tradeActionResponse.Trade"></TradeViewSmall>
+
+<div class="container">
+    <div class="col-md-6">
+        @foreach (ActionDetails a in tradeActionResponse.NextActions.Actions.ToList())
+        {
+            <button type="button" class="btn btn-primary"
+                    @onclick="@(_ => NavigationManager.NavigateTo(Utility.ActionRoute(a.Method, actionKeyValuePairs)))">@a.Name</button>
+        }
+    </div>
+</div>
+
+@code {
+
+    bool show = true;
+    string style_display { get { return show ? "display:show" : "display:none"; } }
+
+    TradeActionResponse tradeActionResponse;
+
+    public override void DoAction()
+    {
+        tradeActionResponse = tradeClient.DoTradeAction(new TradeActionRequest() { ActionName = _Trade.GET, TradeUserRequest = tradeUserRequest });
+    }
+
+}
+

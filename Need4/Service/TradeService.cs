@@ -13,6 +13,8 @@ using StaticData.Constants;
 using _States = StaticData.Constants._States;
 using _Actions = StaticData.Constants._Actions;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Grpc.Core.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Need4
 {
@@ -65,7 +67,8 @@ namespace Need4
         {
             try
             {
-                return Task.FromResult(ts.Where(w).Select(s).First());
+                var relationId = ts.Where(w).Select(s).FirstOrDefault();
+                return Task.FromResult(relationId);
             }
             catch
             {
@@ -136,26 +139,18 @@ namespace Need4
         public override Task<State> GetTradeUserState(TradeUserRequest request, ServerCallContext context)
         {
             State st = new State();
+            if (request.UnauthenticatedUser != null)
+                return Task.FromResult(st);
 
             try
             {
 
-                bool authenticated = request.UnauthenticatedUser == null;
-                if (authenticated)
-                {
-                    RelationshipType relationshipType = new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER};
-                    //var viewPermissionType = new PermissionType { Name = _Permissions.VIEW};
-                    Relation relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
-                    int? relationId = GetRelationId(relationshipType, relation).Result;
-                    if (relationId == null)
-                    {
-                        return Task.FromResult(st);
-                    }
-    
-                    Relationship relationship = new Relationship { Id = relationId.Value, Relation = relation, RelationshipType = relationshipType };
-                    //st.RelationId = relationId.Value;
-                    st = GetRelationshipState(relationship, context).Result;
-                }
+                RelationshipType relationshipType = new RelationshipType { Id = (int)_RelationshipType.ID.TRADE_USER };
+                Relation relation = new Relation { Key1 = request.TradeId, Key2 = request.AuthenticatedUserId };
+                int relationId = GetRelationId(relationshipType, relation).Result.Value;
+
+                Relationship relationship = new Relationship { Id = relationId, Relation = relation, RelationshipType = relationshipType };
+                st = GetRelationshipState(relationship, context).Result;
                 return Task.FromResult(st);
             }
             catch
@@ -167,31 +162,29 @@ namespace Need4
         public override Task<State> AddTradeUserState(TradeUserRequest request, ServerCallContext context)
         {
             State st = new State();
-            bool authenticated = request.UnauthenticatedUser == null;
-            if (authenticated)
+            if (request.UnauthenticatedUser != null)
+                return Task.FromResult(st);
+            try
             {
-                try
-                {
-                    var q = from x in db.States where request.State.Description == x.Description select x;
-                    var state = q.First();
+                var q = from x in db.States where request.State.Description == x.Description select x;
+                var state = q.First();
 
-                    var r = from x in db.TradeUsers where x.TradeId == request.TradeId && x.UserId == request.AuthenticatedUserId select x;
+                var r = from x in db.TradeUsers where x.TradeId == request.TradeId && x.UserId == request.AuthenticatedUserId select x;
 
-                    if(r.Count() > 0)
-                    {
-                        r.First().State = state;
-                        db.SaveChanges();
-                    }
-                    else
-                    {
-                        TradeUser t = new TradeUser { State = state, TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
-                        this.GenericCreate(db, t);
-                    }
-                }
-                catch
+                if (r.Count() > 0)
                 {
-                    return null;
+                    r.First().State = state;
+                    db.SaveChanges();
                 }
+                else
+                {
+                    TradeUser t = new TradeUser { State = state, TradeId = request.TradeId, UserId = request.AuthenticatedUserId };
+                    this.GenericCreate(db, t);
+                }
+            }
+            catch
+            {
+                return null;
             }
 
             return Task.FromResult(st);
@@ -201,8 +194,10 @@ namespace Need4
         {
             PermissionSet ps = GetPermissions(request, context).Result;
 
-            bool authenticated = request.UnauthenticatedUser == null;
-            if (authenticated && (ps == null || ps.Permissions.Count == 0))
+            if (request.UnauthenticatedUser != null)
+                return Task.FromResult(ps);
+
+            if (ps.Permissions.Count == 0)
             {
 
                 Task<State> state = GetTradeUserState(request, context);
@@ -214,8 +209,8 @@ namespace Need4
 
                 if (state.Result.Id == (int)_States._TradeUser.ID.IOI)
                 {
-                    RelationshipType relationshipType = new RelationshipType { Name = _Tables.TRADE_USER};
-                    PermissionType permissionType = new PermissionType { Name = _Permissions.JOIN};
+                    RelationshipType relationshipType = new RelationshipType { Name = _Tables.TRADE_USER };
+                    PermissionType permissionType = new PermissionType { Name = _Permissions.JOIN };
                     PermissionRequest permissionRequest = new PermissionRequest
                     {
                         PermissionType = permissionType,
@@ -347,8 +342,8 @@ namespace Need4
                     (int)_States._TradeUser.ID.JOINED, 
                     new List<int>(){
                         (int)_Actions._Trade.ID.WITHDRAW,
-                        (int)_Actions._Trade.ID.EXCLUDE_USER,
                         (int)_Actions._Trade.ID.ADD_USER,
+                        (int)_Actions._Trade.ID.EXCLUDE_USER,
                         (int)_Actions._Trade.ID.FINALIZE
                     }
                 }
@@ -356,29 +351,12 @@ namespace Need4
 
             return map[stateId];
         }
-        public override Task<TradeActionResponse> GetTradeActions(TradeUserRequest request, ServerCallContext context)
+        public override Task<TradeActionList> GetTradeActions(TradeUserRequest request, ServerCallContext context)
         {
-            TradeActionResponse t = new TradeActionResponse();
-            bool tradeExists = CheckTradeExists(request);
+            TradeActionList t = new TradeActionList();
 
-            if (!tradeExists)
-            {
+            if(request.UnauthenticatedUser != null || !CheckTradeExists(request))
                 return Task.FromResult(t);
-            }
-
-            bool authenticated = request.UnauthenticatedUser == null;
-
-            if(!authenticated)
-            {
-                return Task.FromResult(t);
-            }
-
-            int? relationshipId = GetTradeRelationship(request);
-
-            if(relationshipId == null)
-            {
-                return Task.FromResult(t);
-            }
 
             request.State = GetTradeUserState(request, context).Result;
 
@@ -404,11 +382,7 @@ namespace Need4
                     where a.Category == actionCategory && nextStates.Contains(a.Id)
                     select a;
 
-                foreach( var action in nextActions)
-                {
-                    t.Actions.Add(action);
-                }
-
+                t.Actions.AddRange(nextActions);
             }
             catch
             {
@@ -433,8 +407,33 @@ namespace Need4
                     select t;
             return q.Count() > 0;
         }
+	    public override Task<TradeActionResponse> DoTradeAction(TradeActionRequest request, ServerCallContext context)
+        {
+            var response = new TradeActionResponse();
+            switch(request.ActionName)
+            {
+                case StaticData.Constants._Actions._Trade.GET:
+                    response.Trade = GetDetailedTradeView(request.TradeUserRequest, context);
+                    var tradeUserState = GetTradeUserState(request.TradeUserRequest, context).Result;
 
-        public override Task<Trade> GetDetailedTradeView(TradeUserRequest request, ServerCallContext context)
+                    if(tradeUserState.Description.Length == 0)
+                    {
+                        // add IOI
+                        request.TradeUserRequest.State = new State { Description = _States._TradeUser.IOI };
+                        AddTradeUserState(request.TradeUserRequest, context);
+                    }
+                    response.NextActions = GetTradeActions(request.TradeUserRequest, context).Result;
+
+
+                    break;
+                default:
+                    break;
+            }
+            
+            return Task.FromResult(response);
+        }
+
+        private Trade GetDetailedTradeView(TradeUserRequest request, ServerCallContext context)
         {
             Trade trade = new Trade();
             var q = from t in db.Trades
@@ -444,7 +443,7 @@ namespace Need4
                     where t.Id == request.TradeId
                     select t;
 
-            return Task.FromResult(q.First());
+            return q.First();
         }
         public override Task<TradeList> GetUserTrades(User u, ServerCallContext context)
         {
