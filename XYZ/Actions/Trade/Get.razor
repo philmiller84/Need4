@@ -5,27 +5,14 @@
 <h3>Get Trade</h3>
 
 <TradeViewSmall trade="@tradeActionResponse.Trade"></TradeViewSmall>
-
-<div class="container">
-    <div class="col-md-6">
-        @foreach (ActionDetails a in tradeActionResponse.NextActions.Actions.ToList())
-        {
-            <button type="button" class="btn btn-primary"
-                    @onclick="@(_ => NavigationManager.NavigateTo(Utility.ActionRoute(a.Method, actionKeyValuePairs)))">@a.Name</button>
-        }
-    </div>
-</div>
+<ActionButtonsView tradeActionList="@tradeActionResponse.NextActions" actionKeyValuePairs="@actionKeyValuePairs"></ActionButtonsView>
 
 @code {
 
-    bool show = true;
-    string style_display { get { return show ? "display:show" : "display:none"; } }
-
-    TradeActionResponse tradeActionResponse;
-
     public override void DoAction()
     {
-        tradeActionResponse = tradeClient.DoTradeAction(new TradeActionRequest() { ActionName = _Trade.GET, TradeUserRequest = tradeUserRequest });
+        TradeActionRequest tradeActionRequest = new TradeActionRequest { ActionName = _Trade.GET, TradeUserInfo = tradeUserInfo };
+        tradeActionResponse = tradeClient.DoTradeAction(tradeActionRequest);
     }
 
 }

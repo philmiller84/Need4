@@ -128,7 +128,7 @@ namespace Need4Protocol
     {
         public TradeUser(){ }
 
-        public TradeUser(TradeUserRequest r)
+        public TradeUser(TradeUserInfo r)
         {
             TradeId = r.TradeId;
             UserId = r.AuthenticatedUserId;
@@ -224,11 +224,11 @@ namespace Need4Protocol
     ////JOIN TABLE FOR TRADEACTIONLIST TO WORK
     //////////////////////////////////////////////////////////////////////////////////////////////////
     //public partial class TradeAction { public List<TradeActionList_TradeAction> Joins { get; set; } }
-    //public partial class TradeActionList { public List<TradeActionList_TradeAction> Joins { get; set; } }
+    //public partial class ActionList { public List<TradeActionList_TradeAction> Joins { get; set; } }
     //public class TradeActionList_TradeAction
     //{
     //    public int TAL_Id { get; set; }
-    //    public TradeActionList TradeActionList { get; set; }
+    //    public ActionList ActionList { get; set; }
     //    public int TA_Id { get; set; }
     //    public TradeAction TradeAction { get; set; }
     //}

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Need4Protocol;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace XYZ
@@ -39,8 +40,15 @@ namespace XYZ
             return elements;
         }
 
+        public string ActionRouteReplaceSingle(string actionString, string replaceValue)
+        {
+            Match match = Regex.Matches(actionString, actionToken).First();
+            return Regex.Replace(actionString, match.Value, replaceValue);
+        }
+
         public string ActionRoute(string actionString, IDictionary<string, string> keyValuePairs)
         {
+
             foreach (Match match in Regex.Matches(actionString, actionToken))
             {
                 actionString = Regex.Replace(actionString, match.Value, keyValuePairs[match.Value.ToString().Trim(new char[]{ '{', '}'})]);

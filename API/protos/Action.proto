@@ -5,6 +5,10 @@ message ActionResponse {
 	int32 result = 1;
 }
 
+message ActionList {
+	repeated ActionDetails actions = 1;
+}
+
 message ActionDetails {
 	int32 id = 1;
 	string name = 2;

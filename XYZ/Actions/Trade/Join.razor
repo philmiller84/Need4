@@ -20,8 +20,8 @@ else
 
     public override void DoAction()
     {
-        tradeUserRequest.State = new State { Description = _States._TradeUser.JOINED };
-        tradeClient.AddTradeUserState(tradeUserRequest);
+        tradeUserInfo.State = new State { Description = _States._TradeUser.JOINED };
+        tradeClient.AddTradeUserState(tradeUserInfo);
 
         // add permission
 
@@ -31,8 +31,8 @@ else
         {
             PermissionType = permissionType,
             RelationshipType = relationshipType,
-            Key1 = tradeUserRequest.TradeId,
-            Key2 = tradeUserRequest.AuthenticatedUserId
+            Key1 = tradeUserInfo.TradeId,
+            Key2 = tradeUserInfo.AuthenticatedUserId
         };
         var permissions = tradeClient.AddPermission(permissionRequest);
     }

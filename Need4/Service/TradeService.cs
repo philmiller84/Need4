@@ -136,7 +136,7 @@ namespace Need4
             }
         }
         
-        public override Task<State> GetTradeUserState(TradeUserRequest request, ServerCallContext context)
+        public override Task<State> GetTradeUserState(TradeUserInfo request, ServerCallContext context)
         {
             State st = new State();
             if (request.UnauthenticatedUser != null)
@@ -159,7 +159,7 @@ namespace Need4
             }
         }
 
-        public override Task<State> AddTradeUserState(TradeUserRequest request, ServerCallContext context)
+        public override Task<State> AddTradeUserState(TradeUserInfo request, ServerCallContext context)
         {
             State st = new State();
             if (request.UnauthenticatedUser != null)
@@ -190,7 +190,7 @@ namespace Need4
             return Task.FromResult(st);
         }
 
-        public override Task<PermissionSet> CheckPermissions(TradeUserRequest request, ServerCallContext context)
+        public override Task<PermissionSet> CheckPermissions(TradeUserInfo request, ServerCallContext context)
         {
             PermissionSet ps = GetPermissions(request, context).Result;
 
@@ -287,7 +287,7 @@ namespace Need4
             return -1;
         }
 
-        public override Task<PermissionSet> GetPermissions(TradeUserRequest request, ServerCallContext context)
+        public override Task<PermissionSet> GetPermissions(TradeUserInfo request, ServerCallContext context)
         {
             PermissionSet ps = new PermissionSet();
 
@@ -351,9 +351,9 @@ namespace Need4
 
             return map[stateId];
         }
-        public override Task<TradeActionList> GetTradeActions(TradeUserRequest request, ServerCallContext context)
+        public override Task<ActionList> GetTradeActions(TradeUserInfo request, ServerCallContext context)
         {
-            TradeActionList t = new TradeActionList();
+            ActionList t = new ActionList();
 
             if(request.UnauthenticatedUser != null || !CheckTradeExists(request))
                 return Task.FromResult(t);
@@ -392,7 +392,7 @@ namespace Need4
             return Task.FromResult(t);
         }
 
-        private int? GetTradeRelationship(TradeUserRequest request)
+        private int? GetTradeRelationship(TradeUserInfo request)
         {
             return (from tu in db.TradeUsers
                     .Include(d => d.State)
@@ -400,7 +400,7 @@ namespace Need4
                     select tu).FirstOrDefault()?.Id;
         }
 
-        private bool CheckTradeExists(TradeUserRequest request)
+        private bool CheckTradeExists(TradeUserInfo request)
         {
             var q = from t in db.Trades
                     where t.Id == request.TradeId
@@ -413,16 +413,16 @@ namespace Need4
             switch(request.ActionName)
             {
                 case StaticData.Constants._Actions._Trade.GET:
-                    response.Trade = GetDetailedTradeView(request.TradeUserRequest, context);
-                    var tradeUserState = GetTradeUserState(request.TradeUserRequest, context).Result;
+                    response.Trade = GetDetailedTradeView(request.TradeUserInfo, context);
+                    var tradeUserState = GetTradeUserState(request.TradeUserInfo, context).Result;
 
                     if(tradeUserState.Description.Length == 0)
                     {
                         // add IOI
-                        request.TradeUserRequest.State = new State { Description = _States._TradeUser.IOI };
-                        AddTradeUserState(request.TradeUserRequest, context);
+                        request.TradeUserInfo.State = new State { Description = _States._TradeUser.IOI };
+                        AddTradeUserState(request.TradeUserInfo, context);
                     }
-                    response.NextActions = GetTradeActions(request.TradeUserRequest, context).Result;
+                    response.NextActions = GetTradeActions(request.TradeUserInfo, context).Result;
 
 
                     break;
@@ -433,7 +433,7 @@ namespace Need4
             return Task.FromResult(response);
         }
 
-        private Trade GetDetailedTradeView(TradeUserRequest request, ServerCallContext context)
+        private Trade GetDetailedTradeView(TradeUserInfo request, ServerCallContext context)
         {
             Trade trade = new Trade();
             var q = from t in db.Trades

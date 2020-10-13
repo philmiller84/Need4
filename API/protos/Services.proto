@@ -10,10 +10,12 @@ import "protos/Permission.proto";
 import "protos/Sale.proto";
 import "protos/Trade.proto";
 import "protos/User.proto";
+import "protos/Vote.proto";
 
 service CommunityService {
 	rpc GetAllCommunities (google.protobuf.Empty) returns (CommunityList);
 	rpc GetCommunityMembers (Community) returns (MemberList);
+	rpc GetOpenDecisions (Community) returns (DecisionList);
 }
 
 service ActivityService {
@@ -23,13 +25,13 @@ service ActivityService {
 service TradeService {
 	rpc CreateTrade (Trade) returns (ActionResponse);
 	rpc GetOpenTrades (google.protobuf.Empty) returns (TradeList);
-	rpc GetTradeActions (TradeUserRequest) returns (TradeActionList);
+	rpc GetTradeActions (TradeUserInfo) returns (ActionList);
 	rpc DoTradeAction(TradeActionRequest) returns (TradeActionResponse);
-	rpc GetPermissions (TradeUserRequest) returns (PermissionSet);
+	rpc GetPermissions (TradeUserInfo) returns (PermissionSet);
 	rpc AddPermission (PermissionRequest) returns (PermissionSet);
-	rpc GetTradeUserState (TradeUserRequest) returns (State);
-	rpc AddTradeUserState (TradeUserRequest) returns (State);
-	rpc CheckPermissions (TradeUserRequest) returns (PermissionSet);
+	rpc GetTradeUserState (TradeUserInfo) returns (State);
+	rpc AddTradeUserState (TradeUserInfo) returns (State);
+	rpc CheckPermissions (TradeUserInfo) returns (PermissionSet);
 	rpc GetUserTrades (User) returns (TradeList);
 }
 

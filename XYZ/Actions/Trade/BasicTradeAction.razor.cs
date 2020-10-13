@@ -31,8 +31,11 @@ namespace XYZ.Actions
         protected override void OnParametersSet()
         {
             InitializeParameters();
+
             if(authorization.Result.Succeeded)
+            {
                 DoAction();
+            }
         }
     }
     public abstract class BasicTradeAction : ComponentBase
@@ -47,7 +50,8 @@ namespace XYZ.Actions
         protected Dictionary<string,string> actionKeyValuePairs { get; set; }
         protected Need4Protocol.User user { get; set; }
         protected TradeService.TradeServiceClient tradeClient;
-        protected TradeUserRequest tradeUserRequest;
+        protected TradeUserInfo tradeUserInfo;
+        protected TradeActionResponse tradeActionResponse;
 
         protected override void OnInitialized()
         {
@@ -59,9 +63,9 @@ namespace XYZ.Actions
         protected virtual void InitializeParameters()
         {
             base.OnParametersSet();
-            tradeUserRequest = user != null ?
-                new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = tradeId } :
-                new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = tradeId };
+            tradeUserInfo = user != null ?
+                new TradeUserInfo { AuthenticatedUserId = user.Id, TradeId = tradeId } :
+                new TradeUserInfo { UnauthenticatedUser = new Empty(), TradeId = tradeId };
 
             actionKeyValuePairs = new Dictionary<string, string> { { "tradeId", tradeId.ToString()} };
         }

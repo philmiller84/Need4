@@ -1,0 +1,41 @@
+﻿@page "/members/vote"
+<h3>Vote on issues below. All issues have chat!!!</h3>
+
+
+@foreach(var decision in VotingItems)
+{
+    <VotingItem Decision="@decision" />
+}
+
+@code {
+
+    public List<Decision> VotingItems { get; set; }
+
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        VotingItems = new List<Decision>();
+
+        var d = new Decision{Description = "This guy did stuff", Type = "Confirmation", Actions = new ActionList()};
+        d.Actions.Actions.Add(new ActionDetails { Name = "Kick", Method = String.Format("/vote/kick/{0}", -1) });
+        d.Actions.Actions.Add(new ActionDetails { Name = "Pass", Method = String.Format("/vote/pass/{0}", -1) });
+        VotingItems.Add(d);
+
+        d = new Decision{Description = "Other guy did stuff", Type = "Confirmation", Actions = new ActionList()};
+        d.Actions.Actions.Add(new ActionDetails { Name = "Kick", Method = String.Format("/vote/kick/{0}", -2) });
+        d.Actions.Actions.Add(new ActionDetails { Name = "Pass", Method = String.Format("/vote/pass/{0}", -2) });
+        VotingItems.Add(d);
+
+        d = new Decision{Description = "Some rule change", Type = "Confirmation", Actions = new ActionList()};
+        d.Actions.Actions.Add(new ActionDetails { Name = "Agree", Method = String.Format("/vote/agree/{0}", -3) });
+        d.Actions.Actions.Add(new ActionDetails { Name = "Disagree", Method = String.Format("/vote/disagree/{0}", -3) });
+        VotingItems.Add(d);
+
+        d = new Decision{Description = "Name change for community", Type = "Open poll", Actions = new ActionList()};
+        d.Actions.Actions.Add(new ActionDetails { Name = "Choose", Method = String.Format("/vote/choose/{0}", -4) });
+        d.Actions.Actions.Add(new ActionDetails { Name = "Suggest", Method = String.Format("/vote/suggest/{0}", -4) });
+        VotingItems.Add(d);
+    }
+}

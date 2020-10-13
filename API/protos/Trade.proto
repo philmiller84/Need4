@@ -6,7 +6,7 @@ import "protos/Item.proto";
 import "protos/User.proto";
 import "protos/Permission.proto";
 
-message TradeUserRequest {
+message TradeUserInfo {
 	int32 trade_id = 1;
 	oneof user_info {
 		int32 authenticated_user_id = 2;
@@ -16,18 +16,15 @@ message TradeUserRequest {
 }
 
 message TradeActionRequest {
-	TradeUserRequest trade_user_request = 1;
+	TradeUserInfo trade_user_info = 1;
 	string action_name = 2;
 }
 
 message TradeActionResponse{
 	Trade trade = 1;
-    TradeActionList next_actions = 2;
+    ActionList next_actions = 2;
 }
 
-message TradeActionList {
-	repeated ActionDetails actions = 1;
-}
 
 message TradeList {
 	repeated Trade Trades = 1;

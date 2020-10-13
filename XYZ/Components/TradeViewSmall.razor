@@ -1,15 +1,17 @@
 ﻿
+@using _Trade = StaticData.Constants._Actions._Trade; 
+
 @if (TradeIsPopulated(@trade))
 {
-<div @onclick="@(_ => NavigationManager.NavigateTo(String.Format("/trade/get/{0}", trade.Id)))">
-    <p>Trade started: @trade.TimeStarted</p>
-    <div class="row mb-3">
-    @foreach (TradeItemDetails i in trade.TradeItemList.TradeItemDetails.ToList())
-    {
-        <div class="col-lg-4 themed-grid-col">@i.Item.Name</div>
-    }
+    <div @onclick="@(_ => NavigationManager.NavigateTo(Utility.ActionRouteReplaceSingle(_Trade.GET, trade.Id.ToString())))">
+        <p>Trade started: @trade.TimeStarted</p>
+        <div class="row mb-3">
+            @foreach (TradeItemDetails i in trade.TradeItemList.TradeItemDetails.ToList())
+            {
+                <div class="col-lg-4 themed-grid-col">@i.Item.Name</div>
+            }
+        </div>
     </div>
-</div>
 }
 else
 {
@@ -20,9 +22,6 @@ else
     [Parameter]
     public Trade trade { get; set; }
 
-    override protected void OnParametersSet()
-    {
-    }
     bool TradeIsPopulated(Trade t)
     {
         return trade.TradeItemList != null && trade.TradeItemList.TradeItemDetails != null;

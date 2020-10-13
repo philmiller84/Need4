@@ -30,12 +30,12 @@ namespace Helpers
             UserService.UserServiceClient userClient = service.GetUserClient();
             Need4Protocol.User user = userClient.GetUser(new Need4Protocol.User { Email = email });
 
-            TradeUserRequest tradeUserRequest = user != null ?
-                new TradeUserRequest { AuthenticatedUserId = user.Id, TradeId = resource.Id} :
-                new TradeUserRequest { UnauthenticatedUser = new Empty(), TradeId = resource.Id };
+            TradeUserInfo tradeUserInfo = user != null ?
+                new TradeUserInfo { AuthenticatedUserId = user.Id, TradeId = resource.Id} :
+                new TradeUserInfo { UnauthenticatedUser = new Empty(), TradeId = resource.Id };
 
             TradeService.TradeServiceClient tradeClient = service.GetTradeClient();
-            PermissionSet permissions = tradeClient.GetPermissions(tradeUserRequest);
+            PermissionSet permissions = tradeClient.GetPermissions(tradeUserInfo);
 
             bool hasJoinTradePermission = (from p in permissions.Permissions
                                           where p.PermissionType.Name == _Permissions.BASIC

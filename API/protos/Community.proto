@@ -14,3 +14,4 @@ message CommunityDetails {
 	int32 community_id = 1;
 	int32 tier = 2;
 }
+
