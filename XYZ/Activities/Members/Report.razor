@@ -1,0 +1,104 @@
+﻿@page "/members/report"
+<h3>Report a member</h3>
+
+
+
+<EditForm Model="MemberReport">
+
+
+    <div class="row mb-3">
+        <input @bind="@MemberReport.Name" @bind:event="oninput" @onkeyup="SearchBoxKeyPress" />
+    </div>
+
+    <div class="row mb-3">
+        <InputTextArea @bind-Value="MemberReport.Reason" />
+    </div>
+            
+    <div class="row mb-3">
+        <button class="btn" type="button" @onclick="SearchClick">Search</button>
+        <button class="btn" type="button" @onclick="ClearClick">Clear</button>
+    </div>
+</EditForm>
+
+<div>
+    <ul>
+    @foreach(var nameMatch in Matches)
+    {
+        <li>
+            @nameMatch
+        </li>
+    }
+    </ul>
+</div>
+
+@code {
+
+    public List<string> Matches { get; set; } = new List<string>();
+    public List<string> MemberList { get; set; } = new List<string>();
+    public MemberReport MemberReport { get; set; } = new MemberReport();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        MemberList.Add("Joe");
+        MemberList.Add("Jim");
+        MemberList.Add("John");
+        MemberList.Add("Adam");
+        MemberList.Add("James");
+    }
+
+
+    protected void SearchClick()
+    {
+        if (string.IsNullOrEmpty(MemberReport.Name))
+        {
+            //LoadBooks(int.Parse(Page));
+            return;
+        }
+
+        //Search(SearchTerm, int.Parse(Page));
+    }
+
+    private void Search(string term, int page)
+    {
+        Action<string> action = async (token) =>
+        {
+            //BooksClient.Token = token;
+            //Books = await BooksClient.SearchBooks(term, page);
+
+            StateHasChanged();
+        };
+
+        //RegisteredFunction.InvokeUnmarshalled<bool>("executeWithToken", action);
+    }
+
+    protected void SearchBoxKeyPress(KeyboardEventArgs ev)
+    {
+        if (ev.Key == "Enter")
+        {
+            SearchClick();
+        }
+        else
+        {
+            string name = MemberReport.Name;
+            var q = from x in MemberList
+                    where x.StartsWith(MemberReport.Name)
+                    select x;
+
+
+            Matches.Clear();
+
+            if(name != String.Empty)
+                Matches.AddRange(q.ToList());
+        }
+            
+        StateHasChanged();
+    }
+
+    protected void ClearClick()
+    {
+        MemberReport.Name = "";
+        //LoadBooks(1);
+    }
+}

@@ -25,3 +25,9 @@ message MemberInvite {
 	int32 status = 4;
 }
 
+
+message MemberReport {
+	string name = 1;
+	string reason = 2;
+
+}
