@@ -29,6 +29,12 @@ namespace Need4
         }
 
 
+        public override Task<ActionResponse> DoReportMember(Member c, ServerCallContext context)
+        {
+            var response = new ActionResponse();
+            return Task.FromResult(response);
+        }
+
         public override Task<MemberList> GetCommunityMembers(Community c, ServerCallContext context)
         {
             MemberList memberList = new MemberList();

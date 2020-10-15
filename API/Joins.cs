@@ -10,6 +10,11 @@ namespace Need4Protocol
     //    }
     //    public ICollection<Permission> Permissions { get; set; } 
     //}
+    public partial class MemberReport
+    {
+        public Member ReportingMember { get; set; }
+        public Member ReportedMember { get; set; }
+    }
 
     public partial class ItemList
     {
@@ -96,9 +101,13 @@ namespace Need4Protocol
         partial void OnConstruction()
         {
             CommunityMember = new HashSet<CommunityMember>();
+            MembersReported = new HashSet<MemberReport>();
+            MembersReporting = new HashSet<MemberReport>();
         }
 
         public ICollection<CommunityMember> CommunityMember { get; set; }
+        public ICollection<MemberReport> MembersReported { get; set; }
+        public ICollection<MemberReport> MembersReporting { get; set; }
         public User User { get; set; }
     }
     public class CommunityMember

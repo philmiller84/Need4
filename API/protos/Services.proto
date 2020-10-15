@@ -16,6 +16,7 @@ service CommunityService {
 	rpc GetAllCommunities (google.protobuf.Empty) returns (CommunityList);
 	rpc GetCommunityMembers (Community) returns (MemberList);
 	rpc GetOpenDecisions (Community) returns (DecisionList);
+	rpc DoReportMember(Member) returns (ActionResponse);
 }
 
 service ActivityService {

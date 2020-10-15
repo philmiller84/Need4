@@ -39,6 +39,7 @@ namespace Models
             OnCreateCommunities(modelBuilder.Entity<Community>());
             OnCreateCommunityTrades(modelBuilder.Entity<CommunityTrade>());
             OnCreateCommunityMembers(modelBuilder.Entity<CommunityMember>());
+            OnCreateMemberReports(modelBuilder.Entity<MemberReport>());
             //OnCreateRelationshipStates(modelBuilder.Entity<RelationshipState>());
             OnCreateRelationshipTypes(modelBuilder.Entity<RelationshipType>());
             OnCreatePermissions(modelBuilder.Entity<Permission>());
@@ -53,6 +54,21 @@ namespace Models
             OnCreateSaleItemDetails(modelBuilder.Entity<SaleItemDetails>());
             OnCreateSaleItemList(modelBuilder.Entity<SaleItemList>());
             OnCreateSale(modelBuilder.Entity<Sale>());
+        }
+
+        public DbSet<MemberReport> MemberReports { get; set; }
+        private void OnCreateMemberReports(EntityTypeBuilder<MemberReport> e)
+        {
+            e.HasKey(t => t.Id);
+            e.Property(t => t.Id).ValueGeneratedOnAdd();
+
+            e.HasOne(d => d.ReportingMember)
+                .WithMany(p => p.MembersReporting)
+                .HasForeignKey(d => d.ReportingMemberId);
+
+            e.HasOne(d => d.ReportedMember)
+                .WithMany(p => p.MembersReported)
+                .HasForeignKey(d => d.ReportedMemberId);
         }
 
         public DbSet<Member> Members { get; set; }

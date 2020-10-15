@@ -1,13 +1,12 @@
 ﻿@page "/members/report"
+@inject Need4Service Need4Service 
 <h3>Report a member</h3>
 
 
 
 <EditForm Model="MemberReport">
-
-
     <div class="row mb-3">
-        <input @bind="@MemberReport.Name" @bind:event="oninput" @onkeyup="SearchBoxKeyPress" />
+        <input @bind="@MemberReport.ReportedMember.User.Name" @bind:event="oninput" @onkeyup="SearchBoxKeyPress" />
     </div>
 
     <div class="row mb-3">
@@ -22,10 +21,10 @@
 
 <div>
     <ul>
-    @foreach(var nameMatch in Matches)
+    @foreach(var memberMatch in Matches)
     {
         <li>
-            @nameMatch
+            <button @onclick="() => ReportMember(memberMatch)">@memberMatch.User.Name</button>
         </li>
     }
     </ul>
@@ -33,25 +32,37 @@
 
 @code {
 
-    public List<string> Matches { get; set; } = new List<string>();
-    public List<string> MemberList { get; set; } = new List<string>();
-    public MemberReport MemberReport { get; set; } = new MemberReport();
+    private CommunityService.CommunityServiceClient communityClient;
+    public List<Member> Matches { get; set; } = new List<Member>();
+    public List<Member> MemberList { get; set; } = new List<Member>();
+    public MemberReport MemberReport { get; set; } = new MemberReport { ReportedMember = new Member { User = new User() } };
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        communityClient = Need4Service.GetCommunityClient();
+    }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
 
-        MemberList.Add("Joe");
-        MemberList.Add("Jim");
-        MemberList.Add("John");
-        MemberList.Add("Adam");
-        MemberList.Add("James");
+        MemberList.Add(new Member {User = new User { Name = "Joe"}});
+        MemberList.Add(new Member {User = new User { Name = "Jim"}});
+        MemberList.Add(new Member {User = new User { Name = "John"}});
+        MemberList.Add(new Member {User = new User { Name = "Adam"}});
+        MemberList.Add(new Member {User = new User { Name = "James"}});
     }
 
 
+    public void ReportMember(Member memberToReport)
+    {
+        communityClient.DoReportMember(memberToReport);
+    }
+
     protected void SearchClick()
     {
-        if (string.IsNullOrEmpty(MemberReport.Name))
+        if (string.IsNullOrEmpty(MemberReport.ReportedMember.User.Name))
         {
             //LoadBooks(int.Parse(Page));
             return;
@@ -81,9 +92,9 @@
         }
         else
         {
-            string name = MemberReport.Name;
+            string name = MemberReport.ReportedMember.User.Name;
             var q = from x in MemberList
-                    where x.StartsWith(MemberReport.Name)
+                    where x.User.Name.ToUpper().StartsWith(MemberReport.ReportedMember.User.Name.ToUpper())
                     select x;
 
 
@@ -92,13 +103,16 @@
             if(name != String.Empty)
                 Matches.AddRange(q.ToList());
         }
-            
+
         StateHasChanged();
     }
 
     protected void ClearClick()
     {
-        MemberReport.Name = "";
+        MemberReport.ReportedMember.User.Name = "";
+        MemberReport.Reason = "";
+        Matches.Clear();
+        StateHasChanged();
         //LoadBooks(1);
     }
 }
