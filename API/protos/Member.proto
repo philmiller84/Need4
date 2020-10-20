@@ -1,6 +1,7 @@
 ﻿syntax = "proto3";
 package Need4Protocol;
 import "protos/Community.proto";
+import "protos/User.proto";
 
 message MemberList {
 	repeated MemberDetails members = 1;
@@ -8,7 +9,7 @@ message MemberList {
 
 message Member {
 	int32 id = 1;
-	int32 user_id = 2;
+	User user = 2;
 	//int32 community_id = 3;
 }
 
@@ -27,7 +28,7 @@ message MemberInvite {
 
 message MemberReport {
 	int32 id = 1;
-	int32 reporting_member_id = 2;
-	int32 reported_member_id = 3;
+	Member reporting_member = 2;
+	Member reported_member = 3;
 	string reason = 4;
 }

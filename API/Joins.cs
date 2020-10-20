@@ -12,8 +12,8 @@ namespace Need4Protocol
     //}
     public partial class MemberReport
     {
-        public Member ReportingMember { get; set; }
-        public Member ReportedMember { get; set; }
+        public int ReportingMemberId { get; set; }
+        public int ReportedMemberId { get; set; }
     }
 
     public partial class ItemList
@@ -108,7 +108,7 @@ namespace Need4Protocol
         public ICollection<CommunityMember> CommunityMember { get; set; }
         public ICollection<MemberReport> MembersReported { get; set; }
         public ICollection<MemberReport> MembersReporting { get; set; }
-        public User User { get; set; }
+        public int UserId { get; set; }
     }
     public class CommunityMember
     {

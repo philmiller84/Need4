@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 using Need4Protocol;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -29,9 +30,30 @@ namespace Need4
         }
 
 
-        public override Task<ActionResponse> DoReportMember(Member c, ServerCallContext context)
+        public override Task<ActionResponse> DoReportMember(MemberReport r, ServerCallContext context)
         {
             var response = new ActionResponse();
+
+            try
+            {
+                var z = from x in db.Members
+                        join u in db.Users on x.UserId equals u.Id
+                        where u.Name == r.ReportingMember.User.Name
+                        select x;
+                var q = from x in db.Members
+                        join u in db.Users on x.UserId equals u.Id
+                        join y in db.Members on r.ReportedMember.User.Name equals y.User.Name
+                        where u.Name == r.ReportingMember.User.Name
+                        select new MemberReport { ReportedMember = y, ReportingMember = x, Reason = r.Reason } ;
+                db.Add(q.First());
+                db.SaveChanges();
+                response.Result = (int)HttpStatusCode.OK;
+            }
+            catch 
+            {
+                response.Result = (int)HttpStatusCode.Forbidden;
+            }
+
             return Task.FromResult(response);
         }
 

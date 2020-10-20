@@ -52,12 +52,16 @@
         MemberList.Add(new Member {User = new User { Name = "John"}});
         MemberList.Add(new Member {User = new User { Name = "Adam"}});
         MemberList.Add(new Member {User = new User { Name = "James"}});
+        MemberList.Add(new Member {User = new User { Name = "Phil"}});
     }
 
 
     public void ReportMember(Member memberToReport)
     {
-        communityClient.DoReportMember(memberToReport);
+        MemberReport memberReport = this.MemberReport;
+        memberReport.ReportedMember = memberToReport;
+        memberReport.ReportingMember = new Member { User = Utility.GetUser() };
+        communityClient.DoReportMember(memberReport);
     }
 
     protected void SearchClick()
